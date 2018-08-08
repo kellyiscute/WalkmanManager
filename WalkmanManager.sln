@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "WalkmanManager", "WalkmanManager\WalkmanManager.vbproj", "{918DC2FB-7054-47E2-B4AF-9B36843023F0}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "UnitTest", "UnitTest\UnitTest.vbproj", "{8C6F2FDB-D5C3-44DD-8FA4-18B80F6A4CCE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{918DC2FB-7054-47E2-B4AF-9B36843023F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{918DC2FB-7054-47E2-B4AF-9B36843023F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{918DC2FB-7054-47E2-B4AF-9B36843023F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{918DC2FB-7054-47E2-B4AF-9B36843023F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C6F2FDB-D5C3-44DD-8FA4-18B80F6A4CCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C6F2FDB-D5C3-44DD-8FA4-18B80F6A4CCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C6F2FDB-D5C3-44DD-8FA4-18B80F6A4CCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C6F2FDB-D5C3-44DD-8FA4-18B80F6A4CCE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CDC25F29-C11C-4FE5-9753-921621116CD1}
+	EndGlobalSection
+EndGlobal
