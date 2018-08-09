@@ -24,15 +24,15 @@
 			Database.SaveSetting("song_dir", "SongLib")
 		End If
 		Try
-			Await Task.Run(Function()
-							   Dim lstNew = upd.FindNew(Database.GetSetting("song_dir"))
-							   Dim lstLost = upd.FindLost()
-							   Return New Object() {lstNew, lstLost}
-						   End Function)
+			Dim NewLost = Await Task.Run(Function()
+											 Dim lstNew = upd.FindNew(Database.GetSetting("song_dir"))
+											 Dim lstLost = upd.FindLost()
+											 Return New Object() {lstNew, lstLost}
+										 End Function)
 		Catch ex As TaskCanceledException
+
 		Catch unknown As Exception
 		End Try
-
 
 		'Console.WriteLine(lstNew)
 		DlgWindowRoot.IsOpen = False

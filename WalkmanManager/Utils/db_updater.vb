@@ -23,7 +23,7 @@ Public Class DbUpdater
 		Dim lstNew As New List(Of String)
 		For Each song In songFiles
 			Dim t As New Track(song)
-			BuildQueryString(cmd, "select count(*) from songs where path = ?", New Object() {song})
+			BuildQuery(cmd, "select count(*) from songs where path = ?", New Object() {song})
 			Dim reader = cmd.ExecuteReader()
 			reader.Read()
 			If reader(0) = 0 Then
