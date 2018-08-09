@@ -51,7 +51,7 @@ Imports System.Linq
 		cmd.ExecuteNonQuery()
 		Dim key As String = "sb"
 		Dim value As String = "sb1"
-		Database.BuildQueryString(cmd, "select * from settings where key = ? and value = ?", New Object() {key, value})
+		Database.BuildQuery(cmd, "select * from settings where key = ? and value = ?", New Object() {key, value})
 		Debug.Print(cmd.CommandText)
 		Dim r = cmd.ExecuteReader()
 		If r.HasRows Then
