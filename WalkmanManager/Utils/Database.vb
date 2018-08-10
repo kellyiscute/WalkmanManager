@@ -368,24 +368,6 @@ Public Class Database
 
 	End Sub
 
-	'TODO: This Function has NOT been debugged!
-	Public Shared Function IsExist(ByVal songName As String, Optional ByVal songArtist As String = Nothing) As Boolean
-		Dim conn = Connect()
-		Dim cmd = New SQLiteCommand(conn)
-		If Not IsNothing(songArtist) Then
-			cmd.CommandText = String.Format("select count(*) from songs where title = '{0}' and artists = '?'", New Object() {songName, songArtist})
-		Else
-			cmd.CommandText = String.Format("select count(*) from songs where title = '{0}'", New Object() {songName})
-		End If
-		Dim r = cmd.ExecuteReader
-		If Int(r.Read()) Then
-			Return True
-		Else
-			Return False
-		End If
-		'conn.Close()
-	End Function
-
 	''' <summary>
 	''' Get song Id with path
 	''' </summary>
