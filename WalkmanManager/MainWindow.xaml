@@ -10,7 +10,7 @@
         <Grid>
             <mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="50">
                 <Grid>
-                    <Label Margin="5,7,0,3" Foreground="#DDFFFFFF" FontSize="18" HorizontalAlignment="Left" Width="314">Walkman Manager</Label>
+                    <Label Margin="10,8,0,7" Foreground="#DDFFFFFF" FontSize="18" HorizontalAlignment="Left" Width="174">Walkman Manager</Label>
                     <Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50" mD:ShadowAssist.ShadowDepth="Depth0">
                         <mD:PackIcon Kind="Close" />
                     </Button>
@@ -25,7 +25,7 @@
             <mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50" Margin="0,50,0,0" Background="WhiteSmoke">
                 <Grid>
                     <ListBox x:Name="LstTopbar" Style="{StaticResource MaterialDesignToolToggleFlatListBox}" Height="50" SelectedIndex="0" HorizontalAlignment="Left" Width="337">
-                        <ListBoxItem Height="50">
+                        <ListBoxItem x:Name="TabItmLocal" Height="50">
                             <WrapPanel>
                                 <mD:PackIcon Kind="DesktopTower" />
                                 <TextBlock FontSize="17">本地</TextBlock>
@@ -64,7 +64,7 @@
                                 <Grid>
                                     <mD:ColorZone Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35" Margin="8,5,0,0" HorizontalAlignment="Left" Width="251">
                                         <Grid>
-                                            <TextBox mD:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" VerticalAlignment="Bottom" mD:HintAssist.Hint="搜索" Margin="10,2,35,2" Height="35"></TextBox>
+                                            <TextBox VerticalContentAlignment="Center" mD:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" VerticalAlignment="Bottom" mD:HintAssist.Hint="搜索" Margin="10,0,35,0" Height="35"></TextBox>
                                             <Button x:Name="BtnSearchSong" Style="{DynamicResource MaterialDesignToolButton}" HorizontalAlignment="Right" Width="35" VerticalAlignment="Top" Height="35" mD:RippleAssist.IsCentered="True">
                                                 <mD:PackIcon Kind="Magnify" Height="24" Width="22" />
                                             </Button>
