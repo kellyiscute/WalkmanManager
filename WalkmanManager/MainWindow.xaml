@@ -72,11 +72,11 @@
                                     </mD:ColorZone>
                                     <Button HorizontalAlignment="Left" Margin="264,5,0,0" VerticalAlignment="Top" Width="84" Height="35" Style="{DynamicResource MaterialDesignFlatButton}">
                                         <WrapPanel>
-                                            <mD:PackIcon Kind="ArrowUpBold" Style="{DynamicResource MaterialDesignFlatButton}"></mD:PackIcon>
+                                            <mD:PackIcon Kind="ArrowUpBold"></mD:PackIcon>
                                             <TextBlock>上移</TextBlock>
                                         </WrapPanel>
                                     </Button>
-                                    <Button HorizontalAlignment="Left" Margin="353,5,0,0" VerticalAlignment="Top" Width="84" Height="35">
+                                    <Button HorizontalAlignment="Left" Margin="353,5,0,0" VerticalAlignment="Top" Width="84" Height="35" Style="{DynamicResource MaterialDesignFlatButton}">
                                         <WrapPanel>
                                             <mD:PackIcon Kind="ArrowDownBold"></mD:PackIcon>
                                             <TextBlock>下移</TextBlock>
@@ -87,11 +87,14 @@
                                     </Button>
                                 </Grid>
                             </mD:ColorZone>
-                            <ScrollViewer Margin="0,52,0.333,0.333">
-                                <DataGrid>
-
-                                </DataGrid>
-                            </ScrollViewer>
+                            <DataGrid x:Name="DatSongList" AutoGenerateColumns="false" VerticalScrollBarVisibility="Visible" Margin="0,50,0,0" ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID"/>
+                                    <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220"/>
+                                    <DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220"/>
+                                    <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </Grid>
                     </Grid>
                 </mD:DialogHost>

@@ -96,7 +96,7 @@
     </ApplicationDefinition>
     <Compile Include="Utils\Database.vb" />
     <Compile Include="Utils\db_updater.vb" />
-    <Compile Include="dlg_progress.xaml.vb">
+    <Compile Include="Dialogs\dlg_progress.xaml.vb">
       <DependentUpon>dlg_progress.xaml</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
@@ -106,7 +106,7 @@
       <DependentUpon>SongItm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\StringExtensionMethods.vb" />
-    <Page Include="dlg_progress.xaml">
+    <Page Include="Dialogs\dlg_progress.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
