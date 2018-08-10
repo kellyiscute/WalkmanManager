@@ -21,10 +21,13 @@ Public Class Database
 
 #Region "Structure Definition"
 	Public Structure SongInfo
-		Dim Id As Integer
-		Dim Title As String
-		Dim Artists As String
-		Dim Path As String
+		Public Property Id As Integer
+
+		Public Property Title As String
+
+		Public Property Artists As String
+
+		Public Property Path As String
 	End Structure
 
 	Public Structure PlaylistDetail

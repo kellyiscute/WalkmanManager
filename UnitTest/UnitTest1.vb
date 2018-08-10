@@ -114,4 +114,24 @@ Imports System.Linq
 		Database.CreateDatabase()
 	End Sub
 
+	<TestMethod()> Public Sub GetSongs()
+		Dim lstSongs = Database.GetSongs()
+		For Each s In lstSongs
+			Console.WriteLine("------------------------------------------------------")
+			Console.WriteLine("| Id     : " & s.Id)
+			Console.WriteLine("| Title  : " & s.Title)
+			Console.WriteLine("| Artists: " & s.Artists)
+			Console.WriteLine("| Path   : " & s.Path)
+			Console.WriteLine("------------------------------------------------------")
+		Next
+	End Sub
+
+	<TestMethod()> Public Sub String_Extention_ToStringArray()
+		Dim str = "abcdefghijklmnopqrstuvwxyz"
+		Dim array = str.ToStringArray()
+		For Each a In array
+			Console.WriteLine(a)
+		Next
+	End Sub
+
 End Class

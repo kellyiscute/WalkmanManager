@@ -11,4 +11,13 @@
 		Next
 		Return result = values.Count()
 	End Function
+
+	<System.Runtime.CompilerServices.Extension>
+	Public Function ToStringArray(str As String) As String()
+		Dim array(str.Length - 1) As String
+		For i = 0 To str.Length - 1
+			array(i) = str(i)
+		Next
+		Return array
+	End Function
 End Module
