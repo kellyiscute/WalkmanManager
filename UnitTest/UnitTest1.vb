@@ -39,7 +39,7 @@ Imports System.Linq
 
 	<TestMethod> Public Sub ParamQueryTest()
 		Dim connstrBuilder = New SQLiteConnectionStringBuilder
-		connstrBuilder.DataSource = "test.db"
+		connstrBuilder.DataSource = "data.db"
 		Dim conn = New SQLiteConnection(connstrBuilder.ConnectionString)
 		conn.Open()
 		Dim cmd = conn.CreateCommand()
@@ -61,6 +61,7 @@ Imports System.Linq
 		Else
 			Console.WriteLine("Empty")
 		End If
+		r.Close()
 		conn.Close()
 	End Sub
 
@@ -107,6 +108,10 @@ Imports System.Linq
 		For Each itm As String In query
 			Console.WriteLine(itm)
 		Next
+	End Sub
+
+	<TestMethod()> Public Sub MakeDatabase()
+		Database.CreateDatabase()
 	End Sub
 
 End Class

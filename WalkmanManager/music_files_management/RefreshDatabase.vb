@@ -38,10 +38,11 @@ Public Class RefreshDatabase
         _databaseSongList.Clear()
         Dim song As Song
 
-        Dim connstrBuilder = New System.Data.SQLite.SQLiteConnectionStringBuilder
-        connstrBuilder.DataSource = "data.db"
-        Dim conn = New System.Data.SQLite.SQLiteConnection(connstrBuilder.ConnectionString)
-        conn.Open()
+		Dim connstrBuilder = New System.Data.SQLite.SQLiteConnectionStringBuilder With {
+			.DataSource = "data.db"
+		}
+		Dim conn = New System.Data.SQLite.SQLiteConnection(connstrBuilder.ConnectionString)
+		conn.Open()
         Dim cmd = New System.Data.SQLite.SQLiteCommand(conn)
         cmd.CommandText = String.Format("select id, title, artists, path from songs")
         Dim r = cmd.ExecuteReader
@@ -102,49 +103,49 @@ Public Class RefreshDatabase
         ReadDatabase()
     End Sub
 
-    '''' <returns>State that whether the function is still processing</returns>
-    ''' <summary>
-    ''' Add local songs to database
-    ''' </summary>
-    Public Sub AddSongsToDatabase()
-        For Each local_song In _localSongList
-            If Not Database.IsExist(local_song.title) Then
-                If vbOK = MessageBox.Show(String.Format("Do you want to add the song *{0}*, which is composed by {1} and lies in path {2}, to database?", local_song.title, local_song.artist, local_song.path), "Decision Making", vbYesNo) Then
-                    Database.AddSong(local_song.title, local_song.artist, local_song.path)
-                End If
-            End If
-        Next
-        'refresh database_song_list
-        ReadDatabase()
-        'Return True
-    End Sub
-    '''' <summary>
-    '''' [Warnings]: The Function shares the same process of the same-name function above
-    '''' </summary>
-    '''' <returns></returns>
-    'Public Function RefreshDatabase()
-    '    Dim matched_song_id As New List(Of Integer)
-    '    For Each local_song In local_song_list
-    '        Dim tmp_matched_id_list As List(Of Integer) = Database.GetSong_id(local_song.title)
-    '        For Each id In tmp_matched_id_list
-    '            If Not matched_song_id.Contains(id) Then
-    '                matched_song_id.Add(id)
-    '            End If
-    '        Next
-    '    Next
-    '    Dim database_id_list As List(Of Integer) = Database.GetSong_id()
-    '    'reverse the local_song_list in the limitation of matched_song_id
-    '    For Each database_id In database_id_list
-    '        If matched_song_id.Contains(database_id) Then
-    '            matched_song_id.Remove(database_id)
-    '        Else
-    '            matched_song_id.Add(database_id)
-    '        End If
-    '    Next
-    '    For Each deleting_id In matched_song_id
-    '        Database.RemoveSongFromLib(deleting_id)
-    '    Next
-    '    Return True
-    'End Function
+	'''' <returns>State that whether the function is still processing</returns>
+	''' <summary>
+	''' Add local songs to database
+	''' </summary>
+	'Public Sub AddSongsToDatabase()
+	'    For Each local_song In _localSongList
+	'        If Not Database.IsExist(local_song.title) Then
+	'            If vbOK = MessageBox.Show(String.Format("Do you want to add the song *{0}*, which is composed by {1} and lies in path {2}, to database?", local_song.title, local_song.artist, local_song.path), "Decision Making", vbYesNo) Then
+	'                Database.AddSong(local_song.title, local_song.artist, local_song.path)
+	'            End If
+	'        End If
+	'    Next
+	'    refresh database_song_list
+	'    ReadDatabase()
+	'    Return True
+	'End Sub
+	'''' <summary>
+	'''' [Warnings]: The Function shares the same process of the same-name function above
+	'''' </summary>
+	'''' <returns></returns>
+	'Public Function RefreshDatabase()
+	'    Dim matched_song_id As New List(Of Integer)
+	'    For Each local_song In local_song_list
+	'        Dim tmp_matched_id_list As List(Of Integer) = Database.GetSong_id(local_song.title)
+	'        For Each id In tmp_matched_id_list
+	'            If Not matched_song_id.Contains(id) Then
+	'                matched_song_id.Add(id)
+	'            End If
+	'        Next
+	'    Next
+	'    Dim database_id_list As List(Of Integer) = Database.GetSong_id()
+	'    'reverse the local_song_list in the limitation of matched_song_id
+	'    For Each database_id In database_id_list
+	'        If matched_song_id.Contains(database_id) Then
+	'            matched_song_id.Remove(database_id)
+	'        Else
+	'            matched_song_id.Add(database_id)
+	'        End If
+	'    Next
+	'    For Each deleting_id In matched_song_id
+	'        Database.RemoveSongFromLib(deleting_id)
+	'    Next
+	'    Return True
+	'End Function
 
 End Class
