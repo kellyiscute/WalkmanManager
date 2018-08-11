@@ -54,9 +54,14 @@
                                 <Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center">音乐</Label>
                             </ListBoxItem>
                             <Expander Header="播放列表" Width="207">
-                                <StackPanel>
-                                    <ListBoxItem>新建播放列表</ListBoxItem>
-                                </StackPanel>
+                                <ListBox>
+                                    <ListBoxItem Tag="NewPlaylist">
+                                        <WrapPanel>
+                                            <mD:PackIcon Kind="PlaylistPlus" />
+                                            <TextBlock>新建播放列表</TextBlock>
+                                        </WrapPanel>
+                                    </ListBoxItem>
+                                </ListBox>
                             </Expander>
                         </StackPanel>
                         <Grid x:Name="GridMusic" Margin="220,0,0,0">

@@ -49,6 +49,52 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DocumentationFile>WalkmanManager.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DocumentationFile>WalkmanManager.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>WalkmanManager.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>WalkmanManager.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42314</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ATL, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\z440.atl.core.2.4.2\lib\net30\ATL.dll</HintPath>
@@ -94,6 +140,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialogs\dlgDirSyncResult.xaml.vb">
+      <DependentUpon>dlgDirSyncResult.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\Database.vb" />
     <Compile Include="Utils\db_updater.vb" />
     <Compile Include="Dialogs\dlg_progress.xaml.vb">
@@ -106,6 +155,10 @@
       <DependentUpon>SongItm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\StringExtensionMethods.vb" />
+    <Page Include="Dialogs\dlgDirSyncResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\dlg_progress.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

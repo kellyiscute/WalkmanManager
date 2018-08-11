@@ -2,7 +2,8 @@
 Imports WalkmanManager.Database
 
 Class MainWindow
-	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) Handles CzTitle.MouseLeftButtonDown
+	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
+		Handles CzTitle.MouseLeftButtonDown
 		DragMove()
 	End Sub
 
@@ -27,19 +28,31 @@ Class MainWindow
 			SaveSetting("song_dir", "SongLib")
 		End If
 		Dim songs As List(Of SongInfo)
-		Try
-			Dim newLost = Await Task.Run(Async Function()
-											 Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
-											 Dim lstLost = Await upd.FindLost()
-											 songs = GetSongs()
-											 Return New Object() {lstNew, lstLost}
-										 End Function)
-		Catch ex As TaskCanceledException
-		Catch unknown As Exception
-		End Try
-		DatSongList.ItemsSource = songs
-		'Console.WriteLine(lstNew)
-		DlgWindowRoot.IsOpen = False
-	End Sub
 
+		Dim newLost = Await Task.Run(Async Function()
+										 Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
+										 Dim lstLost = Await upd.FindLost()
+										 songs = GetSongs()
+										 Dim SyncResult As String = ""
+										 If lstNew.Count > 0 Then
+											 SyncResult = "=========================发现以下新项目=========================" & vbNewLine
+											 For Each NewItem In lstNew
+												 SyncResult += NewItem & vbNewLine
+											 Next
+										 End If
+										 If lstLost.Count > 0 Then
+											 SyncResult += "=========================发现已删除项目=========================" & vbNewLine
+											 For Each LostItem In lstLost
+												 SyncResult += LostItem & vbNewLine
+											 Next
+										 End If
+										 Return SyncResult
+									 End Function)
+		DatSongList.ItemsSource = songs
+		DlgWindowRoot.IsOpen = False
+		If newLost <> "" Then
+			Dim DlgSyncResult = New dlgDirSyncResult(newLost)
+			Await DialogHost.Show(DlgSyncResult, "window-root")
+		End If
+	End Sub
 End Class
