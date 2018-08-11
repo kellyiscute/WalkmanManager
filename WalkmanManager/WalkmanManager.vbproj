@@ -143,6 +143,9 @@
     <Compile Include="Dialogs\dlgDirSyncResult.xaml.vb">
       <DependentUpon>dlgDirSyncResult.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DlgSongDetail.xaml.vb">
+      <DependentUpon>DlgSongDetail.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\Database.vb" />
     <Compile Include="Utils\db_updater.vb" />
     <Compile Include="Dialogs\dlg_progress.xaml.vb">
@@ -156,6 +159,10 @@
     </Compile>
     <Compile Include="Utils\StringExtensionMethods.vb" />
     <Page Include="Dialogs\dlgDirSyncResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DlgSongDetail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
