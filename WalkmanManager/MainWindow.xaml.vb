@@ -1,4 +1,5 @@
-﻿Imports MaterialDesignThemes.Wpf
+﻿Imports System.Windows.Shell
+Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
 
 Class MainWindow
@@ -54,5 +55,13 @@ Class MainWindow
 			Dim DlgSyncResult = New dlgDirSyncResult(newLost)
 			Await DialogHost.Show(DlgSyncResult, "window-root")
 		End If
+	End Sub
+
+	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
+		WindowChrome.SetWindowChrome(Me,
+									New WindowChrome() _
+										With {.GlassFrameThickness = New Thickness(0),
+										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5), .CornerRadius = New CornerRadius(0),
+										.CaptionHeight = 0})
 	End Sub
 End Class

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" ResizeMode="CanResizeWithGrip" WindowStyle="None" AllowsTransparency="True">
+        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" WindowStyle="None">
     <mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root">
         <Grid>
             <mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="50">
