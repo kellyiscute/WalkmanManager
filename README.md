@@ -23,9 +23,10 @@ You will also need to install the following packages in order to build this proj
  - atl
 
  To Install Packages, open up the nuget package manager console and copy the code
- `Install-Package MaterialDesignThemes -Version 2.5.0-ci1122`
- `Install-Package System.Data.SQLite -Version 1.0.108`
- `Install-Package z440.atl.core -Version 2.4.2`
+
+    Install-Package MaterialDesignThemes -Version 2.5.0-ci1122
+	Install-Package System.Data.SQLite -Version 1.0.108
+	Install-Package z440.atl.core -Version 2.4.2
 
 ## Third-Party Library
 
