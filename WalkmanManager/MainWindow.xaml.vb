@@ -92,4 +92,12 @@ Class MainWindow
 			End If
 		End If
 	End Sub
+
+	Private Sub ListBoxItem_Drop(sender As Object, e As DragEventArgs)
+		Console.WriteLine(e.Data.ToString)
+	End Sub
+
+	Private Sub ListBoxItem_DragOver(sender As Object, e As DragEventArgs)
+		
+	End Sub
 End Class

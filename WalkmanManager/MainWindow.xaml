@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" WindowStyle="None" Background="White">
     <mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White">
@@ -54,8 +55,8 @@
                                 <Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center">音乐</Label>
                             </ListBoxItem>
                             <Expander Header="播放列表" Width="207">
-                                <ListBox>
-                                    <ListBoxItem Tag="NewPlaylist">
+								<ListBox>
+                                    <ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop" DragOver="ListBoxItem_DragOver">
                                         <WrapPanel>
                                             <mD:PackIcon Kind="PlaylistPlus" />
                                             <TextBlock>新建播放列表</TextBlock>
@@ -92,14 +93,14 @@
                                     </Button>
                                 </Grid>
                             </mD:ColorZone>
-                            <DataGrid x:Name="DatSongList" AutoGenerateColumns="false" VerticalScrollBarVisibility="Visible" Margin="0,50,0,0" ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID"/>
-                                    <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220"/>
-                                    <DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220"/>
-                                    <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <DataGrid x:Name="DatSongList" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" AutoGenerateColumns="false" VerticalScrollBarVisibility="Visible" Margin="0,50,0,0" ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
+								<DataGrid.Columns>
+									<DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID"/>
+									<DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220"/>
+									<DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220"/>
+									<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200"/>
+								</DataGrid.Columns>
+							</DataGrid>
                         </Grid>
                     </Grid>
                 </mD:DialogHost>
@@ -107,3 +108,4 @@
         </Grid>
     </mD:DialogHost>
 </Window>
+
