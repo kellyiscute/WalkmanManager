@@ -3,7 +3,7 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 
 ## The author says `!Important`
 
-**This project is still under construction** and the first release will probably come by September ~~(if i work hard)~~.
+**This project is still under construction** and the first release will probably come by September ~~and it will probably be delayed to October~~.
 I will put a lot of hard work on performance and resource usage. I have been putting a lot of time testing and finding the best solution and the algorithm. Therefore, the release date may delay. I will do whatever I can to create the best user experience because I really understand how it feels using buggy and slow apps.
 **If you want to contribute to this project, continue reading.**
 
@@ -30,10 +30,10 @@ You will also need to install the following packages in order to build this proj
 
 ## Third-Party Library
 
-* [MaterialDesignThemes](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit)
+* [MaterialDesignThemes](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit) - As theme of the Application
 * SQLite
-* [atldotnet](https://github.com/Zeugma440/atldotnet)
-I used this library because ~~I am lazy~~ it is convenient
+* [atldotnet](https://github.com/Zeugma440/atldotnet) - To read IDv3 from audio files
+* [gong-wpf-dragdrop](https://github.com/punker76/gong-wpf-dragdrop) - To Complete Drag-and-Drop feature
 
 ## Contributing
 
