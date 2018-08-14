@@ -9,7 +9,8 @@
 		<mD:ColorZone Height="40" Mode="PrimaryMid">
 			<Grid>
 				<TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="0,12,47,12" TextAlignment="Center" />
-				<Button HorizontalAlignment="Right" Width="47" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0" Command="{x:Static mD:DialogHost.CloseDialogCommand}" IsCancel="True">
+				<Button HorizontalAlignment="Right" Width="47" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0"
+				        Command="{x:Static mD:DialogHost.CloseDialogCommand}" IsCancel="True">
 					<mD:PackIcon Kind="Close" />
 				</Button>
 			</Grid>
@@ -21,43 +22,48 @@
 				<Grid Height="30">
 					<WrapPanel VerticalAlignment="Center">
 						<mD:PackIcon VerticalAlignment="Center" Kind="MusicNote" />
-						<TextBlock Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBlockMusicTitle" Text="标题:"/>
-						<TextBox Margin="22,0,0,0" x:Name="TextBoxMusicTitle" MaxWidth="260" BorderThickness="0"/>
+						<TextBlock Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBlockMusicTitle" Text="标题:" />
+						<TextBox Margin="22,0,0,0" x:Name="TextBoxMusicTitle" MaxWidth="260" BorderThickness="0" MinWidth="50" />
 					</WrapPanel>
 				</Grid>
 				<Grid Height="30">
 					<WrapPanel VerticalAlignment="Center">
-						<mD:PackIcon Kind="Artist" VerticalAlignment="Center"/>
-						<TextBlock Margin="10,0,0,0" x:Name="TextBlockMusicArtists" VerticalAlignment="Center" Text="艺术家:"/>
-						<TextBox Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBoxMusicArtists" MaxWidth="260"  BorderThickness="0"></TextBox>
-					</WrapPanel>
-				</Grid>
-				<Grid>
-					<WrapPanel VerticalAlignment="Center">
-						<mD:PackIcon Kind="Album" VerticalAlignment="Center"/>
-						<TextBlock Margin="10,0,0,0" x:Name="TextBlockMusicAlbum" VerticalAlignment="Center" Text="专辑:"/>
-						<TextBox Margin="22,0,0,0" VerticalAlignment="Center" x:Name="TextBoxMusicAlbum" MaxWidth="260"  BorderThickness="0"></TextBox>
+						<mD:PackIcon Kind="Artist" VerticalAlignment="Center" />
+						<TextBlock Margin="10,0,0,0" x:Name="TextBlockMusicArtists" VerticalAlignment="Center" Text="艺术家:" />
+						<TextBox Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBoxMusicArtists" MaxWidth="260"
+						         BorderThickness="0" MinWidth="50" />
 					</WrapPanel>
 				</Grid>
 				<Grid Height="30">
 					<WrapPanel VerticalAlignment="Center">
-						<mD:PackIcon Kind="ClockStart" VerticalAlignment="Center"/>
-						<TextBlock Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBlockMusicDuration" Text="时间:"/>
-						<TextBox  Margin="22,0,0,0" VerticalAlignment="Center" IsReadOnly="True" MaxWidth="260" x:Name="TextBoxMusicDuration"  BorderThickness="0"></TextBox>
+						<mD:PackIcon Kind="Album" VerticalAlignment="Center" />
+						<TextBlock Margin="10,0,0,0" x:Name="TextBlockMusicAlbum" VerticalAlignment="Center" Text="专辑:" />
+						<TextBox Margin="22,0,0,0" VerticalAlignment="Center" x:Name="TextBoxMusicAlbum" MaxWidth="260"
+						         BorderThickness="0" MinWidth="50" />
 					</WrapPanel>
 				</Grid>
 				<Grid Height="30">
 					<WrapPanel VerticalAlignment="Center">
-						<mD:PackIcon Kind="Calendar" VerticalAlignment="Center"/>
-						<TextBlock Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBlockMusicYear" Text="年份:"/>
-						<TextBox  Margin="22,0,0,0" VerticalAlignment="Center" IsReadOnly="True" MaxWidth="260" x:Name="TextBoxMusicYear"  BorderThickness="0"></TextBox>
+						<mD:PackIcon Kind="ClockStart" VerticalAlignment="Center" />
+						<TextBlock Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBlockMusicDuration" Text="时间:" />
+						<TextBox Margin="22,0,0,0" VerticalAlignment="Center" IsReadOnly="True" MaxWidth="260"
+						         x:Name="TextBoxMusicDuration" mD:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" />
 					</WrapPanel>
 				</Grid>
 				<Grid Height="30">
 					<WrapPanel VerticalAlignment="Center">
-						<mD:PackIcon Kind="Transfer" VerticalAlignment="Center"/>
-						<TextBlock Margin="10,0,0,0" x:Name="TextBlockMusicBitRate" VerticalAlignment="Center" Text="码流率:"/>
-						<TextBox Margin="10,0,0,0" x:Name="TextBoxMusicBitRate" MaxWidth="260" VerticalAlignment="Center" IsReadOnly="True"  BorderThickness="0"></TextBox>
+						<mD:PackIcon Kind="Calendar" VerticalAlignment="Center" />
+						<TextBlock Margin="10,0,0,0" VerticalAlignment="Center" x:Name="TextBlockMusicYear" Text="年份:" />
+						<TextBox Margin="22,0,0,0" VerticalAlignment="Center" IsReadOnly="True" MaxWidth="260" x:Name="TextBoxMusicYear"
+						         mD:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" />
+					</WrapPanel>
+				</Grid>
+				<Grid Height="30">
+					<WrapPanel VerticalAlignment="Center">
+						<mD:PackIcon Kind="Transfer" VerticalAlignment="Center" />
+						<TextBlock Margin="10,0,0,0" x:Name="TextBlockMusicBitRate" VerticalAlignment="Center" Text="码流率:" />
+						<TextBox Margin="10,0,0,0" x:Name="TextBoxMusicBitRate" MaxWidth="260" VerticalAlignment="Center"
+						         IsReadOnly="True" mD:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" />
 					</WrapPanel>
 				</Grid>
 			</StackPanel>

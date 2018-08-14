@@ -21,7 +21,7 @@
                 <materialDesign:Card VerticalAlignment="Stretch">
                     <Grid>
                         <TextBox materialDesign:TextFieldAssist.DecorationVisibility="Collapsed" BorderThickness="0"
-                                 materialDesign:ShadowAssist.ShadowDepth="Depth2" x:Name="TextBoxResult" IsReadOnly="True" VerticalContentAlignment="Top" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                                 materialDesign:ShadowAssist.ShadowDepth="Depth2" x:Name="TextBoxResult" IsReadOnly="True" VerticalContentAlignment="Top" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="10"/>
                     </Grid>
                 </materialDesign:Card>
             </Grid>

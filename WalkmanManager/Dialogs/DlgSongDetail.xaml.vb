@@ -40,7 +40,12 @@ Public Class DlgSongDetail
 			str = 0 & str
 		End If
 		str += ":"
-		str += (Seconds Mod 60).ToString()
+		Dim sec = (Seconds Mod 60).ToString()
+		If sec.Length = 1 Then
+			str += "0" & sec
+		Else
+			str += sec
+		End If
 		Return str
 	End Function
 

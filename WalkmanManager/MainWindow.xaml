@@ -6,106 +6,123 @@
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" WindowStyle="None" Background="White">
-    <mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White">
-        <Grid>
-            <mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="50">
-                <Grid>
-                    <Label Margin="10,8,0,7" Foreground="#DDFFFFFF" FontSize="18" HorizontalAlignment="Left" Width="174">Walkman Manager</Label>
-                    <Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50" mD:ShadowAssist.ShadowDepth="Depth0">
-                        <mD:PackIcon Kind="Close" />
-                    </Button>
-                    <Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50" mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,50,0">
-                        <mD:PackIcon Kind="WindowMinimize" />
-                    </Button>
-                    <Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50" mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,100,0">
-                        <mD:PackIcon Kind="Settings" />
-                    </Button>
-                </Grid>
-            </mD:ColorZone>
-            <mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50" Margin="0,50,0,0" Background="WhiteSmoke">
-                <Grid>
-                    <ListBox x:Name="LstTopbar" Style="{StaticResource MaterialDesignToolToggleFlatListBox}" Height="50" SelectedIndex="0" HorizontalAlignment="Left" Width="337">
-                        <ListBoxItem x:Name="TabItmLocal" Height="50">
-                            <WrapPanel>
-                                <mD:PackIcon Kind="DesktopTower" />
-                                <TextBlock FontSize="17">本地</TextBlock>
-                            </WrapPanel>
-                        </ListBoxItem>
-                        <ListBoxItem>
-                            <WrapPanel>
-                                <mD:PackIcon Kind="MusicBox" />
-                                <TextBlock FontSize="17">网易云音乐</TextBlock>
-                            </WrapPanel>
-                        </ListBoxItem>
-                        <ListBoxItem>
-                            <WrapPanel>
-                                <mD:PackIcon Kind="Cellphone" />
-                                <TextBlock FontSize="17">远程设备</TextBlock>
-                            </WrapPanel>
-                        </ListBoxItem>
-                    </ListBox>
-                </Grid>
-            </mD:ColorZone>
-            <Grid Margin="0,100,0,0" x:Name="GridLocal">
-                <mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
-                    <Grid>
-                        <StackPanel x:Name="LstLocalSidebar" HorizontalAlignment="Left" Width="220">
-                            <ListBoxItem Height="60" VerticalContentAlignment="Center">
-                                <Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center">音乐</Label>
-                            </ListBoxItem>
-                            <Expander Header="播放列表" Width="207">
-								<ListBox>
-                                    <ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop" DragOver="ListBoxItem_DragOver">
-                                        <WrapPanel>
-                                            <mD:PackIcon Kind="PlaylistPlus" />
-                                            <TextBlock>新建播放列表</TextBlock>
-                                        </WrapPanel>
-                                    </ListBoxItem>
-                                </ListBox>
-                            </Expander>
-                        </StackPanel>
-                        <Grid x:Name="GridMusic" Margin="220,0,0,0">
-                            <mD:ColorZone Height="45" Background="#FFF3F3F3" mD:ShadowAssist.ShadowDepth="Depth1">
-                                <Grid>
-                                    <mD:ColorZone Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35" Margin="8,5,0,0" HorizontalAlignment="Left" Width="251">
-                                        <Grid>
-                                            <TextBox VerticalContentAlignment="Center" mD:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" VerticalAlignment="Bottom" mD:HintAssist.Hint="搜索" Margin="10,0,35,0" Height="35"></TextBox>
-                                            <Button x:Name="BtnSearchSong" Style="{DynamicResource MaterialDesignToolButton}" HorizontalAlignment="Right" Width="35" VerticalAlignment="Top" Height="35" mD:RippleAssist.IsCentered="True">
-                                                <mD:PackIcon Kind="Magnify" Height="24" Width="22" />
-                                            </Button>
-                                        </Grid>
-                                    </mD:ColorZone>
-                                    <Button HorizontalAlignment="Left" Margin="264,5,0,0" VerticalAlignment="Top" Width="84" Height="35" Style="{DynamicResource MaterialDesignFlatButton}">
-                                        <WrapPanel>
-                                            <mD:PackIcon Kind="ArrowUpBold"></mD:PackIcon>
-                                            <TextBlock>上移</TextBlock>
-                                        </WrapPanel>
-                                    </Button>
-                                    <Button HorizontalAlignment="Left" Margin="353,5,0,0" VerticalAlignment="Top" Width="84" Height="35" Style="{DynamicResource MaterialDesignFlatButton}">
-                                        <WrapPanel>
-                                            <mD:PackIcon Kind="ArrowDownBold"></mD:PackIcon>
-                                            <TextBlock>下移</TextBlock>
-                                        </WrapPanel>
-                                    </Button>
-                                    <Button Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto" HorizontalAlignment="Right" Width="49" Foreground="#FFFF0404">
-                                        <mD:PackIcon Kind="Delete" />
-                                    </Button>
-                                </Grid>
-                            </mD:ColorZone>
-                            <DataGrid x:Name="DatSongList" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" AutoGenerateColumns="false" VerticalScrollBarVisibility="Visible" Margin="0,50,0,0" ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
-								<DataGrid.Columns>
-									<DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID"/>
-									<DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220"/>
-									<DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220"/>
-									<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200"/>
-								</DataGrid.Columns>
-							</DataGrid>
-                        </Grid>
-                    </Grid>
-                </mD:DialogHost>
-            </Grid>
-        </Grid>
-    </mD:DialogHost>
+        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" WindowStyle="None"
+        Background="White">
+	<Grid>
+		<mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="50">
+			<Grid>
+				<Label Margin="10,8,0,7" Foreground="#DDFFFFFF" FontSize="18" HorizontalAlignment="Left" Width="174">Walkman Manager</Label>
+				<Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50"
+				        mD:ShadowAssist.ShadowDepth="Depth0">
+					<mD:PackIcon Kind="Close" />
+				</Button>
+				<Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50"
+				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,50,0">
+					<mD:PackIcon Kind="WindowMinimize" />
+				</Button>
+				<Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50"
+				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,100,0">
+					<mD:PackIcon Kind="Settings" />
+				</Button>
+			</Grid>
+		</mD:ColorZone>
+		<mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,50,0,0">
+			<Grid>
+				<mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50"
+				              Background="WhiteSmoke">
+					<Grid>
+						<ListBox x:Name="LstTopbar" Style="{StaticResource MaterialDesignToolToggleFlatListBox}" Height="50"
+						         SelectedIndex="0" HorizontalAlignment="Left" Width="337">
+							<ListBoxItem x:Name="TabItmLocal" Height="50">
+								<WrapPanel>
+									<mD:PackIcon Kind="DesktopTower" />
+									<TextBlock FontSize="17">本地</TextBlock>
+								</WrapPanel>
+							</ListBoxItem>
+							<ListBoxItem>
+								<WrapPanel>
+									<mD:PackIcon Kind="MusicBox" />
+									<TextBlock FontSize="17">网易云音乐</TextBlock>
+								</WrapPanel>
+							</ListBoxItem>
+							<ListBoxItem>
+								<WrapPanel>
+									<mD:PackIcon Kind="Cellphone" />
+									<TextBlock FontSize="17">远程设备</TextBlock>
+								</WrapPanel>
+							</ListBoxItem>
+						</ListBox>
+					</Grid>
+				</mD:ColorZone>
+				<Grid Margin="0,50,0,0" x:Name="GridLocal">
+					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
+						<Grid>
+							<StackPanel x:Name="LstLocalSidebar" HorizontalAlignment="Left" Width="220">
+								<ListBoxItem Height="60" VerticalContentAlignment="Center">
+									<Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center">音乐</Label>
+								</ListBoxItem>
+								<Expander Header="播放列表" Width="207">
+									<ListBox>
+										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
+											<WrapPanel>
+												<mD:PackIcon Kind="PlaylistPlus" />
+												<TextBlock>新建播放列表</TextBlock>
+											</WrapPanel>
+										</ListBoxItem>
+									</ListBox>
+								</Expander>
+							</StackPanel>
+							<Grid x:Name="GridMusic" Margin="220,0,0,0">
+								<mD:ColorZone Height="45" Background="#FFF3F3F3" mD:ShadowAssist.ShadowDepth="Depth1">
+									<Grid>
+										<mD:ColorZone Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35" Margin="8,5,0,0"
+										              HorizontalAlignment="Left" Width="251">
+											<Grid>
+												<TextBox VerticalContentAlignment="Center" mD:TextFieldAssist.DecorationVisibility="Hidden"
+												         BorderThickness="0" VerticalAlignment="Bottom" mD:HintAssist.Hint="搜索" Margin="10,0,35,0"
+												         Height="35" />
+												<Button x:Name="BtnSearchSong" Style="{DynamicResource MaterialDesignToolButton}"
+												        HorizontalAlignment="Right" Width="35" VerticalAlignment="Top" Height="35"
+												        mD:RippleAssist.IsCentered="True">
+													<mD:PackIcon Kind="Magnify" Height="24" Width="22" />
+												</Button>
+											</Grid>
+										</mD:ColorZone>
+										<Button HorizontalAlignment="Left" Margin="264,5,0,0" VerticalAlignment="Top" Width="84" Height="35"
+										        Style="{DynamicResource MaterialDesignFlatButton}">
+											<WrapPanel>
+												<mD:PackIcon Kind="ArrowUpBold" />
+												<TextBlock>上移</TextBlock>
+											</WrapPanel>
+										</Button>
+										<Button HorizontalAlignment="Left" Margin="353,5,0,0" VerticalAlignment="Top" Width="84" Height="35"
+										        Style="{DynamicResource MaterialDesignFlatButton}">
+											<WrapPanel>
+												<mD:PackIcon Kind="ArrowDownBold" />
+												<TextBlock>下移</TextBlock>
+											</WrapPanel>
+										</Button>
+										<Button Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto" HorizontalAlignment="Right"
+										        Width="49" Foreground="#FFFF0404">
+											<mD:PackIcon Kind="Delete" />
+										</Button>
+									</Grid>
+								</mD:ColorZone>
+								<DataGrid x:Name="DatSongList" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
+								          AutoGenerateColumns="false" VerticalScrollBarVisibility="Visible" Margin="0,50,0,0"
+								          ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
+									<DataGrid.Columns>
+										<DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID" />
+										<DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220" />
+										<DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220" />
+										<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200" />
+									</DataGrid.Columns>
+								</DataGrid>
+							</Grid>
+						</Grid>
+					</mD:DialogHost>
+				</Grid>
+			</Grid>
+		</mD:DialogHost>
+	</Grid>
 </Window>
-
