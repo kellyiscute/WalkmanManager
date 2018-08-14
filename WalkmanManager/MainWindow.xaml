@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" WindowStyle="None">
-    <mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root">
+        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" WindowStyle="None" Background="White">
+    <mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White">
         <Grid>
             <mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="50">
                 <Grid>
