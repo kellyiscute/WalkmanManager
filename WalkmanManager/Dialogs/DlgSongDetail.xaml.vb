@@ -35,7 +35,7 @@ Public Class DlgSongDetail
 
 	private Function ToTimeString(seconds As Integer) As String
 		Dim str As String
-		str = seconds\60
+		str = seconds \ 60
 		If str.Length = 1 Then
 			str = 0 & str
 		End If
