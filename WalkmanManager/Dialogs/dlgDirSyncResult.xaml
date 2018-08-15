@@ -12,7 +12,8 @@
                 <Grid>
                     <TextBlock FontSize="16" VerticalAlignment="Center" Padding="10,0,0,0">与文件夹同步完成</TextBlock>
                     <Button HorizontalAlignment="Right" Width="54" Height="Auto"
-                            materialDesign:ShadowAssist.ShadowDepth="Depth0">
+                            materialDesign:ShadowAssist.ShadowDepth="Depth0"
+                            Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}">
                         <materialDesign:PackIcon Kind="Close" />
                     </Button>
                 </Grid>

@@ -146,6 +146,9 @@
     <Compile Include="Dialogs\dlgDirSyncResult.xaml.vb">
       <DependentUpon>dlgDirSyncResult.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DlgNewPlaylist.xaml.vb">
+      <DependentUpon>DlgNewPlaylist.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\DlgSongDetail.xaml.vb">
       <DependentUpon>DlgSongDetail.xaml</DependentUpon>
     </Compile>
@@ -162,6 +165,10 @@
     </Compile>
     <Compile Include="Utils\StringExtensionMethods.vb" />
     <Page Include="Dialogs\dlgDirSyncResult.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DlgNewPlaylist.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

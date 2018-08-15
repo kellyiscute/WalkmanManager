@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="DlgNewPlaylist"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             xmlns:local="clr-namespace:WalkmanManager"
+             mc:Ignorable="d" Height="200" Width="400">
+	<Grid>
+		<mD:ColorZone Mode="PrimaryMid" Height="40">
+			<Grid>
+				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" FontSize="18">新播放列表</TextBlock>
+				<Button x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Stretch"
+				        mD:ShadowAssist.ShadowDepth="Depth0" Width="50" Height="Auto"
+				        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
+					<mD:PackIcon Kind="Close" />
+				</Button>
+			</Grid>
+		</mD:ColorZone>
+		<TextBox VerticalAlignment="Top" Margin="10,64,10,0" Height="42"
+		         mD:HintAssist.Hint="名称" mD:HintAssist.IsFloating="True" TextChanged="TextBox_TextChanged" />
+		<Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,111,0,0" Foreground="Red"
+		       x:Name="LabelValidation">
+			重复的名称
+		</Label>
+		<Button HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,25,25" Width="91"
+		        Style="{DynamicResource MaterialDesignFlatButton}"
+		        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
+			取消
+			<Button.CommandParameter>
+				<system:Boolean>False</system:Boolean>
+			</Button.CommandParameter>
+		</Button>
+		<Button x:Name="ButtonDone" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,121,25" IsEnabled="False" Width="91"
+		        Command="{x:Static mD:DialogHost.CloseDialogCommand}"
+		        Style="{DynamicResource ResourceKey=MaterialDesignFlatButton}" Content="完成">
+			<Button.CommandParameter>
+				<system:Boolean>True</system:Boolean>
+			</Button.CommandParameter>
+		</Button>
+	</Grid>
+</UserControl>

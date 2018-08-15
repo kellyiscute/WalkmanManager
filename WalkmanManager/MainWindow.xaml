@@ -63,7 +63,7 @@
 								</ListBoxItem>
 								<Expander Header="播放列表" Width="207">
 									<ListBox>
-										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
+										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop" MouseLeftButtonUp="ListItem_Click">
 											<WrapPanel>
 												<mD:PackIcon Kind="PlaylistPlus" />
 												<TextBlock>新建播放列表</TextBlock>

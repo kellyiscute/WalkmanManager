@@ -505,6 +505,10 @@ Public Class Database
 		End If
 	End Function
 
+	''' <summary>
+	''' update song detail in dastabase
+	''' </summary>
+	''' <param name="path">path of the song</param>
 	Public Shared Sub UpdateInfo(path As String)
 		Dim conn = Connect()
 		Dim trans = conn.BeginTransaction()
@@ -523,9 +527,30 @@ Public Class Database
 		Else
 			reader.Close()
 			conn.Close()
-
 		End If
 	End Sub
+
+	''' <summary>
+	''' check if playlist name is used
+	''' </summary>
+	''' <param name="PlaylistName">name</param>
+	''' <returns>True or False</returns>
+	Public Shared Function CheckPlaylistNameAvailability(PlaylistName As String) As Boolean
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
+		BuildQuery(cmd, "select count(*) from playlists where name = ?", New Object() {PlaylistName})
+		Dim reader = cmd.ExecuteReader()
+		reader.Read()
+		If reader(0) = 0 Then
+			reader.Close()
+			conn.Close()
+			Return True
+		Else
+			reader.Close()
+			conn.Close()
+			Return False
+		End If
+	End Function
 
 	'TODO: This Function has NOT been debugged!
 	Public Shared Function GetSong_id(Optional ByVal songName As String = Nothing,

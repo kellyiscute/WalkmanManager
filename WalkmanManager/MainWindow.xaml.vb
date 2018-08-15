@@ -110,4 +110,15 @@ Class MainWindow
 			Next
 		End Try
 	End Sub
+
+	Private Async Sub ListItem_Click(sender As ListBoxItem, e As EventArgs)
+
+		If sender.Tag = "NewPlaylist" Then
+			Dim dlg As New DlgNewPlaylist
+			Dim result = Await DlgWindowRoot.ShowDialog(dlg)
+			If result Then
+				AddPlaylist(dlg.PlaylistName)
+			End If
+		End If
+	End Sub
 End Class
