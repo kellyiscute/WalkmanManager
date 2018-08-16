@@ -6,21 +6,24 @@
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen" WindowStyle="None"
+        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen"
         Background="White">
 	<Grid>
 		<mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="50">
 			<Grid>
 				<Label Margin="10,8,0,7" Foreground="#DDFFFFFF" FontSize="18" HorizontalAlignment="Left" Width="174">Walkman Manager</Label>
 				<Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50"
+				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0">
 					<mD:PackIcon Kind="Close" />
 				</Button>
 				<Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50"
+				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,50,0">
 					<mD:PackIcon Kind="WindowMinimize" />
 				</Button>
 				<Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50"
+				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,100,0">
 					<mD:PackIcon Kind="Settings" />
 				</Button>

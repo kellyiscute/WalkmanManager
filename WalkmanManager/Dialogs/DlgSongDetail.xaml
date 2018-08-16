@@ -81,13 +81,15 @@
 						<TextBlock Margin="5,0,0,0">打开所在文件夹</TextBlock>
 					</WrapPanel>
 				</Button>
-				<Button x:Name="ButtonSaveChanges" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0">
+				<Button x:Name="ButtonSaveChanges" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0"
+				        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
 					<WrapPanel>
 						<mD:PackIcon Kind="ContentSave" VerticalAlignment="Center" />
 						<TextBlock Margin="5,0,0,0">保存更改</TextBlock>
 					</WrapPanel>
 				</Button>
-				<Button x:Name="ButtonDelete" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0" Foreground="Red">
+				<Button x:Name="ButtonDelete" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0" Foreground="Red"
+				        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
 					<WrapPanel>
 						<mD:PackIcon Kind="Delete" VerticalAlignment="Center" />
 						<TextBlock Margin="5,0,0,0">删除</TextBlock>

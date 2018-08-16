@@ -20,7 +20,7 @@ Class MainWindow
 	End Sub
 
 	Private Sub btn_window_minimize_Click(sender As Object, e As RoutedEventArgs) Handles BtnWindowMinimize.Click
-		WindowState = WindowState.Minimized
+		SystemCommands.MinimizeWindow(Me)
 	End Sub
 
 	Private Sub btn_window_close_Click(sender As Object, e As RoutedEventArgs) Handles BtnWindowClose.Click
@@ -78,11 +78,11 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-		                             New WindowChrome() _
-			                            With {.GlassFrameThickness = New Thickness(1),
-			                            .UseAeroCaptionButtons = True, .ResizeBorderThickness = New Thickness(5),
-			                            .CornerRadius = New CornerRadius(0),
-			                            .CaptionHeight = 0})
+									 New WindowChrome() _
+										With {.GlassFrameThickness = New Thickness(7),
+										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
+										.CornerRadius = New CornerRadius(10),
+										.CaptionHeight = 50})
 	End Sub
 
 	Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
@@ -138,7 +138,10 @@ Class MainWindow
 				Dim result = Await DlgWindowRoot.ShowDialog(dlg)
 				If result Then
 					AddPlaylist(dlg.PlaylistName)
-					ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, New ListBoxItem() With {.Content = dlg.PlaylistName})
+
+					Dim lbitm = New ListBoxItem() With {.Content = dlg.PlaylistName, .AllowDrop = True}
+					AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
+					ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, lbitm)
 				End If
 				sender.SelectedIndex = -1
 			Else
@@ -168,6 +171,7 @@ Class MainWindow
 
 	Private Sub ButtonMusic_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) _
 		Handles ButtonMusic.MouseLeftButtonUp
+		DatSongList.ItemsSource = Nothing
 		DatSongList.ItemsSource = _lstSongs
 	End Sub
 
