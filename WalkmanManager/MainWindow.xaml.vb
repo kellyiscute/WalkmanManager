@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.ObjectModel
+Imports System.Data.Entity
 Imports System.Windows.Shell
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
@@ -40,30 +41,32 @@ Class MainWindow
 		End If
 
 		Dim newLost = Await Task.Run(Async Function()
-										 Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
-										 Dim lstLost = Await upd.FindLost()
-										 _lstSongs = GetSongs()
-										 Dim syncResult As String = ""
-										 If lstNew.Count > 0 Then
-											 syncResult = "=========================发现以下新项目=========================" & vbNewLine
-											 For Each NewItem In lstNew
-												 syncResult += NewItem & vbNewLine
-											 Next
-										 End If
-										 If lstLost.Count > 0 Then
-											 syncResult += "=========================发现已删除项目=========================" & vbNewLine
-											 For Each LostItem In lstLost
-												 syncResult += LostItem & vbNewLine
-											 Next
-										 End If
-										 Return syncResult
-									 End Function)
+			Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
+			Dim lstLost = Await upd.FindLost()
+			_lstSongs = GetSongs()
+			Dim syncResult As String = ""
+			If lstNew.Count > 0 Then
+				syncResult = "=========================发现以下新项目=========================" & vbNewLine
+				For Each NewItem In lstNew
+					syncResult += NewItem & vbNewLine
+				Next
+			End If
+			If lstLost.Count > 0 Then
+				syncResult += "=========================发现已删除项目=========================" & vbNewLine
+				For Each LostItem In lstLost
+					syncResult += LostItem & vbNewLine
+				Next
+			End If
+			Return syncResult
+		End Function)
 		Dim lstPlaylist = Await Task.Run(Function()
-											 Dim r = GetPlaylists()
-											 Return r
-										 End Function)
+			Dim r = GetPlaylists()
+			Return r
+		End Function)
 		For Each itm In lstPlaylist
-			ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, New ListBoxItem() With {.Content = itm})
+			Dim lbitm = New ListBoxItem() With {.Content = itm, .AllowDrop = True}
+			AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
+			ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, lbitm)
 		Next
 		DatSongList.ItemsSource = _lstSongs
 		DlgWindowRoot.IsOpen = False
@@ -75,11 +78,11 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-									New WindowChrome() _
-										With {.GlassFrameThickness = New Thickness(1),
-										.UseAeroCaptionButtons = True, .ResizeBorderThickness = New Thickness(5),
-										.CornerRadius = New CornerRadius(0),
-										.CaptionHeight = 0})
+		                             New WindowChrome() _
+			                            With {.GlassFrameThickness = New Thickness(1),
+			                            .UseAeroCaptionButtons = True, .ResizeBorderThickness = New Thickness(5),
+			                            .CornerRadius = New CornerRadius(0),
+			                            .CaptionHeight = 0})
 	End Sub
 
 	Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
@@ -103,6 +106,7 @@ Class MainWindow
 				_lstSongs.RemoveAt(DatSongList.SelectedIndex)
 			End If
 		End If
+		DlgWindowRoot.CloseOnClickAway = False
 	End Sub
 
 	Private Sub ListBoxItem_Drop(sender As Object, e As DragEventArgs)
@@ -111,25 +115,63 @@ Class MainWindow
 			Dim songInf As SongInfo = e.Data.GetData(DragDrop.DataFormat.Name)
 		Catch ex As Exception
 			Dim a = e.Data.GetData("GongSolutions.Wpf.DragDrop")
-			Console.WriteLine(a.ToString)
+			Dim playlistId = GetPlaylistIdByName(sender.Content)
+			Dim counter = 0
+			Dim conn = Connect()
+			Dim trans = conn.BeginTransaction()
+			Dim cmd = conn.CreateCommand()
+			cmd.Transaction = trans
 			For Each itm As SongInfo In a
-				Console.WriteLine(itm.Title)
+				AddSongToPlaylist(playlistId, itm.Id, counter, cmd)
+				counter += 1
 			Next
+			trans.Commit()
+			conn.Close()
 		End Try
 	End Sub
 
 	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs)
-		If sender.SelectedItem.Tag = "NewPlaylist" Then
-			Dim dlg As New DlgNewPlaylist
-			Dim result = Await DlgWindowRoot.ShowDialog(dlg)
-			If result Then
-				AddPlaylist(dlg.PlaylistName)
-				ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, New ListBoxItem() With {.Content = dlg.PlaylistName})
+		If sender.SelectedIndex <> -1 Then
+			If sender.SelectedItem.Tag = "NewPlaylist" Then
+				'if is button "NewPlaylist"
+				Dim dlg As New DlgNewPlaylist
+				Dim result = Await DlgWindowRoot.ShowDialog(dlg)
+				If result Then
+					AddPlaylist(dlg.PlaylistName)
+					ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, New ListBoxItem() With {.Content = dlg.PlaylistName})
+				End If
+				sender.SelectedIndex = -1
+			Else
+				ButtonMusic.IsSelected = False
+				Dim dlg As New dlg_progress
+				DatSongList.ItemsSource = Nothing
+				DialogHost.Show(dlg, "window-root")
+				Dim PlaylistName = sender.SelectedItem.Content
+				Dim lstSongs = Await Task.Run(Function()
+												  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(PlaylistName))
+												  Dim conn = Connect()
+												  Dim trans = conn.BeginTransaction()
+												  Dim cmd = conn.CreateCommand()
+												  cmd.Transaction = trans
+												  Dim songs As New ObservableCollection(Of SongInfo)
+												  For Each itm In songIds
+													  songs.Add(GetSongById(itm, cmd))
+												  Next
+												  conn.Close()
+												  Return songs
+											  End Function)
+				DatSongList.ItemsSource = lstSongs
+				DlgWindowRoot.IsOpen = False
 			End If
 		End If
 	End Sub
 
-	Private Sub ButtonMusic_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) Handles ButtonMusic.MouseLeftButtonUp
+	Private Sub ButtonMusic_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) _
+		Handles ButtonMusic.MouseLeftButtonUp
 		DatSongList.ItemsSource = _lstSongs
+	End Sub
+
+	Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected
+		ListBoxPlaylist.SelectedIndex = -1
 	End Sub
 End Class

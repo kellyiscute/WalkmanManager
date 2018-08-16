@@ -62,6 +62,7 @@ Public Class Database
 	''' <param name="params">SQL Query arguments</param>
 	Public Shared Sub BuildQuery(ByRef cmd As SQLiteCommand, sql As String, Optional params As Object() = Nothing)
 		'if no params was passed, set CommandText directly
+		cmd.Parameters.Clear()
 		If IsNothing(params) Then
 			cmd.CommandText = sql
 			Return
@@ -209,7 +210,7 @@ Public Class Database
 		BuildQuery(cmd, "select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
 				   New Object() {playlistId, songId})
 		Dim r = cmd.ExecuteReader
-		r.NextResult()
+		r.Read()
 		If r(0) = 0 Then
 			r.Close()
 			BuildQuery(cmd, "insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
@@ -233,7 +234,7 @@ Public Class Database
 		BuildQuery(cmd, "select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
 				   New Object() {playlistId, songId})
 		Dim r = cmd.ExecuteReader
-		r.NextResult()
+		r.Read()
 		If r(0) = 0 Then
 			r.Close()
 			BuildQuery(cmd, "insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
@@ -255,7 +256,7 @@ Public Class Database
 		BuildQuery(cmd, "select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
 				   New Object() {playlistId, songId})
 		Dim r = cmd.ExecuteReader
-		r.NextResult()
+		r.Read()
 		If r(0) = 0 Then
 			r.Close()
 			BuildQuery(cmd, "insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
@@ -572,6 +573,130 @@ Public Class Database
 		reader.Close()
 		conn.Close()
 		Return result
+	End Function
+
+	''' <summary>
+	''' get song ids of a playlist
+	''' </summary>
+	''' <param name="id">playlist id</param>
+	''' <returns>song ids</returns>
+	Public Overloads Shared Function GetSongsFromPlaylist(id As Integer) As List(Of Integer)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
+		BuildQuery(cmd, "select * from playlist_detail where playlist_id = ? order by song_order", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of Integer)
+		While reader.Read
+			result.Add(reader(1))
+		End While
+		reader.Close()
+		conn.Close()
+		Return result
+	End Function
+
+	Public Overloads Shared Function GetSongsFromPlaylist(id As Integer, conn As SQLiteConnection) As List(Of Integer)
+		Dim cmd = conn.CreateCommand()
+		BuildQuery(cmd, "select * from playlist_detail where playlist_id = ? orderby song_order", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of Integer)
+		While reader.Read
+			result.Add(1)
+		End While
+		reader.Close()
+		Return result
+	End Function
+
+	Public Overloads Shared Function GetSongsFromPlaylist(id As Integer, cmd As SQLiteCommand) As List(Of Integer)
+		BuildQuery(cmd, "select * from playlist_detail where playlist_id = ? orderby song_order", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of Integer)
+		While reader.Read
+			result.Add(1)
+		End While
+		reader.Close()
+		Return result
+	End Function
+
+	''' <summary>
+	''' get song info by id
+	''' </summary>
+	''' <param name="id">song id</param>
+	''' <returns>song detail info</returns>
+	Public Overloads Shared Function GetSongById(id As Integer) As SongInfo
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
+		BuildQuery(cmd, "select * from songs where id = ?", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		If reader.HasRows Then
+			Dim t As New SongInfo
+			reader.Read()
+			t.Id = reader("id")
+			t.Title = reader("title")
+			t.Artists = reader("artists")
+			t.Path = reader("path")
+			reader.Close()
+			conn.Close()
+			Return t
+		Else
+			reader.Close()
+			conn.Close()
+			Return Nothing
+		End If
+	End Function
+
+	Public Overloads Shared Function GetSongById(id As Integer, conn As SQLiteConnection) As SongInfo
+		Dim cmd = conn.CreateCommand()
+		BuildQuery(cmd, "select * from songs where id = ?", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		If reader.HasRows Then
+			Dim t As New SongInfo
+			reader.Read()
+			t.Id = reader("id")
+			t.Title = reader("title")
+			t.Artists = reader("artists")
+			t.Path = reader("path")
+			reader.Close()
+			Return t
+		Else
+			reader.Close()
+			Return Nothing
+		End If
+	End Function
+
+	Public Overloads Shared Function GetSongById(id As Integer, cmd As SQLiteCommand) As SongInfo
+		BuildQuery(cmd, "select * from songs where id = ?", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		If reader.HasRows Then
+			Dim t As New SongInfo
+			reader.Read()
+			t.Id = reader("id")
+			t.Title = reader("title")
+			t.Artists = reader("artists")
+			t.Path = reader("path")
+			reader.Close()
+			Return t
+		Else
+			reader.Close()
+			Return Nothing
+		End If
+	End Function
+
+	Public Shared Function GetPlaylistIdByName(playlistName As String) As Integer
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
+		BuildQuery(cmd, "select id from playlists where name = ?", New Object() {playlistName})
+		Dim reader = cmd.ExecuteReader()
+		If reader.HasRows Then
+			reader.Read()
+			Dim id = reader(0)
+			reader.Close()
+			conn.Close()
+			Return id
+		Else
+			reader.Close()
+			conn.Close()
+			Return -1
+		End If
 	End Function
 
 	'TODO: This Function has NOT been debugged!
