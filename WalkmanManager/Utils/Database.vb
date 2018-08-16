@@ -33,13 +33,17 @@ Public Class Database
 	End Structure
 
 	Public Structure PlaylistDetail
-		Dim PlaylistId As Integer
+		Public PlaylistId As Integer
 		' ids of songs, already ordered by field "song_order"
-		Dim SongIds As List(Of Integer)
+		Public SongIds As List(Of Integer)
+	End Structure
+
+	Public Structure Playlists
+		Public Id As Integer
+		Public PlaylistName As String
 	End Structure
 
 #End Region
-
 
 	Public Shared Function Connect() As SQLiteConnection
 		Dim connstrBuilder = New SQLiteConnectionStringBuilder
@@ -427,7 +431,7 @@ Public Class Database
 	''' Get song list from database
 	''' </summary>
 	''' <returns></returns>
-	Public Overloads Shared Function GetSongs() As ObservableCollection(Of SongInfo )
+	Public Overloads Shared Function GetSongs() As ObservableCollection(Of SongInfo)
 		Dim conn = Connect()
 		Dim cmd = conn.CreateCommand()
 		BuildQuery(cmd, "select * from songs order by title")
@@ -457,12 +461,12 @@ Public Class Database
 	''' </summary>
 	''' <param name="conn">SQLiteConnection Object</param>
 	''' <returns></returns>
-	Public Overloads Shared Function GetSongs(conn As SQLiteConnection) As ObservableCollection(Of SongInfo )
+	Public Overloads Shared Function GetSongs(conn As SQLiteConnection) As ObservableCollection(Of SongInfo)
 		Dim cmd = conn.CreateCommand()
 		BuildQuery(cmd, "select * from songs order by title")
 		Dim reader = cmd.ExecuteReader()
 		If reader.HasRows Then
-			Dim lst As New ObservableCollection(Of SongInfo )
+			Dim lst As New ObservableCollection(Of SongInfo)
 			While reader.Read()
 				Dim t As New SongInfo
 				t.Id = reader("id")
@@ -484,11 +488,11 @@ Public Class Database
 	''' </summary>
 	''' <param name="cmd">SQLiteCommand Object</param>
 	''' <returns></returns>
-	Public Overloads Shared Function GetSongs(cmd As SQLiteCommand) As ObservableCollection(Of SongInfo )
+	Public Overloads Shared Function GetSongs(cmd As SQLiteCommand) As ObservableCollection(Of SongInfo)
 		BuildQuery(cmd, "select * from songs order by title")
 		Dim reader = cmd.ExecuteReader()
 		If reader.HasRows Then
-			Dim lst As New ObservableCollection(Of SongInfo )
+			Dim lst As New ObservableCollection(Of SongInfo)
 			While reader.Read()
 				Dim t As New SongInfo
 				t.Id = reader("id")
@@ -533,12 +537,12 @@ Public Class Database
 	''' <summary>
 	''' check if playlist name is used
 	''' </summary>
-	''' <param name="PlaylistName">name</param>
-	''' <returns>True or False</returns>
-	Public Shared Function CheckPlaylistNameAvailability(PlaylistName As String) As Boolean
+	''' <param name="playlistName">name</param>
+	''' <returns>True if not used</returns>
+	Public Shared Function CheckPlaylistNameAvailability(playlistName As String) As Boolean
 		Dim conn = Connect()
 		Dim cmd = conn.CreateCommand()
-		BuildQuery(cmd, "select count(*) from playlists where name = ?", New Object() {PlaylistName})
+		BuildQuery(cmd, "select count(*) from playlists where name = ?", New Object() {playlistName})
 		Dim reader = cmd.ExecuteReader()
 		reader.Read()
 		If reader(0) = 0 Then
@@ -550,6 +554,24 @@ Public Class Database
 			conn.Close()
 			Return False
 		End If
+	End Function
+
+	''' <summary>
+	''' Get all playlists
+	''' </summary>
+	''' <returns></returns>
+	Public Shared Function GetPlaylists() As List(Of String)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
+		BuildQuery(cmd, "select * from playlists")
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of String)
+		While reader.Read()
+			result.Add(reader(1))
+		End While
+		reader.Close()
+		conn.Close()
+		Return result
 	End Function
 
 	'TODO: This Function has NOT been debugged!

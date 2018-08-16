@@ -58,6 +58,13 @@ Class MainWindow
 										 End If
 										 Return syncResult
 									 End Function)
+		Dim lstPlaylist = Await Task.Run(Function()
+											 Dim r = GetPlaylists()
+											 Return r
+										 End Function)
+		For Each itm In lstPlaylist
+			ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, New ListBoxItem() With {.Content = itm})
+		Next
 		DatSongList.ItemsSource = _lstSongs
 		DlgWindowRoot.IsOpen = False
 		If newLost <> "" Then
@@ -111,14 +118,18 @@ Class MainWindow
 		End Try
 	End Sub
 
-	Private Async Sub ListItem_Click(sender As ListBoxItem, e As EventArgs)
-
-		If sender.Tag = "NewPlaylist" Then
+	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs)
+		If sender.SelectedItem.Tag = "NewPlaylist" Then
 			Dim dlg As New DlgNewPlaylist
 			Dim result = Await DlgWindowRoot.ShowDialog(dlg)
 			If result Then
 				AddPlaylist(dlg.PlaylistName)
+				ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, New ListBoxItem() With {.Content = dlg.PlaylistName})
 			End If
 		End If
+	End Sub
+
+	Private Sub ButtonMusic_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) Handles ButtonMusic.MouseLeftButtonUp
+		DatSongList.ItemsSource = _lstSongs
 	End Sub
 End Class

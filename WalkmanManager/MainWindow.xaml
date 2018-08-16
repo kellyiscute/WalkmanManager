@@ -58,12 +58,12 @@
 					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
 						<Grid>
 							<StackPanel x:Name="LstLocalSidebar" HorizontalAlignment="Left" Width="220">
-								<ListBoxItem Height="60" VerticalContentAlignment="Center">
+								<ListBoxItem Height="60" VerticalContentAlignment="Center" x:Name="ButtonMusic">
 									<Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center">音乐</Label>
 								</ListBoxItem>
 								<Expander Header="播放列表" Width="207">
-									<ListBox>
-										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop" MouseLeftButtonUp="ListItem_Click">
+									<ListBox x:Name="ListBoxPlaylist" SelectionChanged="ListItem_SelectionChange">
+										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
 											<WrapPanel>
 												<mD:PackIcon Kind="PlaylistPlus" />
 												<TextBlock>新建播放列表</TextBlock>
@@ -88,20 +88,6 @@
 												</Button>
 											</Grid>
 										</mD:ColorZone>
-										<Button HorizontalAlignment="Left" Margin="264,5,0,0" VerticalAlignment="Top" Width="84" Height="35"
-										        Style="{DynamicResource MaterialDesignFlatButton}">
-											<WrapPanel>
-												<mD:PackIcon Kind="ArrowUpBold" />
-												<TextBlock>上移</TextBlock>
-											</WrapPanel>
-										</Button>
-										<Button HorizontalAlignment="Left" Margin="353,5,0,0" VerticalAlignment="Top" Width="84" Height="35"
-										        Style="{DynamicResource MaterialDesignFlatButton}">
-											<WrapPanel>
-												<mD:PackIcon Kind="ArrowDownBold" />
-												<TextBlock>下移</TextBlock>
-											</WrapPanel>
-										</Button>
 										<Button Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto" HorizontalAlignment="Right"
 										        Width="49" Foreground="#FFFF0404">
 											<mD:PackIcon Kind="Delete" />

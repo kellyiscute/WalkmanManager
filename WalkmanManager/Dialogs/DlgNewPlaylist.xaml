@@ -11,7 +11,7 @@
 		<mD:ColorZone Mode="PrimaryMid" Height="40">
 			<Grid>
 				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" FontSize="18">新播放列表</TextBlock>
-				<Button x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Stretch"
+				<Button x:Name="ButtonClose" HorizontalAlignment="Right" VerticalAlignment="Stretch" IsCancel="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Width="50" Height="Auto"
 				        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
 					<mD:PackIcon Kind="Close" />
@@ -32,7 +32,7 @@
 				<system:Boolean>False</system:Boolean>
 			</Button.CommandParameter>
 		</Button>
-		<Button x:Name="ButtonDone" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,121,25" IsEnabled="False" Width="91"
+		<Button x:Name="ButtonDone" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,121,25" IsEnabled="False" Width="91" TabIndex="0"
 		        Command="{x:Static mD:DialogHost.CloseDialogCommand}"
 		        Style="{DynamicResource ResourceKey=MaterialDesignFlatButton}" Content="完成">
 			<Button.CommandParameter>
