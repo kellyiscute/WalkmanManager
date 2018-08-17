@@ -1,6 +1,8 @@
 ﻿# WalkmanManager
 A easy-to-use app to replace Sony MediaCenter with more features and better design
 
+[![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
+
 ## The author says `!Important`
 
 **This project is still under construction** and the first release will probably come by September ~~and it will probably be delayed to October~~.
@@ -21,12 +23,15 @@ You will also need to install the following packages in order to build this proj
  - MaterialDesignThemes
  - SQLite
  - atl
+ - gong-wpf-dragdrop
 
  To Install Packages, open up the nuget package manager console and copy the code
+ Packages should be already installed and ready to build, but in case something strange happens
 
     Install-Package MaterialDesignThemes -Version 2.5.0-ci1122
 	Install-Package System.Data.SQLite -Version 1.0.108
 	Install-Package z440.atl.core -Version 2.4.2
+	Install-Package gong-wpf-dragdrop -Version 1.1.0
 
 ## Third-Party Library
 
