@@ -154,7 +154,7 @@ Public Class Database
 	''' <param name="playlistId">id of the playlist</param>
 	''' <param name="songId">id of the song</param>
 	''' <param name="order">order, start from ZERO</param>
-	Public Overloads Shared Sub AddSongToPlaylist(playlistId As Integer, songId As Integer, order As Integer)
+	Public Overloads Shared Sub AddSongToPlaylist(playlistId As Integer, songId As Integer, Optional order As Integer = -1)
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
@@ -163,7 +163,16 @@ Public Class Database
 		r.Read()
 		If r(0) = 0 Then
 			r.Close()
-			cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
+			If order = -1 Then
+				cmd.BuildQuery("select count(*) from playlist_detail where playlist_id = ?", New Object() {playlistId})
+				r = cmd.ExecuteReader()
+				r.Read()
+				Dim counter = r(0)
+				r.Close()
+				cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, counter + 1})
+			Else
+				cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
+			End If
 			cmd.ExecuteNonQuery()
 			conn.Close()
 		Else
