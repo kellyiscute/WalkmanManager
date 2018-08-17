@@ -169,6 +169,10 @@ Class MainWindow
 		End If
 	End Sub
 
+	Private Sub BlockRightClickSelectoin(sender As Object, e As MouseButtonEventArgs)
+		e.Handled = True
+	End Sub
+
 	Private Sub ButtonMusic_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) _
 		Handles ButtonMusic.MouseLeftButtonUp
 		DatSongList.ItemsSource = Nothing

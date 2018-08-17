@@ -163,7 +163,8 @@
     <Compile Include="SongItm.xaml.vb">
       <DependentUpon>SongItm.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utils\StringExtensionMethods.vb" />
+    <Compile Include="Utils\Searching.vb" />
+    <Compile Include="Utils\ExtensionMethods.vb" />
     <Page Include="Dialogs\dlgDirSyncResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -1,5 +1,4 @@
-﻿Imports System.Net.Mime
-Imports ATL
+﻿Imports ATL
 
 Public Class DlgSongDetail
 	Private ReadOnly _songInfo As Track

@@ -67,7 +67,8 @@
 									</ListBoxItem>
 								</ListBox>
 								<Expander Header="播放列表" Width="207">
-									<ListBox x:Name="ListBoxPlaylist" SelectionChanged="ListItem_SelectionChange">
+									<ListBox x:Name="ListBoxPlaylist" SelectionChanged="ListItem_SelectionChange"
+									         PreviewMouseRightButtonDown="BlockRightClickSelectoin">
 										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
 											<WrapPanel>
 												<mD:PackIcon Kind="PlaylistPlus" />
@@ -93,9 +94,12 @@
 												</Button>
 											</Grid>
 										</mD:ColorZone>
-										<Button Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto" HorizontalAlignment="Right"
-										        Width="49" Foreground="#FFFF0404">
-											<mD:PackIcon Kind="Delete" />
+										<Button x:Name="ButtonDelete" Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto"
+										        HorizontalAlignment="Right">
+											<WrapPanel>
+												<mD:PackIcon Foreground="Red" Kind="Delete" />
+												<TextBlock Foreground="Red">删除</TextBlock>
+											</WrapPanel>
 										</Button>
 									</Grid>
 								</mD:ColorZone>
