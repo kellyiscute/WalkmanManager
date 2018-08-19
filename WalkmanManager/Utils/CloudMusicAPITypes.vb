@@ -94,7 +94,7 @@ Public Class Playlist
 	Public Property Subscribers As Object()
 	Public Property Subscribed As Boolean
 	Public Property Creator As User
-	Public Property Tracks As Track()
+	Public Property Tracks As CloudMusicTrack()
 	Public Property TrackIds As TrackId()
 	Public Property CoverImgId As Long
 	Public Property CreateTime As Long
