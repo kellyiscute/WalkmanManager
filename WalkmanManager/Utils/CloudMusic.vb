@@ -7,7 +7,7 @@ Imports Newtonsoft.Json
 
 
 ''' <summary>
-''' This class is translated from C# by the author
+''' Partof this class is translated from C# by the author
 ''' The origional file is written by GEEKiDoS and can be found by this link https://github.com/GEEKiDoS/NeteaseMuiscApi/blob/master/NeteaseCloudMuiscApi.cs
 ''' The file is licensed under the MIT License, written as below
 ''' MIT License
