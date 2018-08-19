@@ -4,7 +4,7 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
 ## Current Progress
-I am currently experiencing difficulties having the api working, which means the beta release would probably delay. I am now considering fetching stuff from CloudMusic Official Website. However this may affect reliability of the program. I am still working on the API stuff but if I still cannot get it work within a week, I will change to plan B. **If you have any idea on using the APIs, open an issue and let me know**
+The API issue have been resolved successfully and I am moving on to the next job. The Cloud Music page will probably be designed by another trused person. However, I still have no idea wether the project would be delayed. I am trying to speed up as the summer holiday is ending.
 
 ## The author says `!Important`
 
