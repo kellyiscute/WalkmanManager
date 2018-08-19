@@ -29,7 +29,7 @@ Imports Newtonsoft.Json
 '''SOFTWARE.
 ''' </summary>
 
-	Public Class CloudMusic
+Public Class CloudMusic
 
 #Region "Constants"
 
@@ -43,18 +43,21 @@ Imports Newtonsoft.Json
 	Const Useragent =
 		"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
 
-	Const Cookie =
-		"os=pc;osver=Microsoft-Windows-10-Professional-build-16299.125-64bit;appver=2.0.3.131777;channel=netease;__remember_me=true"
+	Dim Cookie As New CookieContainer
 
 	Const Referer = "http://music.163.com/"
-	Private _secretKey As string
-	Private _encSecKey As string
+	Private _secretKey As String
+	Private _encSecKey As String
 
 #End Region
 
-	Sub new
+	Sub New()
 		_secretKey = CreateSecretKey(16)
-		_encSecKey = RSAEncode(_secretKey)
+		_encSecKey = RsaEncode(_secretKey)
+		Cookie.Add(New Cookie With {.Name = "os", .Value = "pc", .Domain = "music.163.com"})
+		Cookie.Add(New Cookie With {.Name = "osver", .Value = "Ubuntu 18.04", .Domain = "music.163.com"})
+		Cookie.Add(New Cookie With {.Name = "appver", .Value = "2.0.3.131777", .Domain = "music.163.com"})
+		Cookie.Add(New Cookie With {.Name = "channel", .Value = "netease", .Domain = "music.163.com"})
 	End Sub
 
 	Public Function CreateSecretKey(length As Integer) As String
@@ -67,31 +70,31 @@ Imports Newtonsoft.Json
 		Return r
 	End Function
 
-	Public Function Prepare(raw As string) As Dictionary(Of string, string)
-		Dim data = New Dictionary(Of String, string)
-		data("params") = AESEncode(raw, Nonce)
-		data("params") = AESEncode(data("params"), _secretKey)
+	Public Function Prepare(raw As String) As Dictionary(Of String, String)
+		Dim data = New Dictionary(Of String, String)
+		data("params") = AesEncode(raw, Nonce)
+		data("params") = AesEncode(data("params"), _secretKey)
 		data("encSecKey") = _encSecKey
 		Return data
 	End Function
 
 	Public Function BcHexDec(hex As String) As BigInteger
-		Dim dec As new BigInteger(0)
-		For i = 0 To Hex.Length
-			dec += BigInteger.Multiply(New BigInteger(Convert.ToInt32(Hex(i).ToString, 16)),
-			                           BigInteger.Pow(New BigInteger(16), Hex.Length - i - 1))
+		Dim dec As New BigInteger(0)
+		For i = 0 To hex.Length
+			dec += BigInteger.Multiply(New BigInteger(Convert.ToInt32(hex(i).ToString, 16)),
+										BigInteger.Pow(New BigInteger(16), hex.Length - i - 1))
 		Next
 		Return dec
 	End Function
 
 	Public Function RsaEncode(text As String) As String
 		Dim srtext = New String(text.Reverse)
-		Dim a = BCHexDec(BitConverter.ToString(Encoding.Default.GetBytes(srtext)).Replace("-", ""))
-		Dim b = BCHexDec(Pubkey)
-		dim c = BCHexDec(Modulus)
+		Dim a = BcHexDec(BitConverter.ToString(Encoding.Default.GetBytes(srtext)).Replace("-", ""))
+		Dim b = BcHexDec(Pubkey)
+		Dim c = BcHexDec(Modulus)
 		Dim key = BigInteger.ModPow(a, b, c).ToString("x")
 		key = key.PadLeft(256, "0")
-		If key.Length > 256
+		If key.Length > 256 Then
 			Return key.Substring(key.Length - 256, 256)
 		Else
 			Return key
@@ -99,12 +102,12 @@ Imports Newtonsoft.Json
 	End Function
 
 	Public Function AesEncode(secretData As String, Optional secret As String = "TA3YiYCfY2dDJQgg") As String
-		Dim encrypted() as Byte
-		Dim iv() as Byte = Encoding.UTF8.GetBytes(Vi)
+		Dim encrypted() As Byte
+		Dim iv() As Byte = Encoding.UTF8.GetBytes(Vi)
 
-		Using aes As Aes = aes.Create()
+		Using aes As Aes = Aes.Create()
 			aes.Key = Encoding.UTF8.GetBytes(secret)
-			aes.IV = IV
+			aes.IV = iv
 			aes.Mode = CipherMode.CBC
 			Using encryptor = aes.CreateEncryptor()
 				Using stream = New MemoryStream()
@@ -121,12 +124,12 @@ Imports Newtonsoft.Json
 	End Function
 
 	Public Function AesDecode(secretData As String, Optional secret As String = "TA3YiYCfY2dDJQgg") As String
-		Dim encrypted() as Byte
-		Dim iv() as Byte = Encoding.UTF8.GetBytes(Vi)
+		Dim encrypted() As Byte
+		Dim iv() As Byte = Encoding.UTF8.GetBytes(Vi)
 
-		Using aes As Aes = aes.Create()
+		Using aes As Aes = Aes.Create()
 			aes.Key = Encoding.UTF8.GetBytes(secret)
-			aes.IV = IV
+			aes.IV = iv
 			aes.Mode = CipherMode.CBC
 			Using encryptor = aes.CreateDecryptor()
 				Using stream = New MemoryStream()
@@ -143,20 +146,28 @@ Imports Newtonsoft.Json
 	End Function
 
 	'fake curl
-	Public Function Curl(url As String, parms As Dictionary(Of String, string), Optional method As String = "POST") _
+	Public Function Curl(url As String, parms As Dictionary(Of String, String), Optional method As String = "POST") _
 		As String
 		Dim result As String
-		Using wc = New WebClient
-			wc.Headers.Add(HttpRequestHeader.ContentType, "application/w-www-form-urlencoded")
+		Using wc = New CookieAwareWebClient
 			wc.Headers.Add(HttpRequestHeader.Referer, Referer)
 			wc.Headers.Add(HttpRequestHeader.UserAgent, Useragent)
-			wc.Headers.Add(HttpRequestHeader.Cookie, Cookie)
+			wc.CookieContainer = Cookie
 			Dim reqparm = New System.Collections.Specialized.NameValueCollection()
-			For Each keyPair As KeyValuePair(Of String,String) In parms
+			For Each keyPair As KeyValuePair(Of String, String) In parms
 				reqparm.Add(keyPair.Key, keyPair.Value)
 			Next
 
 			Dim responsebytes = wc.UploadValues(url, method, reqparm)
+
+			Debug.Print("=================Cookies=================")
+			For i = 0 To wc.ResponseCookies.Count - 1
+				'Cookie += ";" & wc.ResponseCookies.Item(i).Name & "="
+				'Cookie += wc.ResponseCookies.Item(i).Value
+				Cookie.Add(wc.ResponseCookies.Item(i))
+			Next
+			'Debug.Print(Cookie)
+
 			result = Encoding.UTF8.GetString(responsebytes)
 		End Using
 		Return result
@@ -166,12 +177,12 @@ Imports Newtonsoft.Json
 		Public S As String
 		Public Type As Integer
 		Public Limit As Integer
-		Public Total as String = "true"
+		Public Total As String = "true"
 		Public Offset As Integer
 		Public CsrfToken As String = ""
 	End Class
 
-	Public enum SearchType
+	Public Enum SearchType
 		Song = 1
 		Album = 10
 		Artist = 100
@@ -180,18 +191,67 @@ Imports Newtonsoft.Json
 		Radio = 1009
 	End Enum
 
-	Public Function Search(keyword as string, Optional limit As Integer = 30, Optional offset As Integer = 0,
-	                       Optional type As SearchType = SearchType.Song) As SearchResult
+	Public Function Search(keyword As String, Optional limit As Integer = 30, Optional offset As Integer = 0,
+							Optional type As SearchType = SearchType.Song) As SearchResult
 		Dim url = "http://music.163.com/weapi/cloudsearch/get/web"
 		Dim data = New SearchJson With {
-			    .s = keyword,
-			    .type = type,
-			    .limit = limit,
-			    .offset = offset
-			    }
-		Dim raw As String = CURL(url, Prepare(JsonConvert.SerializeObject(data)))
-		Dim deserializedObj = JsonConvert.DeserializeObject (Of SearchResult)(raw)
+				.S = keyword,
+				.Type = type,
+				.Limit = limit,
+				.Offset = offset
+				}
+		Dim raw As String = Curl(url, Prepare(JsonConvert.SerializeObject(data)))
+		Dim deserializedObj = JsonConvert.DeserializeObject(Of SearchResult)(raw)
 		Return deserializedObj
+	End Function
+
+	Public Function Login(phone As String, password As String) As Dictionary(Of String, Object)
+		Dim api = New CloudMusic
+		Dim params = New Dictionary(Of String, String)()
+		params("phone") = phone
+		Dim md5Pwd = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password))
+		Dim b As New StringBuilder
+		For i = 0 To md5Pwd.Length - 1
+			b.Append(md5Pwd(i).ToString("X2"))
+		Next
+		params("password") = b.ToString().ToLower
+		Dim j = JsonConvert.SerializeObject(params)
+		Debug.Print(j)
+		Dim r = api.Curl("https://music.163.com/weapi/login/cellphone/", api.Prepare(j))
+
+		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+	End Function
+
+	Public Function GetPlaylists(uid As String, Optional offset As Integer = 0, Optional limit As Integer = 100)
+		Dim params = New Dictionary(Of String, String)()
+		params("offset") = offset
+		params("limit") = limit
+		params("uid") = uid
+		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
+		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 	End Function
 End Class
 
+Public Class CookieAwareWebClient
+	Inherits WebClient
+
+	Public Property CookieContainer As CookieContainer
+	Public Property ResponseCookies As CookieCollection
+
+	Sub New()
+		CookieContainer = New CookieContainer()
+		ResponseCookies = New CookieCollection()
+	End Sub
+
+	Protected Overrides Function GetWebRequest(address As Uri) As WebRequest
+		Dim request = CType(MyBase.GetWebRequest(address), HttpWebRequest)
+		request.CookieContainer = CookieContainer
+		Return request
+	End Function
+
+	Protected Overrides Function GetWebResponse(request As WebRequest) As WebResponse
+		Dim response = CType(MyBase.GetWebResponse(request), HttpWebResponse)
+		ResponseCookies = response.Cookies
+		Return response
+	End Function
+End Class
