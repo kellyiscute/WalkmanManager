@@ -1,10 +1,10 @@
-﻿# WalkmanManager
+# WalkmanManager
 A easy-to-use app to replace Sony MediaCenter with more features and better design
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
 ## Current Progress
-The API issue have been resolved successfully and I am moving on to the next job. The Cloud Music page will probably be designed by another trused person. However, I still have no idea wether the project would be delayed. I am trying to speed up as the summer holiday is ending.
+All issues are resolved. I think the project will delay for a while. I am trying to speed up as the summer holiday is ending.
 
 ## The author says `!Important`
 
