@@ -9,6 +9,7 @@ Imports GongSolutions.Wpf.DragDrop
 
 Class MainWindow
 	Dim _lstSongs As ObservableCollection(Of SongInfo)
+	Dim _isRightClickSelect As Boolean = False
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -78,7 +79,7 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-									 New WindowChrome() _
+									New WindowChrome() _
 										With {.GlassFrameThickness = New Thickness(7),
 										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
 										.CornerRadius = New CornerRadius(10),
@@ -110,20 +111,32 @@ Class MainWindow
 	End Sub
 
 	Private Sub ListBoxItem_Drop(sender As Object, e As DragEventArgs)
-		Console.WriteLine(e.Data.GetFormats())
+		Console.WriteLine(sender.Content.GetType.ToString)
+		If sender.Content.GetType.ToString = "System.Windows.Controls.WrapPanel" Then
+			Exit Sub
+		End If
 		Try
 			Dim songInf As SongInfo = e.Data.GetData(DragDrop.DataFormat.Name)
+			Dim playlistId = GetPlaylistIdByName(sender.Content)
+			AddSongToPlaylist(playlistId, songInf.Id)
 		Catch ex As Exception
+			If ex.Message = "Already Exist" Then
+				Exit Sub
+			End If
 			Dim a = e.Data.GetData("GongSolutions.Wpf.DragDrop")
 			Dim playlistId = GetPlaylistIdByName(sender.Content)
-			Dim counter = 0
 			Dim conn = Connect()
 			Dim trans = conn.BeginTransaction()
 			Dim cmd = conn.CreateCommand()
 			cmd.Transaction = trans
 			For Each itm As SongInfo In a
-				AddSongToPlaylist(playlistId, itm.Id, counter, cmd)
-				counter += 1
+				Try
+					AddSongToPlaylist(playlistId, itm.Id, cmd)
+				Catch exc As Exception
+					If exc.Message <> "Already Exist" Then
+						Console.WriteLine("Unexpected Error : " & exc.Message)
+					End If
+				End Try
 			Next
 			trans.Commit()
 			conn.Close()
@@ -131,7 +144,7 @@ Class MainWindow
 	End Sub
 
 	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs)
-		If sender.SelectedIndex <> -1 Then
+		If sender.SelectedIndex <> -1 And Not _isRightClickSelect Then
 			If sender.SelectedItem.Tag = "NewPlaylist" Then
 				'if is button "NewPlaylist"
 				Dim dlg As New DlgNewPlaylist
@@ -167,16 +180,18 @@ Class MainWindow
 				DlgWindowRoot.IsOpen = False
 			End If
 		End If
+		_isRightClickSelect = False
 	End Sub
 
 	Private Sub BlockRightClickSelectoin(sender As Object, e As MouseButtonEventArgs)
-		e.Handled = True
+		_isRightClickSelect = True
 	End Sub
 
 	Private Sub ButtonMusic_MouseLeftButtonUp(sender As Object, e As MouseButtonEventArgs) _
 		Handles ButtonMusic.MouseLeftButtonUp
 		DatSongList.ItemsSource = Nothing
 		DatSongList.ItemsSource = _lstSongs
+		ListBoxPlaylist.SelectedIndex = -1
 	End Sub
 
 	Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected

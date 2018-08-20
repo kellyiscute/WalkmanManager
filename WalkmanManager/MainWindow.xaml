@@ -69,6 +69,11 @@
 								<Expander Header="播放列表" Width="207">
 									<ListBox x:Name="ListBoxPlaylist" SelectionChanged="ListItem_SelectionChange"
 									         PreviewMouseRightButtonDown="BlockRightClickSelectoin">
+										<ListBox.ContextMenu>
+											<ContextMenu>
+												<MenuItem Header="删除播放列表" Width="150"/>
+											</ContextMenu>
+										</ListBox.ContextMenu>
 										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
 											<WrapPanel>
 												<mD:PackIcon Kind="PlaylistPlus" />

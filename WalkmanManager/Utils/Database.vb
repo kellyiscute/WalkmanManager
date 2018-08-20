@@ -81,7 +81,7 @@ Public Class Database
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("insert into songs (title, artists, path) calues (?, ?, ?)",
-				   New Object() {title, artists, path})
+						New Object() {title, artists, path})
 		cmd.ExecuteNonQuery()
 		conn.Close()
 	End Sub
@@ -97,7 +97,7 @@ Public Class Database
 	Public Overloads Shared Sub AddSong(title As String, artists As String, path As String, conn As SQLiteConnection)
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("insert into songs (title, artists, path) calues (?, ?, ?)",
-				   New Object() {title, artists, path})
+						New Object() {title, artists, path})
 		cmd.ExecuteNonQuery()
 	End Sub
 
@@ -110,7 +110,7 @@ Public Class Database
 	''' <param name="cmd">SQLiteCommand Object</param>
 	Public Overloads Shared Sub AddSong(title As String, artists As String, path As String, cmd As SQLiteCommand)
 		cmd.BuildQuery("insert into songs (title, artists, path) values (?, ?, ?)",
-				   New Object() {title, artists, path})
+						New Object() {title, artists, path})
 		cmd.ExecuteNonQuery()
 	End Sub
 
@@ -158,7 +158,7 @@ Public Class Database
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
-				   New Object() {playlistId, songId})
+						New Object() {playlistId, songId})
 		Dim r = cmd.ExecuteReader
 		r.Read()
 		If r(0) = 0 Then
@@ -176,6 +176,7 @@ Public Class Database
 			cmd.ExecuteNonQuery()
 			conn.Close()
 		Else
+			r.Close()
 			Throw New Exception("Already Exist")
 		End If
 	End Sub
@@ -185,20 +186,29 @@ Public Class Database
 	''' </summary>
 	''' <param name="playlistId">id of the playlist</param>
 	''' <param name="songId">id of the song</param>
-	''' <param name="order">order, start from ZERO</param>
 	''' <param name="conn">SQLiteConnection Object</param>
-	Public Overloads Shared Sub AddSongToPlaylist(playlistId As Integer, songId As Integer, order As Integer,
-												  conn As SQLiteConnection)
+	''' <param name="order">order, start from ZERO</param>
+	Public Overloads Shared Sub AddSongToPlaylist(playlistId As Integer, songId As Integer, conn As SQLiteConnection,
+												Optional order As Integer = -1)
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
-				   New Object() {playlistId, songId})
+						New Object() {playlistId, songId})
 		Dim r = cmd.ExecuteReader
 		r.Read()
 		If r(0) = 0 Then
 			r.Close()
-			cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
-			cmd.ExecuteNonQuery()
+			If order = -1 Then
+				cmd.BuildQuery("select count(*) from playlist_detail where playlist_id = ?", New Object() {playlistId})
+				r = cmd.ExecuteReader()
+				r.Read()
+				Dim counter = r(0)
+				r.Close()
+				cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, counter + 1})
+			Else
+				cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
+			End If
 		Else
+			r.Close()
 			Throw New Exception("Already Exist")
 		End If
 	End Sub
@@ -210,17 +220,28 @@ Public Class Database
 	''' <param name="songId">id of the song</param>
 	''' <param name="order">order, start from ZERO</param>
 	''' <param name="cmd">SQLiteCommand Object</param>
-	Public Overloads Shared Sub AddSongToPlaylist(playlistId As Integer, songId As Integer, order As Integer,
-												  cmd As SQLiteCommand)
+	Public Overloads Shared Sub AddSongToPlaylist(playlistId As Integer, songId As Integer,
+												cmd As SQLiteCommand, optional order As Integer = -1)
+
 		cmd.BuildQuery("select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
-				   New Object() {playlistId, songId})
+						New Object() {playlistId, songId})
 		Dim r = cmd.ExecuteReader
 		r.Read()
 		If r(0) = 0 Then
 			r.Close()
-			cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
+			If order = -1 Then
+				cmd.BuildQuery("select count(*) from playlist_detail where playlist_id = ?", New Object() {playlistId})
+				r = cmd.ExecuteReader()
+				r.Read()
+				Dim counter = r(0)
+				r.Close()
+				cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, counter + 1})
+			Else
+				cmd.BuildQuery("insert into playlist_detail values (?, ?, ?)", New Object() {playlistId, songId, order})
+			End If
 			cmd.ExecuteNonQuery()
 		Else
+			r.Close()
 			Throw New Exception("Already Exist")
 		End If
 	End Sub
@@ -234,7 +255,7 @@ Public Class Database
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("delete from playlist_detail where playlist_id = ? and song_id = ?", New Object() {playlistId,
-																										   songId})
+																										songId})
 		cmd.ExecuteNonQuery()
 		conn.Close()
 	End Sub
@@ -248,7 +269,7 @@ Public Class Database
 	Public Overloads Shared Sub RemoveSongFromPlaylist(playlistId As Integer, songId As Integer, conn As SQLiteConnection)
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("delete from playlist_detail where playlist_id = ? and song_id = ?", New Object() {playlistId,
-																										   songId})
+																										songId})
 		cmd.ExecuteNonQuery()
 	End Sub
 
@@ -260,7 +281,7 @@ Public Class Database
 	''' <param name="cmd">SQLiteConnection Object</param>
 	Public Overloads Shared Sub RemoveSongFromPlaylist(playlistId As Integer, songId As Integer, cmd As SQLiteCommand)
 		cmd.BuildQuery("delete from playlist_detail where playlist_id = ? and song_id = ?", New Object() {playlistId,
-																										   songId})
+																										songId})
 		cmd.ExecuteNonQuery()
 	End Sub
 
@@ -660,7 +681,7 @@ Public Class Database
 
 	'TODO: This Function has NOT been debugged!
 	Public Shared Function GetSong_id(Optional ByVal songName As String = Nothing,
-									  Optional ByVal songArtist As String = Nothing) As List(Of Integer)
+									Optional ByVal songArtist As String = Nothing) As List(Of Integer)
 		Dim lstId As New List(Of Integer)
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
