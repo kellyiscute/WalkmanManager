@@ -42,28 +42,28 @@ Class MainWindow
 		End If
 
 		Dim newLost = Await Task.Run(Async Function()
-			Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
-			Dim lstLost = Await upd.FindLost()
-			_lstSongs = GetSongs()
-			Dim syncResult As String = ""
-			If lstNew.Count > 0 Then
-				syncResult = "=========================发现以下新项目=========================" & vbNewLine
-				For Each NewItem In lstNew
-					syncResult += NewItem & vbNewLine
-				Next
-			End If
-			If lstLost.Count > 0 Then
-				syncResult += "=========================发现已删除项目=========================" & vbNewLine
-				For Each LostItem In lstLost
-					syncResult += LostItem & vbNewLine
-				Next
-			End If
-			Return syncResult
-		End Function)
+										 Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
+										 Dim lstLost = Await upd.FindLost()
+										 _lstSongs = GetSongs()
+										 Dim syncResult As String = ""
+										 If lstNew.Count > 0 Then
+											 syncResult = "=========================发现以下新项目=========================" & vbNewLine
+											 For Each NewItem In lstNew
+												 syncResult += NewItem & vbNewLine
+											 Next
+										 End If
+										 If lstLost.Count > 0 Then
+											 syncResult += "=========================发现已删除项目=========================" & vbNewLine
+											 For Each LostItem In lstLost
+												 syncResult += LostItem & vbNewLine
+											 Next
+										 End If
+										 Return syncResult
+									 End Function)
 		Dim lstPlaylist = Await Task.Run(Function()
-			Dim r = GetPlaylists()
-			Return r
-		End Function)
+											 Dim r = GetPlaylists()
+											 Return r
+										 End Function)
 		For Each itm In lstPlaylist
 			Dim lbitm = New ListBoxItem() With {.Content = itm, .AllowDrop = True}
 			AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
@@ -79,7 +79,7 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-									New WindowChrome() _
+									 New WindowChrome() _
 										With {.GlassFrameThickness = New Thickness(7),
 										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
 										.CornerRadius = New CornerRadius(10),
@@ -111,18 +111,25 @@ Class MainWindow
 	End Sub
 
 	Private Sub ListBoxItem_Drop(sender As Object, e As DragEventArgs)
-		Console.WriteLine(sender.Content.GetType.ToString)
 		If sender.Content.GetType.ToString = "System.Windows.Controls.WrapPanel" Then
 			Exit Sub
 		End If
 		Try
 			Dim songInf As SongInfo = e.Data.GetData(DragDrop.DataFormat.Name)
+			'if it is 0(initial number of integer), it is probably not dragged from the list
+			If songInf.Id = 0 Then
+				Exit Sub
+			End If
 			Dim playlistId = GetPlaylistIdByName(sender.Content)
 			AddSongToPlaylist(playlistId, songInf.Id)
 		Catch ex As Exception
 			If ex.Message = "Already Exist" Then
 				Exit Sub
 			End If
+			Try
+				e.Data.GetData("GongSolutions.Wpf.DragDrop")
+			Catch
+			End Try
 			Dim a = e.Data.GetData("GongSolutions.Wpf.DragDrop")
 			Dim playlistId = GetPlaylistIdByName(sender.Content)
 			Dim conn = Connect()
@@ -151,7 +158,6 @@ Class MainWindow
 				Dim result = Await DlgWindowRoot.ShowDialog(dlg)
 				If result Then
 					AddPlaylist(dlg.PlaylistName)
-
 					Dim lbitm = New ListBoxItem() With {.Content = dlg.PlaylistName, .AllowDrop = True}
 					AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
 					ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, lbitm)
@@ -159,6 +165,7 @@ Class MainWindow
 				sender.SelectedIndex = -1
 			Else
 				ButtonMusic.IsSelected = False
+				DatSongList.CanUserSortColumns = False
 				Dim dlg As New dlg_progress
 				DatSongList.ItemsSource = Nothing
 				DialogHost.Show(dlg, "window-root")
@@ -192,9 +199,54 @@ Class MainWindow
 		DatSongList.ItemsSource = Nothing
 		DatSongList.ItemsSource = _lstSongs
 		ListBoxPlaylist.SelectedIndex = -1
+		DatSongList.CanUserSortColumns = True
 	End Sub
 
 	Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected
+		On Error Resume Next
 		ListBoxPlaylist.SelectedIndex = -1
+		DatSongList.CanUserSortColumns = True
+	End Sub
+
+	Private Async Sub DeletePlaylist_Click(sender As Object, e As EventArgs) Handles MenuDeletePlaylist.Click
+		If ListBoxPlaylist.SelectedIndex <> -1 Then
+			Dim dlg As New DlgYesNoDialog("删除播放列表", "要删除播放列表 """ & ListBoxPlaylist.SelectedItem.Content & """ 吗")
+			Dim r = Await DlgWindowRoot.ShowDialog(dlg)
+			If r = True Then
+				Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content)
+				RemovePlaylist(id)
+				ListBoxPlaylist.Items.Remove(ListBoxPlaylist.SelectedItem)
+				ButtonMusic_MouseLeftButtonUp(Nothing, Nothing)
+			End If
+		End If
+	End Sub
+
+	Private Sub ButtonDelete_Click(sender As Object, e As RoutedEventArgs) Handles ButtonDelete.Click
+		If Not ButtonMusic.IsSelected Then
+			If DatSongList.SelectedItems.Count <> 0 Then
+				Dim conn = Connect()
+				Dim cmd = conn.CreateCommand()
+				cmd.Transaction = conn.BeginTransaction()
+				Dim removeList As New List(Of Object)
+				Dim playlistId = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content)
+				For Each itm In DatSongList.SelectedItems
+					Dim itmLocal As Object = itm
+					RemoveSongFromPlaylist(playlistId, itm.id, cmd)
+					removeList.Add(itmLocal)
+				Next
+				cmd.Transaction.Commit()
+				conn.Close()
+				For Each o As Object In removeList
+					Dim source = CType(DatSongList.ItemsSource, ObservableCollection(Of SongInfo))
+					source.Remove(o)
+				Next
+			End If
+		End If
+	End Sub
+
+	Private Sub LocalMusicTabKeyHandler(sender As Object, e As KeyEventArgs) Handles DatSongList.KeyUp
+		If e.Key = Key.Delete Then
+			ButtonDelete_Click(Nothing, Nothing)
+		End If
 	End Sub
 End Class

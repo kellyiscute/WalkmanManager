@@ -139,6 +139,41 @@ Public Class Database
 	End Sub
 
 	''' <summary>
+	''' Remove a Playlist
+	''' </summary>
+	''' <param name="id">playlist id</param>
+	Public Overloads Shared Sub RemovePlaylist(id As Integer)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
+		Dim trans = conn.BeginTransaction()
+		cmd.Transaction = trans
+		cmd.BuildQuery("delete from playlists where id = ?", New Object() {id})
+		cmd.ExecuteNonQuery()
+		cmd.BuildQuery("delete from playlist_detail where playlist_id = ?", New Object() {id})
+		cmd.ExecuteNonQuery()
+		trans.Commit()
+		conn.Close()
+	End Sub
+
+	Public Overloads Shared Sub RemovePlaylist(id As Integer, conn As SQLiteConnection)
+		Dim cmd = conn.CreateCommand()
+		Dim trans = conn.BeginTransaction()
+		cmd.Transaction = trans
+		cmd.BuildQuery("delete from playlists where id = ?", New Object() {id})
+		cmd.ExecuteNonQuery()
+		cmd.BuildQuery("delete from playlist_detail where playlist_id = ?", New Object() {id})
+		cmd.ExecuteNonQuery()
+		trans.Commit()
+	End Sub
+
+	Public Overloads Shared Sub RemovePlaylist(id As Integer, cmd As SQLiteCommand)
+		cmd.BuildQuery("delete from playlists where id = ?", New Object() {id})
+		cmd.ExecuteNonQuery()
+		cmd.BuildQuery("delete from playlist_detail where playlist_id = ?", New Object() {id})
+		cmd.ExecuteNonQuery()
+	End Sub
+
+	''' <summary>
 	''' this is a overload method of AddPlaylist, which allows you to use your own SQliteConnection object to operate the database
 	''' </summary>
 	''' <param name="name">name of the playlist</param>

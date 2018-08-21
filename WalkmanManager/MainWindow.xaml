@@ -62,7 +62,7 @@
 						<Grid>
 							<StackPanel x:Name="LstLocalSidebar" HorizontalAlignment="Left" Width="220">
 								<ListBox>
-									<ListBoxItem Height="60" VerticalContentAlignment="Center" x:Name="ButtonMusic">
+									<ListBoxItem Height="60" VerticalContentAlignment="Center" x:Name="ButtonMusic" IsSelected="True">
 										<Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center">音乐</Label>
 									</ListBoxItem>
 								</ListBox>
@@ -71,7 +71,7 @@
 									         PreviewMouseRightButtonDown="BlockRightClickSelectoin">
 										<ListBox.ContextMenu>
 											<ContextMenu>
-												<MenuItem Header="删除播放列表" Width="150"/>
+												<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150"/>
 											</ContextMenu>
 										</ListBox.ContextMenu>
 										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
@@ -86,7 +86,7 @@
 							<Grid x:Name="GridMusic" Margin="220,0,0,0">
 								<mD:ColorZone Height="45" Background="#FFF3F3F3" mD:ShadowAssist.ShadowDepth="Depth1">
 									<Grid>
-										<mD:ColorZone Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35" Margin="8,5,0,0"
+										<mD:ColorZone x:Name="PanelSearchLocalMusic" Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35" Margin="8,5,0,0"
 										              HorizontalAlignment="Left" Width="251">
 											<Grid>
 												<TextBox VerticalContentAlignment="Center" mD:TextFieldAssist.DecorationVisibility="Hidden"
@@ -99,6 +99,12 @@
 												</Button>
 											</Grid>
 										</mD:ColorZone>
+										<Button x:Name="ButtonSaveSorting" Margin="10,6,0,7" HorizontalAlignment="Left" Width="141" Style="{DynamicResource MaterialDesignFlatButton}" Visibility="Collapsed">
+											<WrapPanel>
+												<mD:PackIcon Kind="ContentSave"></mD:PackIcon>
+												<TextBlock>保存当前排序</TextBlock>
+											</WrapPanel>
+										</Button>
 										<Button x:Name="ButtonDelete" Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto"
 										        HorizontalAlignment="Right">
 											<WrapPanel>

@@ -1,0 +1,46 @@
+﻿<UserControl x:Class="DlgYesNoDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:WalkmanManager"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" Height="221.281" Width="445.765">
+	<Grid>
+		<mD:ColorZone Mode="PrimaryMid" Height="40">
+			<Grid>
+				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="TextBlockTitle" FontSize="16"
+				           Margin="10,0,0,0">
+				</TextBlock>
+				<Button VerticalAlignment="Stretch" HorizontalAlignment="Right" mD:ShadowAssist.ShadowDepth="Depth0"
+				        Command="{x:Static mD:DialogHost.CloseDialogCommand}"
+				        Height="Auto"
+				        Width="50">
+					<mD:PackIcon Kind="Close" />
+				</Button>
+			</Grid>
+		</mD:ColorZone>
+		<Grid Margin="0,45,0,58">
+			<Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" x:Name="LabelContent" />
+		</Grid>
+		<Grid Margin="0,168,0,0">
+			<Button HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignFlatButton}"
+			        Command="{x:Static mD:DialogHost.CloseDialogCommand}" Margin="0,10,25,10"
+			        Height="Auto" Width="80">
+				<Button.CommandParameter>
+					<system:Boolean>False</system:Boolean>
+				</Button.CommandParameter>
+				否
+			</Button>
+			<Button HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignFlatButton}"
+			        Command="{x:Static mD:DialogHost.CloseDialogCommand}" Margin="0,10,119,10"
+			        Height="Auto" Width="80">
+				<Button.CommandParameter>
+					<system:Boolean>True</system:Boolean>
+				</Button.CommandParameter>
+				是
+			</Button>
+		</Grid>
+	</Grid>
+</UserControl>

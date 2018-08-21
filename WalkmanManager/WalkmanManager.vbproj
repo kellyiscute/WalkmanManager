@@ -156,6 +156,9 @@
     <Compile Include="Dialogs\DlgSongDetail.xaml.vb">
       <DependentUpon>DlgSongDetail.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DlgYesNoDialog.xaml.vb">
+      <DependentUpon>DlgYesNoDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\CloudMusic.vb" />
     <Compile Include="Utils\CloudMusicAPITypes.vb" />
     <Compile Include="Utils\Database.vb" />
@@ -180,6 +183,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\DlgSongDetail.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DlgYesNoDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
