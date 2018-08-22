@@ -1,10 +1,8 @@
 ﻿Imports System.Collections.ObjectModel
-Imports System.Data.Entity
 Imports System.Windows.Shell
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
 Imports ATL
-Imports System.Linq
 Imports GongSolutions.Wpf.DragDrop
 
 Class MainWindow
@@ -245,6 +243,22 @@ Class MainWindow
 				For Each o As Object In removeList
 					Dim source = CType(DatSongList.ItemsSource, ObservableCollection(Of SongInfo))
 					source.Remove(o)
+				Next
+			End If
+		Else
+			'Remove from whole library
+			If DatSongList.SelectedIndex <> -1 Then
+				Dim conn = Connect()
+				Dim cmd = conn.CreateCommand()
+				Dim trans = conn.BeginTransaction()
+				cmd.Transaction = trans
+				Dim removeList As New List(Of Object)
+				For Each itm In DatSongList.SelectedItems
+					If My.Computer.FileSystem.FileExists(itm.path) Then
+						My.Computer.FileSystem.DeleteFile(itm.path)
+					End If
+					removeList.Add(itm)
+
 				Next
 			End If
 		End If

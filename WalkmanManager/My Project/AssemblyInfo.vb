@@ -1,8 +1,6 @@
-﻿Imports System
+﻿
 Imports System.Reflection
 Imports System.Runtime.InteropServices
-Imports System.Globalization
-Imports System.Resources
 Imports System.Windows
 
 ' 有关程序集的一般信息由以下

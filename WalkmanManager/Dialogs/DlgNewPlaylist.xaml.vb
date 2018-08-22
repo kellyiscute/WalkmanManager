@@ -1,4 +1,4 @@
-﻿Imports MaterialDesignThemes.Wpf
+﻿
 Imports WalkmanManager.Database
 
 Public Class DlgNewPlaylist
