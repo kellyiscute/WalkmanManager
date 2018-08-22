@@ -166,6 +166,8 @@ Class MainWindow
 			Else
 				ButtonMusic.IsSelected = False
 				DatSongList.CanUserSortColumns = False
+				ButtonSaveSorting.Visibility = Visibility.Visible
+				PanelSearchLocalMusic.Visibility = Visibility.Collapsed
 				Dim dlg As New dlg_progress
 				DatSongList.ItemsSource = Nothing
 				DialogHost.Show(dlg, "window-root")
@@ -200,13 +202,15 @@ Class MainWindow
 		DatSongList.ItemsSource = _lstSongs
 		ListBoxPlaylist.SelectedIndex = -1
 		DatSongList.CanUserSortColumns = True
+		PanelSearchLocalMusic.Visibility = Visibility.Visible
+		ButtonSaveSorting.Visibility = Visibility.Collapsed
 	End Sub
 
-	Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected
-		On Error Resume Next
-		ListBoxPlaylist.SelectedIndex = -1
-		DatSongList.CanUserSortColumns = True
-	End Sub
+	'Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected
+	'	On Error Resume Next
+	'	ListBoxPlaylist.SelectedIndex = -1
+	'	DatSongList.CanUserSortColumns = True
+	'End Sub
 
 	Private Async Sub DeletePlaylist_Click(sender As Object, e As EventArgs) Handles MenuDeletePlaylist.Click
 		If ListBoxPlaylist.SelectedIndex <> -1 Then
@@ -247,6 +251,29 @@ Class MainWindow
 	Private Sub LocalMusicTabKeyHandler(sender As Object, e As KeyEventArgs) Handles DatSongList.KeyUp
 		If e.Key = Key.Delete Then
 			ButtonDelete_Click(Nothing, Nothing)
+		End If
+	End Sub
+
+	Private Async Sub SavePlaylistSorting(sender As Object, e As EventArgs) Handles ButtonSaveSorting.Click
+		If ListBoxPlaylist.SelectedIndex <> -1 Then
+			Dim conn = Connect()
+			Dim cmd = conn.CreateCommand()
+			cmd.Transaction = conn.BeginTransaction
+			Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content, cmd)
+			ClearPlaylist(id, cmd)
+			cmd.Transaction.Commit()
+			Dim lst As ObservableCollection(Of SongInfo) = DatSongList.ItemsSource
+			DatSongList.ItemsSource = Nothing
+			Dim dlg As New dlg_progress
+			DlgWindowRoot.Show(dlg)
+			Await Task.Run(Sub()
+							   For Each songInfo As SongInfo In lst
+								   AddSongToPlaylist(id, songInfo.Id)
+							   Next
+						   End Sub)
+			cmd.Transaction.Commit()
+			conn.Close()
+			DlgWindowRoot.IsOpen = False
 		End If
 	End Sub
 End Class

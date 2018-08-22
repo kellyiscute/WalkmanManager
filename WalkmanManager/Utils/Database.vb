@@ -696,7 +696,7 @@ Public Class Database
 		End If
 	End Function
 
-	Public Shared Function GetPlaylistIdByName(playlistName As String) As Integer
+	Public Overloads Shared Function GetPlaylistIdByName(playlistName As String) As Integer
 		Dim conn = Connect()
 		Dim cmd = conn.CreateCommand()
 		cmd.BuildQuery("select id from playlists where name = ?", New Object() {playlistName})
@@ -713,6 +713,24 @@ Public Class Database
 			Return -1
 		End If
 	End Function
+
+	Public Overloads Shared Function GetPlaylistIdByName(playlistName As String, ByRef cmd As SQLiteCommand) As Integer
+		cmd.BuildQuery("select id from playlists where name = ?", New Object() {playlistName})
+		Dim reader = cmd.ExecuteReader()
+		If reader.HasRows Then
+			reader.Read()
+			Dim id = reader(0)
+			reader.Close()
+			Return id
+		Else
+			reader.Close()
+			Return -1
+		End If
+	End Function
+
+	Public Shared Sub ClearPlaylist(playlistId As Integer, cmd As SQLiteCommand)
+		cmd.BuildQuery("delete from playlist_detail where playlist_id = ?", New Object() {playlistId})
+	End Sub
 
 	'TODO: This Function has NOT been debugged!
 	Public Shared Function GetSong_id(Optional ByVal songName As String = Nothing,
