@@ -258,7 +258,13 @@ Class MainWindow
 						My.Computer.FileSystem.DeleteFile(itm.path)
 					End If
 					removeList.Add(itm)
-
+					RemoveSongFromLib(itm.id, cmd)
+				Next
+				trans.Commit()
+				conn.Close()
+				For Each o As Object In removeList
+					Dim source = CType(DatSongList.ItemsSource, ObservableCollection(Of SongInfo))
+					source.Remove(o)
 				Next
 			End If
 		End If
@@ -274,22 +280,23 @@ Class MainWindow
 		If ListBoxPlaylist.SelectedIndex <> -1 Then
 			Dim conn = Connect()
 			Dim cmd = conn.CreateCommand()
-			cmd.Transaction = conn.BeginTransaction
-			Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content, cmd)
-			ClearPlaylist(id, cmd)
-			cmd.Transaction.Commit()
+			Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content)
+			ClearPlaylist(id)
 
+			Dim trans = conn.BeginTransaction()
+			cmd.Transaction = trans
 			Dim lst As ObservableCollection(Of SongInfo) = DatSongList.ItemsSource
 			DatSongList.ItemsSource = Nothing
 			Dim dlg As New dlg_progress
 			DlgWindowRoot.Show(dlg)
 			Await Task.Run(Sub()
 							   For Each songInfo As SongInfo In lst
-								   AddSongToPlaylist(id, songInfo.Id)
+								   AddSongToPlaylist(id, songInfo.Id, cmd)
 							   Next
 						   End Sub)
-			cmd.Transaction.Commit()
+			trans.Commit()
 			conn.Close()
+			DatSongList.ItemsSource = lst
 			DlgWindowRoot.IsOpen = False
 		End If
 	End Sub
