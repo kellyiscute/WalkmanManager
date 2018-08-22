@@ -212,6 +212,7 @@ Public Class Database
 			conn.Close()
 		Else
 			r.Close()
+			conn.Close()
 			Throw New Exception("Already Exist")
 		End If
 	End Sub
@@ -728,8 +729,17 @@ Public Class Database
 		End If
 	End Function
 
-	Public Shared Sub ClearPlaylist(playlistId As Integer, cmd As SQLiteCommand)
+	Public Overloads Shared Sub ClearPlaylist(playlistId As Integer)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
 		cmd.BuildQuery("delete from playlist_detail where playlist_id = ?", New Object() {playlistId})
+		cmd.ExecuteNonQuery()
+		conn.Close()
+	End Sub
+
+	Public Overloads Shared Sub ClearPlaylist(playlistId As Integer, cmd As SQLiteCommand)
+		cmd.BuildQuery("delete from playlist_detail where playlist_id = ?", New Object() {playlistId})
+		cmd.ExecuteNonQuery()
 	End Sub
 
 	'TODO: This Function has NOT been debugged!

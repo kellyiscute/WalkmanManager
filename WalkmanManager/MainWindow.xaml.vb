@@ -182,6 +182,7 @@ Class MainWindow
 												  For Each itm In songIds
 													  songs.Add(GetSongById(itm, cmd))
 												  Next
+												  trans.Commit()
 												  conn.Close()
 												  Return songs
 											  End Function)
@@ -229,10 +230,11 @@ Class MainWindow
 		If Not ButtonMusic.IsSelected Then
 			If DatSongList.SelectedItems.Count <> 0 Then
 				Dim conn = Connect()
+				Dim trans = conn.BeginTransaction()
 				Dim cmd = conn.CreateCommand()
-				cmd.Transaction = conn.BeginTransaction()
+				cmd.Transaction = trans
 				Dim removeList As New List(Of Object)
-				Dim playlistId = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content)
+				Dim playlistId = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content, cmd)
 				For Each itm In DatSongList.SelectedItems
 					Dim itmLocal As Object = itm
 					RemoveSongFromPlaylist(playlistId, itm.id, cmd)
@@ -262,6 +264,7 @@ Class MainWindow
 			Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content, cmd)
 			ClearPlaylist(id, cmd)
 			cmd.Transaction.Commit()
+
 			Dim lst As ObservableCollection(Of SongInfo) = DatSongList.ItemsSource
 			DatSongList.ItemsSource = Nothing
 			Dim dlg As New dlg_progress
