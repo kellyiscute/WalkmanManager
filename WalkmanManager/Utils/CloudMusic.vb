@@ -80,7 +80,7 @@ Public Class CloudMusic
 
 	Public Function BcHexDec(hex As String) As BigInteger
 		Dim dec As New BigInteger(0)
-		For i = 0 To hex.Length
+		For i = 0 To hex.Length - 1
 			dec += BigInteger.Multiply(New BigInteger(Convert.ToInt32(hex(i).ToString, 16)),
 										BigInteger.Pow(New BigInteger(16), hex.Length - i - 1))
 		Next
@@ -88,7 +88,7 @@ Public Class CloudMusic
 	End Function
 
 	Public Function RsaEncode(text As String) As String
-		Dim srtext = New String(text.Reverse)
+		Dim srtext = New String(text.Reverse.ToArray())
 		Dim a = BcHexDec(BitConverter.ToString(Encoding.Default.GetBytes(srtext)).Replace("-", ""))
 		Dim b = BcHexDec(Pubkey)
 		Dim c = BcHexDec(Modulus)
@@ -205,7 +205,7 @@ Public Class CloudMusic
 		Return deserializedObj
 	End Function
 
-	Public Function Login(phone As String, password As String) As Dictionary(Of String, Object)
+	Public Function Login(phone As String, password As String) 'As Dictionary(Of String, Object)
 		Dim api = New CloudMusic
 		Dim params = New Dictionary(Of String, String)()
 		params("phone") = phone
@@ -219,7 +219,8 @@ Public Class CloudMusic
 		Debug.Print(j)
 		Dim r = api.Curl("https://music.163.com/weapi/login/cellphone/", api.Prepare(j))
 
-		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		'Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		Return r
 	End Function
 
 	Public Function GetPlaylists(uid As String, Optional offset As Integer = 0, Optional limit As Integer = 100)

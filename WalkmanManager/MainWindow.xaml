@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:dd="urn:gong-wpf-dragdrop"
+        xmlns:resources="clr-namespace:WalkmanManager.My.Resources"
         mc:Ignorable="d"
         Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen"
         Background="White">
@@ -36,19 +37,19 @@
 					<Grid>
 						<ListBox x:Name="LstTopbar" Style="{StaticResource MaterialDesignToolToggleFlatListBox}" Height="50"
 						         SelectedIndex="0" HorizontalAlignment="Left" Width="337">
-							<ListBoxItem x:Name="TabItmLocal" Height="50">
+							<ListBoxItem Height="50" x:Name="TabLocal">
 								<WrapPanel>
 									<mD:PackIcon Kind="DesktopTower" />
 									<TextBlock FontSize="17">本地</TextBlock>
 								</WrapPanel>
 							</ListBoxItem>
-							<ListBoxItem>
+							<ListBoxItem x:Name="TabCloudMusic">
 								<WrapPanel>
 									<mD:PackIcon Kind="MusicBox" />
 									<TextBlock FontSize="17">网易云音乐</TextBlock>
 								</WrapPanel>
 							</ListBoxItem>
-							<ListBoxItem>
+							<ListBoxItem x:Name="TabRemote">
 								<WrapPanel>
 									<mD:PackIcon Kind="Cellphone" />
 									<TextBlock FontSize="17">远程设备</TextBlock>
@@ -57,7 +58,7 @@
 						</ListBox>
 					</Grid>
 				</mD:ColorZone>
-				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Hidden">
+				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible">
 					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
 						<Grid>
 							<StackPanel x:Name="LstLocalSidebar" HorizontalAlignment="Left" Width="220">
@@ -71,7 +72,8 @@
 									         PreviewMouseRightButtonDown="BlockRightClickSelectoin">
 										<ListBox.ContextMenu>
 											<ContextMenu>
-												<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150" />
+												<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150" Height="50"/>
+												<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="150" Height="50"/>
 											</ContextMenu>
 										</ListBox.ContextMenu>
 										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
@@ -130,17 +132,16 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0">
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" Visibility="Hidden">
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
-							<Border BorderThickness="0,0,1,1" BorderBrush="Black" HorizontalAlignment="Left" Width="270" Height="70" VerticalAlignment="Top">
+							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70" VerticalAlignment="Top">
 								<Grid>
-									<Image x:Name="ImageCloudMusicAvatar" VerticalAlignment="Top" Height="49" Margin="20,10,192,0">
-									</Image>
-									<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" Cursor="Hand" FontSize="16" Margin="92,10,10,10">登录</Label>
+									<Image x:Name="ImageCloudMusicAvatar" VerticalAlignment="Top" Height="49" Margin="20,10,192,0" Stretch="UniformToFill"/>
+										<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" Cursor="Hand" FontSize="16" Margin="92,10,10,10">登录</Label>
 								</Grid>
 							</Border>
-							<ListBox BorderThickness="0,0,1,0" BorderBrush="Black" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
+							<ListBox BorderThickness="0,0,1,0" BorderBrush="LightGray" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
 						</Grid>
 					</mD:DialogHost>
 				</Grid>

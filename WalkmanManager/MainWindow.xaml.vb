@@ -8,6 +8,7 @@ Imports GongSolutions.Wpf.DragDrop
 Class MainWindow
 	Dim _lstSongs As ObservableCollection(Of SongInfo)
 	Dim _isRightClickSelect As Boolean = False
+	Dim _isCloudMusicLoggedIn As Boolean = False
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -24,6 +25,24 @@ Class MainWindow
 
 	Private Sub btn_window_close_Click(sender As Object, e As RoutedEventArgs) Handles BtnWindowClose.Click
 		Environment.Exit(0)
+	End Sub
+
+	Private Sub PageSwitcher(sender As Object, e As RoutedEventArgs) Handles LstTopbar.SelectionChanged
+		On Error Resume Next
+		If TabLocal.IsSelected Then
+			GridLocal.Visibility = Visibility.Visible
+		Else
+			GridLocal.Visibility = Visibility.Hidden
+		End If
+		If TabCloudMusic.IsSelected Then
+			If _isCloudMusicLoggedIn Then
+				GridCloudMusic.Visibility = Visibility.Visible
+			Else
+
+			End If
+		Else
+			GridCloudMusic.Visibility = Visibility.Hidden
+		End If
 	End Sub
 
 	Private Async Sub MainWindow_ContentRendered(sender As Object, e As EventArgs) Handles Me.ContentRendered
