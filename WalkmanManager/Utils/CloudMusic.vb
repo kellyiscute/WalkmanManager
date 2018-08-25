@@ -54,6 +54,7 @@ Public Class CloudMusic
 	Public Playlists
 
 	Public Property Uid As Integer = 0
+	Public Property UserNickName As Integer = 0
 
 #End Region
 

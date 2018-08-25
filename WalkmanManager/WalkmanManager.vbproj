@@ -182,6 +182,9 @@
     <Compile Include="Dialogs\DlgSongDetail.xaml.vb">
       <DependentUpon>DlgSongDetail.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DlgMessageDialog.xaml.vb">
+      <DependentUpon>DlgMessageDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\DlgYesNoDialog.xaml.vb">
       <DependentUpon>DlgYesNoDialog.xaml</DependentUpon>
     </Compile>
@@ -215,6 +218,10 @@
     <Page Include="Dialogs\DlgSongDetail.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DlgMessageDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\DlgYesNoDialog.xaml">
       <SubType>Designer</SubType>

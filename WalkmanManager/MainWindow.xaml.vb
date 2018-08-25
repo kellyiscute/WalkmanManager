@@ -45,18 +45,20 @@ Class MainWindow
 				Dim login As Boolean = Await DlgWindowRoot.ShowDialog(dlgLogin)
 				If login Then
 					DlgWindowRoot.ShowDialog(New dlg_progress)
-					Await Task.Run(Sub()
-									   Try
-										   Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
-										   If loginResult("success") Then
-											   Dim playlists = _cloudMusic.GetPlaylists()
-
-										   Else
-
-										   End If
-									   Catch
-									   End Try
-								   End Sub)
+					Dim result = Await UiCloudMusicLogin(dlgLogin)
+					If result = "" Then
+						For Each p In _cloudMusic.Playlists
+							ListBoxCloudMusicPlaylists.Items.Add(p("name"))
+						Next
+						GridCloudMusic.Visibility = Visibility.Visible
+						_isCloudMusicLoggedIn = True
+						DlgWindowRoot.IsOpen = False
+					Else
+						Dim dlgRetry As New DlgMessageDialog("登录失败", result)
+						_isCloudMusicLoggedIn = False
+						DlgWindowRoot.IsOpen = False
+						Await DlgWindowRoot.ShowDialog(dlgRetry)
+					End If
 				Else
 					TabCloudMusic.IsSelected = False
 					TabLocal.IsSelected = True
@@ -66,6 +68,24 @@ Class MainWindow
 			GridCloudMusic.Visibility = Visibility.Hidden
 		End If
 	End Sub
+
+	Private Async Function UiCloudMusicLogin(dlgLogin As DlgCloudMusicLogin) As Task(Of String)
+		Dim result = Await Task.Run(Function()
+										Try
+											Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
+											If loginResult("success") Then
+												_cloudMusic.GetPlaylists()
+												Return ""
+											Else
+												Return loginResult("msg")
+											End If
+										Catch
+											MessageBox.Show("出现未知错误", "错误", MessageBoxButton.OK, MessageBoxImage.Exclamation)
+											Return "Unknown Error"
+										End Try
+									End Function)
+		Return result
+	End Function
 
 	Private Async Sub MainWindow_ContentRendered(sender As Object, e As EventArgs) Handles Me.ContentRendered
 		If Not My.Computer.FileSystem.FileExists("data.db") Then
@@ -118,7 +138,7 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-									 New WindowChrome() _
+									New WindowChrome() _
 										With {.GlassFrameThickness = New Thickness(7),
 										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
 										.CornerRadius = New CornerRadius(10),

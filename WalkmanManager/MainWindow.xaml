@@ -57,7 +57,7 @@
 						</ListBox>
 					</Grid>
 				</mD:ColorZone>
-				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible">
+				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible" d:IsHidden="True">
 					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
 						<Grid>
 							<StackPanel x:Name="LstLocalSidebar" HorizontalAlignment="Left" Width="220">
@@ -131,7 +131,7 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" Visibility="Hidden">
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0"><!--Visibility="Hidden"-->
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
 							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70" VerticalAlignment="Top">
@@ -140,7 +140,7 @@
 										<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" Cursor="Hand" FontSize="16" Margin="92,10,10,10">登录</Label>
 								</Grid>
 							</Border>
-							<ListBox BorderThickness="0,0,1,0" BorderBrush="LightGray" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
+							<ListBox x:Name="ListBoxCloudMusicPlaylists" BorderThickness="0,0,1,0" BorderBrush="LightGray" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
