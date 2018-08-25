@@ -9,24 +9,26 @@ Imports Newtonsoft.Json
 ''' <summary>
 ''' Partof this class is translated from C# by the author
 ''' The origional file is written by GEEKiDoS and can be found by this link https://github.com/GEEKiDoS/NeteaseMuiscApi/blob/master/NeteaseCloudMuiscApi.cs
-''' The file is licensed under the MIT License, written as below
+''' The file is licensed under the MIT License, written below
+''' 
 ''' MIT License
-'''Copyright (c) 2018 GEEKiDoS
-'''Permission is hereby granted, free of charge, to any person obtaining a copy
-'''of this software and associated documentation files (the "Software"), to deal
-'''in the Software without restriction, including without limitation the rights
-'''to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-'''copies of the Software, and to permit persons to whom the Software is
-'''furnished to do so, subject to the following conditions
-'''The above copyright notice and this permission notice shall be included in all
-'''copies or substantial portions of the Software.
-'''THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS O
-'''IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-'''FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL TH
-'''AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-'''LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-'''OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-'''SOFTWARE.
+''' Copyright (c) 2018 GEEKiDoS
+''' Permission is hereby granted, free of charge, to any person obtaining a copy
+''' of this software and associated documentation files (the "Software"), to deal
+''' in the Software without restriction, including without limitation the rights
+''' to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+''' copies of the Software, and to permit persons to whom the Software is
+''' furnished to do so, subject to the following conditions
+''' The above copyright notice and this permission notice shall be included in all
+''' copies or substantial portions of the Software.
+''' THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS O
+''' IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+''' FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL TH
+''' AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+''' LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+''' OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+''' SOFTWARE.
+'''
 ''' </summary>
 
 Public Class CloudMusic
@@ -48,6 +50,8 @@ Public Class CloudMusic
 	Const Referer = "http://music.163.com/"
 	Private _secretKey As String
 	Private _encSecKey As String
+
+	Public Property Uid As Integer = 0
 
 #End Region
 
@@ -153,7 +157,7 @@ Public Class CloudMusic
 			wc.Headers.Add(HttpRequestHeader.Referer, Referer)
 			wc.Headers.Add(HttpRequestHeader.UserAgent, Useragent)
 			wc.CookieContainer = Cookie
-			Dim reqparm = New System.Collections.Specialized.NameValueCollection()
+			Dim reqparm = New Specialized.NameValueCollection()
 			For Each keyPair As KeyValuePair(Of String, String) In parms
 				reqparm.Add(keyPair.Key, keyPair.Value)
 			Next
@@ -162,11 +166,8 @@ Public Class CloudMusic
 
 			Debug.Print("=================Cookies=================")
 			For i = 0 To wc.ResponseCookies.Count - 1
-				'Cookie += ";" & wc.ResponseCookies.Item(i).Name & "="
-				'Cookie += wc.ResponseCookies.Item(i).Value
 				Cookie.Add(wc.ResponseCookies.Item(i))
 			Next
-			'Debug.Print(Cookie)
 
 			result = Encoding.UTF8.GetString(responsebytes)
 		End Using
@@ -205,7 +206,7 @@ Public Class CloudMusic
 		Return deserializedObj
 	End Function
 
-	Public Function Login(phone As String, password As String) 'As Dictionary(Of String, Object)
+	Public Function Login(phone As String, password As String) As Dictionary(Of String, Object)
 		Dim api = New CloudMusic
 		Dim params = New Dictionary(Of String, String)()
 		params("phone") = phone
@@ -219,15 +220,45 @@ Public Class CloudMusic
 		Debug.Print(j)
 		Dim r = api.Curl("https://music.163.com/weapi/login/cellphone/", api.Prepare(j))
 
-		'Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
-		Return r
+		Dim returnJson = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		If returnJson.Keys.Contains("msg") Then
+			If returnJson("msg").contains("密码错误") Then
+				Dim re = New Dictionary(Of String, Object)
+				re("msg") = returnJson("msg")
+				re("success") = False
+				Return re
+			Else
+				Dim re = New Dictionary(Of String, Object)
+				re("msg") = "Unknown Error"
+				re("success") = False
+				Return re
+			End If
+		Else
+			Dim re = New Dictionary(Of String, Object)
+			re("msg") = ""
+			re("success") = True
+			re("id") = returnJson("account")("id")
+			Uid = re("id")
+			re("avatarurl") = returnJson("profile")("avatarUrl")
+			re("nickname") = returnJson("profile")("nickname")
+			Return re
+		End If
 	End Function
 
-	Public Function GetPlaylists(uid As String, Optional offset As Integer = 0, Optional limit As Integer = 100)
+	Public Overloads Function GetPlaylists(customUid As String, Optional offset As Integer = 0, Optional limit As Integer = 100)
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
-		params("uid") = uid
+		params("uid") = Uid
+		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
+		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+	End Function
+
+	Public Overloads Function GetPlaylists(Optional offset As Integer = 0, Optional limit As Integer = 100)
+		Dim params = New Dictionary(Of String, String)()
+		params("offset") = offset
+		params("limit") = limit
+		params("uid") = Uid
 		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
 		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 	End Function
