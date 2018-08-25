@@ -249,7 +249,7 @@ Public Class CloudMusic
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
-		params("uid") = Uid
+		params("uid") = customUid
 		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
 		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 	End Function
@@ -260,7 +260,8 @@ Public Class CloudMusic
 		params("limit") = limit
 		params("uid") = Uid
 		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
-		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		Dim CloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+
 	End Function
 End Class
 

@@ -6,11 +6,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:WalkmanManager"
-             mc:Ignorable="d" Height="248.343" Width="483.262">
+             mc:Ignorable="d" Height="180.128" Width="360.69">
 	<Grid>
-		<mD:ColorZone Background="#c62f2f" Height="50">
+		<mD:ColorZone Background="#c62f2f" Height="40">
 			<Grid>
-				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,0,0,0" Foreground="White" FontSize="20">登录网易云音乐</TextBlock>
+				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="White" FontSize="16">登录网易云音乐</TextBlock>
 				<Button Background="#c62f2f" VerticalAlignment="Stretch" HorizontalAlignment="Right" Height="Auto" Width="50"
 				        mD:ShadowAssist.ShadowDepth="Depth0" BorderThickness="0"
 				        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
@@ -18,23 +18,23 @@
 				</Button>
 			</Grid>
 		</mD:ColorZone>
-		<Grid Margin="0,50,0,65">
-			<TextBox x:Name="TextBoxPhone" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,24,0,0" Height="50" Width="463"
+		<Grid Margin="0,40,0,0" Height="93" VerticalAlignment="Top">
+			<TextBox x:Name="TextBoxPhone" VerticalAlignment="Top" Margin="10,10,10,0" Height="35"
 			         mD:HintAssist.IsFloating="True" mD:HintAssist.Hint="手机号" />
-			<TextBox x:Name="TextBoxPassword" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,79,0,0" Height="50" Width="463"
+			<PasswordBox x:Name="TextBoxPassword" VerticalAlignment="Top" Margin="10,53,10,0" Height="35"
 			         mD:HintAssist.IsFloating="True" mD:HintAssist.Hint="密码" />
 		</Grid>
-		<Grid Margin="0,183,0,0">
-			<Button VerticalAlignment="Center" HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignFlatButton}"
-			        Width="70" Margin="0,0,20,0"
+		<Grid Height="47" VerticalAlignment="Bottom">
+			<Button IsCancel="True" VerticalAlignment="Top" HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignFlatButton}"
+			        Width="70" Margin="0,5,15,0"
 			        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
 				<Button.CommandParameter>
-					<system:Boolean>True</system:Boolean>
+					<system:Boolean>False</system:Boolean>
 				</Button.CommandParameter>
 				取消
 			</Button>
-			<Button x:Name="ButtonLogin" VerticalAlignment="Center" HorizontalAlignment="Right" Background="#c62f2f" BorderThickness="0" Width="70"
-			        Margin="0,0,100,0"
+			<Button x:Name="ButtonLogin" IsDefault="True" IsEnabled="False" VerticalAlignment="Top" HorizontalAlignment="Right" Background="#c62f2f" BorderThickness="0" Width="70"
+			        Margin="0,5,90,0"
 			        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
 				<Button.CommandParameter>
 					<system:Boolean>True</system:Boolean>

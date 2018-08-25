@@ -9,6 +9,7 @@ Class MainWindow
 	Dim _lstSongs As ObservableCollection(Of SongInfo)
 	Dim _isRightClickSelect As Boolean = False
 	Dim _isCloudMusicLoggedIn As Boolean = False
+	Dim _cloudMusic As New CloudMusic
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -27,8 +28,10 @@ Class MainWindow
 		Environment.Exit(0)
 	End Sub
 
-	Private Sub PageSwitcher(sender As Object, e As RoutedEventArgs) Handles LstTopbar.SelectionChanged
-		On Error Resume Next
+	Private Async Sub PageSwitcher(sender As Object, e As RoutedEventArgs) Handles LstTopbar.SelectionChanged
+		If IsNothing(GridLocal) Then
+			Exit Sub
+		End If
 		If TabLocal.IsSelected Then
 			GridLocal.Visibility = Visibility.Visible
 		Else
@@ -38,7 +41,17 @@ Class MainWindow
 			If _isCloudMusicLoggedIn Then
 				GridCloudMusic.Visibility = Visibility.Visible
 			Else
+				Dim dlgLogin As New DlgCloudMusicLogin
+				Dim login As Boolean = Await DlgWindowRoot.ShowDialog(dlgLogin)
+				If login Then
+					DlgWindowRoot.ShowDialog(New dlg_progress)
+					Await Task.Run(Function()
 
+								   End Function)
+				Else
+					TabCloudMusic.IsSelected = False
+					TabLocal.IsSelected = True
+				End If
 			End If
 		Else
 			GridCloudMusic.Visibility = Visibility.Hidden
