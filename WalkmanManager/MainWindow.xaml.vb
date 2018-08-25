@@ -45,9 +45,18 @@ Class MainWindow
 				Dim login As Boolean = Await DlgWindowRoot.ShowDialog(dlgLogin)
 				If login Then
 					DlgWindowRoot.ShowDialog(New dlg_progress)
-					Await Task.Run(Function()
+					Await Task.Run(Sub()
+									   Try
+										   Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
+										   If loginResult("success") Then
+											   Dim playlists = _cloudMusic.GetPlaylists()
 
-								   End Function)
+										   Else
+
+										   End If
+									   Catch
+									   End Try
+								   End Sub)
 				Else
 					TabCloudMusic.IsSelected = False
 					TabLocal.IsSelected = True
@@ -201,9 +210,9 @@ Class MainWindow
 				Dim dlg As New dlg_progress
 				DatSongList.ItemsSource = Nothing
 				DialogHost.Show(dlg, "window-root")
-				Dim PlaylistName = sender.SelectedItem.Content
+				Dim playlistName = sender.SelectedItem.Content
 				Dim lstSongs = Await Task.Run(Function()
-												  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(PlaylistName))
+												  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
 												  Dim conn = Connect()
 												  Dim trans = conn.BeginTransaction()
 												  Dim cmd = conn.CreateCommand()

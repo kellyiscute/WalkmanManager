@@ -51,6 +51,8 @@ Public Class CloudMusic
 	Private _secretKey As String
 	Private _encSecKey As String
 
+	Public Playlists
+
 	Public Property Uid As Integer = 0
 
 #End Region
@@ -245,23 +247,45 @@ Public Class CloudMusic
 		End If
 	End Function
 
-	Public Overloads Function GetPlaylists(customUid As String, Optional offset As Integer = 0, Optional limit As Integer = 100)
-		Dim params = New Dictionary(Of String, String)()
-		params("offset") = offset
-		params("limit") = limit
-		params("uid") = customUid
-		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
-		Return JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
-	End Function
-
-	Public Overloads Function GetPlaylists(Optional offset As Integer = 0, Optional limit As Integer = 100)
+	Public Overloads Function GetPlaylists(customUid As String, Optional offset As Integer = 0,
+											Optional limit As Integer = 100) As List(Of Dictionary(Of String, Object))
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
 		params("uid") = Uid
 		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
-		Dim CloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		Dim result As New List(Of Dictionary(Of String, Object))
+		For Each playlist In cloudMusicDeserialize("playlist") 'As Dictionary(Of String, Object)
+			Dim p As New Dictionary(Of String, Object)
+			p("id") = playlist("id").ToString
+			p("name") = playlist("name").ToString
+			p("coverImgUrl") = playlist("coverImgUrl").ToString
+			result.Add(p)
+		Next
+		Playlists = result
+		Return result
+	End Function
 
+	Public Overloads Function GetPlaylists(Optional offset As Integer = 0, Optional limit As Integer = 100) _
+		As List(Of Dictionary(Of String, Object))
+
+		Dim params = New Dictionary(Of String, String)()
+		params("offset") = offset
+		params("limit") = limit
+		params("uid") = Uid
+		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
+		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		Dim result As New List(Of Dictionary(Of String, Object))
+		For Each playlist In cloudMusicDeserialize("playlist") 'As Dictionary(Of String, Object)
+			Dim p As New Dictionary(Of String, Object)
+			p("id") = playlist("id").ToString
+			p("name") = playlist("name").ToString
+			p("coverImgUrl") = playlist("coverImgUrl").ToString
+			result.Add(p)
+		Next
+		Playlists = result
+		Return result
 	End Function
 End Class
 
