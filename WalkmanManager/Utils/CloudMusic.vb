@@ -45,11 +45,11 @@ Public Class CloudMusic
 	Const Useragent =
 		"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
 
-	Dim Cookie As New CookieContainer
+	Dim _cookie As New CookieContainer
 
 	Const Referer = "http://music.163.com/"
-	Private _secretKey As String
-	Private _encSecKey As String
+	Private ReadOnly _secretKey As String
+	Private ReadOnly _encSecKey As String
 
 	Public Playlists
 
@@ -60,13 +60,13 @@ Public Class CloudMusic
 	Sub New()
 		_secretKey = CreateSecretKey(16)
 		_encSecKey = RsaEncode(_secretKey)
-		Cookie.Add(New Cookie With {.Name = "os", .Value = "pc", .Domain = "music.163.com"})
-		Cookie.Add(New Cookie With {.Name = "osver", .Value = "Ubuntu 18.04", .Domain = "music.163.com"})
-		Cookie.Add(New Cookie With {.Name = "appver", .Value = "2.0.3.131777", .Domain = "music.163.com"})
-		Cookie.Add(New Cookie With {.Name = "channel", .Value = "netease", .Domain = "music.163.com"})
+		_cookie.Add(New Cookie With {.Name = "os", .Value = "pc", .Domain = "music.163.com"})
+		_cookie.Add(New Cookie With {.Name = "osver", .Value = "Ubuntu 18.04", .Domain = "music.163.com"})
+		_cookie.Add(New Cookie With {.Name = "appver", .Value = "2.0.3.131777", .Domain = "music.163.com"})
+		_cookie.Add(New Cookie With {.Name = "channel", .Value = "netease", .Domain = "music.163.com"})
 	End Sub
 
-	Public Function CreateSecretKey(length As Integer) As String
+	Private Function CreateSecretKey(length As Integer) As String
 		Dim str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		Dim r = ""
 		Dim rnd = New Random()
@@ -76,7 +76,7 @@ Public Class CloudMusic
 		Return r
 	End Function
 
-	Public Function Prepare(raw As String) As Dictionary(Of String, String)
+	Private Function Prepare(raw As String) As Dictionary(Of String, String)
 		Dim data = New Dictionary(Of String, String)
 		data("params") = AesEncode(raw, Nonce)
 		data("params") = AesEncode(data("params"), _secretKey)
@@ -84,7 +84,7 @@ Public Class CloudMusic
 		Return data
 	End Function
 
-	Public Function BcHexDec(hex As String) As BigInteger
+	Private Function BcHexDec(hex As String) As BigInteger
 		Dim dec As New BigInteger(0)
 		For i = 0 To hex.Length - 1
 			dec += BigInteger.Multiply(New BigInteger(Convert.ToInt32(hex(i).ToString, 16)),
@@ -93,7 +93,7 @@ Public Class CloudMusic
 		Return dec
 	End Function
 
-	Public Function RsaEncode(text As String) As String
+	Private Function RsaEncode(text As String) As String
 		Dim srtext = New String(text.Reverse.ToArray())
 		Dim a = BcHexDec(BitConverter.ToString(Encoding.Default.GetBytes(srtext)).Replace("-", ""))
 		Dim b = BcHexDec(Pubkey)
@@ -107,7 +107,7 @@ Public Class CloudMusic
 		End If
 	End Function
 
-	Public Function AesEncode(secretData As String, Optional secret As String = "TA3YiYCfY2dDJQgg") As String
+	Private Function AesEncode(secretData As String, Optional secret As String = "TA3YiYCfY2dDJQgg") As String
 		Dim encrypted() As Byte
 		Dim iv() As Byte = Encoding.UTF8.GetBytes(Vi)
 
@@ -137,10 +137,10 @@ Public Class CloudMusic
 			aes.Key = Encoding.UTF8.GetBytes(secret)
 			aes.IV = iv
 			aes.Mode = CipherMode.CBC
-			Using encryptor = aes.CreateDecryptor()
+			Using encrypt = aes.CreateDecryptor()
 				Using stream = New MemoryStream()
-					Using cstream = New CryptoStream(stream, encryptor, CryptoStreamMode.Write)
-						Using sw = New StreamWriter(cstream)
+					Using cStream = New CryptoStream(stream, encrypt, CryptoStreamMode.Write)
+						Using sw = New StreamWriter(cStream)
 							sw.Write(secretData)
 						End Using
 						encrypted = stream.ToArray()
@@ -152,37 +152,37 @@ Public Class CloudMusic
 	End Function
 
 	'fake curl
-	Public Function Curl(url As String, parms As Dictionary(Of String, String), Optional method As String = "POST") _
+	Private Function Curl(url As String, parms As Dictionary(Of String, String), Optional method As String = "POST") _
 		As String
 		Dim result As String
 		Using wc = New CookieAwareWebClient
 			wc.Headers.Add(HttpRequestHeader.Referer, Referer)
 			wc.Headers.Add(HttpRequestHeader.UserAgent, Useragent)
-			wc.CookieContainer = Cookie
-			Dim reqparm = New Specialized.NameValueCollection()
+			wc.CookieContainer = _cookie
+			Dim reqParam = New Specialized.NameValueCollection()
 			For Each keyPair As KeyValuePair(Of String, String) In parms
-				reqparm.Add(keyPair.Key, keyPair.Value)
+				reqParam.Add(keyPair.Key, keyPair.Value)
 			Next
 
-			Dim responsebytes = wc.UploadValues(url, method, reqparm)
+			Dim responseBytes = wc.UploadValues(url, method, reqParam)
 
 			Debug.Print("=================Cookies=================")
 			For i = 0 To wc.ResponseCookies.Count - 1
-				Cookie.Add(wc.ResponseCookies.Item(i))
+				_cookie.Add(wc.ResponseCookies.Item(i))
 			Next
 
-			result = Encoding.UTF8.GetString(responsebytes)
+			result = Encoding.UTF8.GetString(responseBytes)
 		End Using
 		Return result
 	End Function
 
-	Public Class SearchJson
+	Private Class SearchJson
 		Public S As String
 		Public Type As Integer
 		Public Limit As Integer
 		Public Total As String = "true"
 		Public Offset As Integer
-		Public CsrfToken As String = ""
+		'Public CSRFToken As String = ""
 	End Class
 
 	Public Enum SearchType
