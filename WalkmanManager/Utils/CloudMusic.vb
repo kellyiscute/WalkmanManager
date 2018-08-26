@@ -53,8 +53,7 @@ Public Class CloudMusic
 
 	Public Playlists
 
-	Public Property Uid As Integer = 0
-	Public Property UserNickName As Integer = 0
+	Public Property UserInfo As Dictionary(Of String, Object)
 
 #End Region
 
@@ -241,9 +240,9 @@ Public Class CloudMusic
 			re("msg") = ""
 			re("success") = True
 			re("id") = returnJson("account")("id")
-			Uid = re("id")
-			re("avatarurl") = returnJson("profile")("avatarUrl")
+			re("avatarUrl") = returnJson("profile")("avatarUrl")
 			re("nickname") = returnJson("profile")("nickname")
+			UserInfo = re
 			Return re
 		End If
 	End Function
@@ -253,7 +252,7 @@ Public Class CloudMusic
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
-		params("uid") = Uid
+		params("uid") = UserInfo("id")
 		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
 		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 		Dim result As New List(Of Dictionary(Of String, Object))
@@ -274,7 +273,7 @@ Public Class CloudMusic
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
-		params("uid") = Uid
+		params("uid") = UserInfo("id")
 		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
 		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 		Dim result As New List(Of Dictionary(Of String, Object))

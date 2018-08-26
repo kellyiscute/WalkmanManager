@@ -17,7 +17,7 @@
 		</mD:ColorZone>
 		<Grid Margin="0,40,0,0">
 			<Image x:Name="ImageAlbum" Margin="21,21,0,0" HorizontalAlignment="Left" Width="181" Height="181"
-			       VerticalAlignment="Top" />
+			       VerticalAlignment="Top" RenderOptions.BitmapScalingMode="Fant"/>
 			<StackPanel Margin="219,21,19,0" Height="192" VerticalAlignment="Top">
 				<Grid Height="30">
 					<WrapPanel VerticalAlignment="Center">

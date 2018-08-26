@@ -131,13 +131,13 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0"><!--Visibility="Hidden"-->
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" Visibility="Hidden"><!---->
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
 							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70" VerticalAlignment="Top">
 								<Grid>
-									<Image x:Name="ImageCloudMusicAvatar" VerticalAlignment="Top" Height="49" Margin="20,10,192,0" Stretch="UniformToFill"/>
-										<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" Cursor="Hand" FontSize="16" Margin="92,10,10,10">登录</Label>
+									<Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top" Height="49" Margin="20,10,192,0" Stretch="UniformToFill"/>
+									<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" Cursor="Hand" FontSize="16" Margin="92,10,10,10">登录</Label>
 								</Grid>
 							</Border>
 							<ListBox x:Name="ListBoxCloudMusicPlaylists" BorderThickness="0,0,1,0" BorderBrush="LightGray" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />

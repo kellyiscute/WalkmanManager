@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.ObjectModel
+Imports System.Net
 Imports System.Windows.Shell
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
@@ -48,8 +49,22 @@ Class MainWindow
 					Dim result = Await UiCloudMusicLogin(dlgLogin)
 					If result = "" Then
 						For Each p In _cloudMusic.Playlists
-							ListBoxCloudMusicPlaylists.Items.Add(p("name"))
+							ListBoxCloudMusicPlaylists.Items.Add(New ListBoxItem() _
+																	With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
 						Next
+						Try
+							Dim img As New BitmapImage
+							img.BeginInit()
+							Console.WriteLine(_cloudMusic.UserInfo("avatarUrl"))
+							img.UriSource = New Uri(_cloudMusic.UserInfo("avatarUrl"))
+							img.CacheOption = BitmapCacheOption.OnLoad
+							img.EndInit()
+							ImageCloudMusicAvatar.Source = img
+							LabelCloudMusicNickName.Content = _cloudMusic.UserInfo("nickname")
+						Catch ex As Exception
+
+						End Try
+
 						GridCloudMusic.Visibility = Visibility.Visible
 						_isCloudMusicLoggedIn = True
 						DlgWindowRoot.IsOpen = False
