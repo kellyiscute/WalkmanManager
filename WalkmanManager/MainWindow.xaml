@@ -131,20 +131,41 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0"><!--Visibility="Hidden"-->
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0">
+					<!--Visibility="Hidden"-->
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
 							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70" VerticalAlignment="Top">
 								<Grid>
-									<mD:PopupBox Width="68" Margin="20,5,192,5">
-										<mD:PopupBox.ToggleContent>
-											<Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top" Height="50" Width="60" Stretch="UniformToFill"/>
-										</mD:PopupBox.ToggleContent>
-										<StackPanel>
-											
-										</StackPanel>
-									</mD:PopupBox>
-									<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" FontSize="16" Margin="92,10,10,10">登录</Label>
+									<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" FontSize="16" Margin="92,10,10,10" Content="登录"/>
+									<mD:ColorZone CornerRadius="5" Width="auto" Margin="15,5,191,0" Height="59" VerticalAlignment="Top" mD:ShadowAssist.ShadowDepth="Depth1">
+										<mD:PopupBox mD:ShadowAssist.ShadowDepth="Depth3" Margin="0" HorizontalAlignment="Stretch">
+											<mD:PopupBox.ToggleContent>
+												<Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top" Height="50" Width="55" Stretch="Uniform" HorizontalAlignment="Left"/>
+											</mD:PopupBox.ToggleContent>
+											<StackPanel>
+												<Button Height="45">
+													<WrapPanel>
+														<mD:PackIcon Kind="Sync"/>
+														<TextBlock><Run Text="同步"/></TextBlock>
+													</WrapPanel>
+												</Button>
+												<Button Height="45">
+													<WrapPanel>
+														<mD:PackIcon Kind="Refresh"/>
+														<TextBlock><Run Text="刷新"/></TextBlock>
+													</WrapPanel>
+												</Button>
+												<Separator/>
+												<Button Height="45">
+													<WrapPanel>
+														<mD:PackIcon Kind="Logout"/>
+														<TextBlock><Run Text="退出登录"/></TextBlock>
+													</WrapPanel>
+												</Button>
+											</StackPanel>
+										</mD:PopupBox>
+									</mD:ColorZone>
 								</Grid>
 							</Border>
 							<ListBox x:Name="ListBoxCloudMusicPlaylists" BorderThickness="0,0,1,0" BorderBrush="LightGray" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />

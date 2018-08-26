@@ -176,38 +176,6 @@ Public Class CloudMusic
 		Return result
 	End Function
 
-	Private Class SearchJson
-		Public S As String
-		Public Type As Integer
-		Public Limit As Integer
-		Public Total As String = "true"
-		Public Offset As Integer
-		'Public CSRFToken As String = ""
-	End Class
-
-	Public Enum SearchType
-		Song = 1
-		Album = 10
-		Artist = 100
-		Playlist = 1000
-		User = 1002
-		Radio = 1009
-	End Enum
-
-	Public Function Search(keyword As String, Optional limit As Integer = 30, Optional offset As Integer = 0,
-							Optional type As SearchType = SearchType.Song) As SearchResult
-		Dim url = "http://music.163.com/weapi/cloudsearch/get/web"
-		Dim data = New SearchJson With {
-				.S = keyword,
-				.Type = type,
-				.Limit = limit,
-				.Offset = offset
-				}
-		Dim raw As String = Curl(url, Prepare(JsonConvert.SerializeObject(data)))
-		Dim deserializedObj = JsonConvert.DeserializeObject(Of SearchResult)(raw)
-		Return deserializedObj
-	End Function
-
 	Public Function Login(phone As String, password As String) As Dictionary(Of String, Object)
 		Dim api = New CloudMusic
 		Dim params = New Dictionary(Of String, String)()
@@ -291,6 +259,17 @@ Public Class CloudMusic
 		Playlists = result
 		Return result
 	End Function
+
+	Public Function GetPlaylistDetail(id As Integer) As List(Of Dictionary(Of String, Object))
+		Dim params = New Dictionary(Of String, String)()
+		Dim r = Curl("http://music.163.com/api/playlist/detail", Prepare(JsonConvert.SerializeObject(params)))
+		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
+		Dim result As New List(Of Dictionary(Of String, Object))
+		'Read Tracks (in /result: Object/tracks: List, list of Objects)
+
+		Return Nothing
+	End Function
+
 End Class
 
 Public Class CookieAwareWebClient
