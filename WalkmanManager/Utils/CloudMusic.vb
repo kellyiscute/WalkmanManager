@@ -231,7 +231,11 @@ Public Class CloudMusic
 				Return re
 			Else
 				Dim re = New Dictionary(Of String, Object)
-				re("msg") = "Unknown Error"
+				If returnJson.Keys.Contains("msg") Then
+					re("msg") = returnJson("msg")
+				Else
+					re("msg") = "Unknown Error"
+				End If
 				re("success") = False
 				Return re
 			End If

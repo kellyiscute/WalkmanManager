@@ -1,4 +1,7 @@
-﻿Public Class dlg_progress
+﻿Imports System.ComponentModel
+Imports System.Threading
+
+Public Class dlg_progress
 
 	Property Progress() As Integer
 		Get
@@ -18,4 +21,18 @@
 		End Set
 	End Property
 
+	Property Text As String
+		Get
+			Dim r = LabelStatus.Dispatcher.Invoke(Function()
+													  Return LabelStatus.Content
+												  End Function)
+			Return r
+		End Get
+		Set
+			LabelStatus.Dispatcher.Invoke(Sub()
+											  LabelStatus.Content = Value
+										  End Sub)
+
+		End Set
+	End Property
 End Class

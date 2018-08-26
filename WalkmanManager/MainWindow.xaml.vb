@@ -45,8 +45,9 @@ Class MainWindow
 				Dim dlgLogin As New DlgCloudMusicLogin
 				Dim login As Boolean = Await DlgWindowRoot.ShowDialog(dlgLogin)
 				If login Then
-					DlgWindowRoot.ShowDialog(New dlg_progress)
-					Dim result = Await UiCloudMusicLogin(dlgLogin)
+					Dim dlgProg = New dlg_progress
+					DlgWindowRoot.ShowDialog(dlgProg)
+					Dim result = Await UiCloudMusicLogin(dlgLogin, dlgProg)
 					If result = "" Then
 						For Each p In _cloudMusic.Playlists
 							ListBoxCloudMusicPlaylists.Items.Add(New ListBoxItem() _
@@ -73,6 +74,8 @@ Class MainWindow
 						_isCloudMusicLoggedIn = False
 						DlgWindowRoot.IsOpen = False
 						Await DlgWindowRoot.ShowDialog(dlgRetry)
+						GridCloudMusic.Visibility = Visibility.Hidden
+						GridLocal.Visibility = Visibility.Visible
 					End If
 				Else
 					TabCloudMusic.IsSelected = False
@@ -84,18 +87,19 @@ Class MainWindow
 		End If
 	End Sub
 
-	Private Async Function UiCloudMusicLogin(dlgLogin As DlgCloudMusicLogin) As Task(Of String)
+	Private Async Function UiCloudMusicLogin(dlgLogin As DlgCloudMusicLogin, dlgProg As dlg_progress) As Task(Of String)
 		Dim result = Await Task.Run(Function()
 										Try
+											dlgProg.Text = "登录中"
 											Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
 											If loginResult("success") Then
+												dlgProg.Text = "获取歌单"
 												_cloudMusic.GetPlaylists()
 												Return ""
 											Else
 												Return loginResult("msg")
 											End If
 										Catch
-											MessageBox.Show("出现未知错误", "错误", MessageBoxButton.OK, MessageBoxImage.Exclamation)
 											Return "Unknown Error"
 										End Try
 									End Function)
