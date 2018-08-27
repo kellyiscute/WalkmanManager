@@ -52,7 +52,7 @@ Class MainWindow
 						For Each p In _cloudMusic.Playlists
 							ListBoxCloudMusicPlaylists.Items.Add(
 								New ListBoxItem() _
-																	With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
+									With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
 						Next
 						Try
 							Dim img As New BitmapImage
@@ -75,8 +75,8 @@ Class MainWindow
 						_isCloudMusicLoggedIn = False
 						DlgWindowRoot.IsOpen = False
 						Await DlgWindowRoot.ShowDialog(dlgRetry)
-						GridCloudMusic.Visibility = Visibility.Hidden
-						GridLocal.Visibility = Visibility.Visible
+						TabCloudMusic.IsSelected = False
+						TabLocal.IsSelected = True
 					End If
 				Else
 					TabCloudMusic.IsSelected = False
@@ -119,6 +119,8 @@ Class MainWindow
 			My.Computer.FileSystem.CreateDirectory("SongLib")
 			SaveSetting("song_dir", "SongLib")
 		End If
+
+		PageSwitcher(Nothing, Nothing)
 
 		Dim newLost = Await Task.Run(Async Function()
 			Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
@@ -380,5 +382,12 @@ Class MainWindow
 			DatSongList.ItemsSource = lst
 			DlgWindowRoot.IsOpen = False
 		End If
+	End Sub
+
+	Private Sub ButtonCloudMusicLogout_Click(sender As Object, e As RoutedEventArgs) Handles ButtonCloudMusicLogout.Click
+		_cloudMusic = New CloudMusic()
+		_isCloudMusicLoggedIn = False
+		TabCloudMusic.IsSelected = False
+		TabLocal.IsSelected = True
 	End Sub
 End Class
