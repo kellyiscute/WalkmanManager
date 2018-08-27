@@ -134,6 +134,8 @@ Class MainWindow
 			SaveSetting("song_dir", "SongLib")
 		End If
 
+		PageSwitcher(Nothing, Nothing)
+
 		Dim newLost = Await Task.Run(Async Function()
 										 Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
 										 Dim lstLost = Await upd.FindLost()
