@@ -25,7 +25,7 @@
 			         mD:HintAssist.IsFloating="True" mD:HintAssist.Hint="密码" />
 		</Grid>
 		<Grid Height="47" VerticalAlignment="Bottom">
-			<Button IsCancel="True" VerticalAlignment="Top" HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignFlatButton}"
+			<Button IsCancel="True" VerticalAlignment="Top" HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignFlatButton}" Foreground="#c62f2f"
 			        Width="70" Margin="0,5,15,0"
 			        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
 				<Button.CommandParameter>

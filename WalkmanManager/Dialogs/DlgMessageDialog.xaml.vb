@@ -8,4 +8,11 @@
 		TextBlockTitle.Text = title
 		LabelContent.Content = content
 	End Sub
+
+	Public Sub ChangeColorTheme(brush As SolidColorBrush)
+		ColorZoneTitle.Background = brush
+		ButtonClose.Foreground = brush
+		ButtonOk.Foreground = brush
+	End Sub
+
 End Class

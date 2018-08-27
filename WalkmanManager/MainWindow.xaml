@@ -9,27 +9,27 @@
         Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen"
         Background="White">
 	<Grid>
-		<mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="50">
+		<mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="35">
 			<Grid>
-				<Label Margin="10,8,0,7" Foreground="#DDFFFFFF" FontSize="18" HorizontalAlignment="Left" Width="174">Walkman Manager</Label>
-				<Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50"
+				<Label Margin="10,2,0,0" Foreground="#DDFFFFFF" FontSize="16" HorizontalAlignment="Left" Width="154" Height="30" VerticalAlignment="Top">Walkman Manager</Label>
+				<Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent" BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0">
 					<mD:PackIcon Kind="Close" />
 				</Button>
-				<Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50"
+				<Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent" BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,50,0">
 					<mD:PackIcon Kind="WindowMinimize" />
 				</Button>
-				<Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50"
+				<Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent" BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,100,0">
 					<mD:PackIcon Kind="Settings" />
 				</Button>
 			</Grid>
 		</mD:ColorZone>
-		<mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,50,0,0">
+		<mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,35,0,0">
 			<Grid>
 				<mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50"
 				              Background="WhiteSmoke">
@@ -131,8 +131,8 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0">
-					<!--Visibility="Hidden"-->
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" Visibility="Hidden">
+					<!---->
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
 							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70" VerticalAlignment="Top">
@@ -143,21 +143,21 @@
 											<mD:PopupBox.ToggleContent>
 												<Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top" Height="50" Width="55" Stretch="Uniform" HorizontalAlignment="Left"/>
 											</mD:PopupBox.ToggleContent>
-											<StackPanel Width="150">
-												<Button Height="45">
+											<StackPanel Width="200">
+												<Button x:Name="ButtonCloudMusicSyncAll" Height="45">
 													<WrapPanel>
 														<mD:PackIcon Kind="Sync"/>
-														<TextBlock Margin="10,0,0,0"><Run Text="同步"/></TextBlock>
+														<TextBlock Margin="10,0,0,0"><Run Text="同步所有歌单到本地"/></TextBlock>
 													</WrapPanel>
 												</Button>
-												<Button Height="45">
+												<Button x:Name="ButtonCloudMusicRefresh" Height="45">
 													<WrapPanel>
 														<mD:PackIcon Kind="Refresh"/>
 														<TextBlock Margin="10,0,0,0"><Run Text="刷新"/></TextBlock>
 													</WrapPanel>
 												</Button>
 												<Separator/>
-												<Button Height="45">
+												<Button x:Name="ButtonCloudMusicLogout" Height="45">
 													<WrapPanel>
 														<mD:PackIcon Kind="Logout"/>
 														<TextBlock Margin="10,0,0,0"><Run Text="退出登录"/></TextBlock>
@@ -176,7 +176,12 @@
 								</mD:ColorZone>
 								<Grid Margin="175,20,10,0" Height="150" VerticalAlignment="Top">
 									<Label x:Name="LabelCloudMusicPlaylistName" Foreground="#333333" VerticalContentAlignment="Center" FontSize="35" Height="59" VerticalAlignment="Top" Content="" Margin="0,10,0,0"/>
-
+									<Button Margin="10,90,0,0" HorizontalAlignment="Left" Width="194" VerticalAlignment="Top" Background="#c62f2f" BorderBrush="#a82828">
+										<WrapPanel>
+											<mD:PackIcon Kind="Sync"></mD:PackIcon>
+											<TextBlock Margin="10,0,0,0">同步当前歌单到本地</TextBlock>
+										</WrapPanel>
+									</Button>
 								</Grid>
 							</Grid>
 						</Grid>

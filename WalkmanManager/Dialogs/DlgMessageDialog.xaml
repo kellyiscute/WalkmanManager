@@ -8,12 +8,12 @@
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" Height="186.142" Width="387.358">
 	<Grid>
-		<mD:ColorZone Mode="PrimaryMid" Height="40">
+		<mD:ColorZone x:Name="ColorZoneTitle" Mode="PrimaryMid" Height="40">
 			<Grid>
 				<TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="TextBlockTitle" FontSize="16"
 				           Margin="10,0,0,0">
 				</TextBlock>
-				<Button VerticalAlignment="Stretch" HorizontalAlignment="Right" mD:ShadowAssist.ShadowDepth="Depth0"
+				<Button x:Name="ButtonClose" VerticalAlignment="Stretch" HorizontalAlignment="Right" mD:ShadowAssist.ShadowDepth="Depth0" Foreground="White" Background="Transparent" BorderThickness="0"
 				        Command="{x:Static mD:DialogHost.CloseDialogCommand}"
 				        Height="Auto"
 				        Width="50">
@@ -25,7 +25,7 @@
 			<Label HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14" x:Name="LabelContent" />
 		</Grid>
 		<Grid Height="53" VerticalAlignment="Bottom">
-			<Button HorizontalAlignment="Right" IsDefault="True" IsCancel="True" TabIndex="0" Style="{DynamicResource MaterialDesignFlatButton}"
+			<Button x:Name="ButtonOk" HorizontalAlignment="Right" IsDefault="True" IsCancel="True" TabIndex="0" Style="{DynamicResource MaterialDesignFlatButton}"
 			        Command="{x:Static mD:DialogHost.CloseDialogCommand}" Margin="0,10,25,10"
 			        Height="Auto" Width="80">
 				<Button.CommandParameter>

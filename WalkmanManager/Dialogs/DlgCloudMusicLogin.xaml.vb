@@ -1,4 +1,12 @@
 ﻿Public Class DlgCloudMusicLogin
+	Public Sub New(Optional defaultPhone As String = "")
+
+		' 此调用是设计器所必需的。
+		InitializeComponent()
+
+		' 在 InitializeComponent() 调用之后添加任何初始化。
+		TextBoxPhone.Text = defaultPhone
+	End Sub
 
 	Public Property Phone As String = ""
 	Public Property Password As String = ""

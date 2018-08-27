@@ -35,4 +35,9 @@ Public Class dlg_progress
 
 		End Set
 	End Property
+
+	Public Sub ChangeColorTheme(brush As SolidColorBrush)
+		ProgProgress.Foreground = brush
+	End Sub
+
 End Class

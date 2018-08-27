@@ -7,6 +7,10 @@ Imports ATL
 Imports GongSolutions.Wpf.DragDrop
 
 Class MainWindow
+
+	ReadOnly NETEASE_RED = Color.FromRgb(198, 47, 47)
+	ReadOnly DEFAULT_COLOR = Color.FromRgb(103, 58, 183)
+
 	Dim _lstSongs As ObservableCollection(Of SongInfo)
 	Dim _isRightClickSelect As Boolean = False
 	Dim _isCloudMusicLoggedIn As Boolean = False
@@ -33,6 +37,11 @@ Class MainWindow
 		If IsNothing(GridLocal) Then
 			Exit Sub
 		End If
+		If TabCloudMusic.IsSelected Then
+			CzTitle.Background = New SolidColorBrush(NETEASE_RED)
+		Else
+			CzTitle.Background = New SolidColorBrush(DEFAULT_COLOR)
+		End If
 		If TabLocal.IsSelected Then
 			GridLocal.Visibility = Visibility.Visible
 		Else
@@ -42,46 +51,51 @@ Class MainWindow
 			If _isCloudMusicLoggedIn Then
 				GridCloudMusic.Visibility = Visibility.Visible
 			Else
-				Dim dlgLogin As New DlgCloudMusicLogin
-				Dim login As Boolean = Await DlgWindowRoot.ShowDialog(dlgLogin)
-				If login Then
-					Dim dlgProg = New dlg_progress
-					DlgWindowRoot.ShowDialog(dlgProg)
-					Dim result = Await UiCloudMusicLogin(dlgLogin, dlgProg)
-					If result = "" Then
-						For Each p In _cloudMusic.Playlists
-							ListBoxCloudMusicPlaylists.Items.Add(
-								New ListBoxItem() _
-																	With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
-						Next
-						Try
-							Dim img As New BitmapImage
-							img.BeginInit()
-							Console.WriteLine(_cloudMusic.UserInfo("avatarUrl"))
-							img.UriSource = New Uri(_cloudMusic.UserInfo("avatarUrl"))
-							img.CacheOption = BitmapCacheOption.OnLoad
-							img.EndInit()
-							ImageCloudMusicAvatar.Source = img
-							LabelCloudMusicNickName.Content = _cloudMusic.UserInfo("nickname")
-						Catch ex As Exception
+				Dim lastPhone As String = ""
+				While True
+					Dim dlgLogin As New DlgCloudMusicLogin(lastPhone)
+					Dim login As Boolean = Await DlgWindowRoot.ShowDialog(dlgLogin)
+					If login Then
+						Dim dlgProg = New dlg_progress
+						dlgProg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
+						DlgWindowRoot.ShowDialog(dlgProg)
+						Dim result = Await UiCloudMusicLogin(dlgLogin, dlgProg)
+						If result = "" Then
+							For Each p In _cloudMusic.Playlists
+								ListBoxCloudMusicPlaylists.Items.Add(
+								New ListBoxItem() With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
+							Next
+							Try
+								Dim img As New BitmapImage
+								img.BeginInit()
+								Console.WriteLine(_cloudMusic.UserInfo("avatarUrl"))
+								img.UriSource = New Uri(_cloudMusic.UserInfo("avatarUrl"))
+								img.CacheOption = BitmapCacheOption.OnLoad
+								img.EndInit()
+								ImageCloudMusicAvatar.Source = img
+								LabelCloudMusicNickName.Content = _cloudMusic.UserInfo("nickname")
+							Catch ex As Exception
 
-						End Try
+							End Try
 
-						GridCloudMusic.Visibility = Visibility.Visible
-						_isCloudMusicLoggedIn = True
-						DlgWindowRoot.IsOpen = False
+							GridCloudMusic.Visibility = Visibility.Visible
+							_isCloudMusicLoggedIn = True
+							DlgWindowRoot.IsOpen = False
+							Exit While
+						Else
+							lastPhone = dlgLogin.TextBoxPhone.Text
+							Dim dlgFail As New DlgMessageDialog("登录失败", result)
+							dlgFail.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
+							_isCloudMusicLoggedIn = False
+							DlgWindowRoot.IsOpen = False
+							Await DlgWindowRoot.ShowDialog(dlgFail)
+						End If
 					Else
-						Dim dlgRetry As New DlgMessageDialog("登录失败", result)
-						_isCloudMusicLoggedIn = False
-						DlgWindowRoot.IsOpen = False
-						Await DlgWindowRoot.ShowDialog(dlgRetry)
-						GridCloudMusic.Visibility = Visibility.Hidden
-						GridLocal.Visibility = Visibility.Visible
+						TabCloudMusic.IsSelected = False
+						TabLocal.IsSelected = True
+						Exit While
 					End If
-				Else
-					TabCloudMusic.IsSelected = False
-					TabLocal.IsSelected = True
-				End If
+				End While
 			End If
 		Else
 			GridCloudMusic.Visibility = Visibility.Hidden
@@ -90,20 +104,20 @@ Class MainWindow
 
 	Private Async Function UiCloudMusicLogin(dlgLogin As DlgCloudMusicLogin, dlgProg As dlg_progress) As Task(Of String)
 		Dim result = Await Task.Run(Function()
-			Try
-				dlgProg.Text = "登录中"
-				Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
-				If loginResult("success") Then
-					dlgProg.Text = "获取歌单"
-					_cloudMusic.GetPlaylists()
-					Return ""
-				Else
-					Return loginResult("msg")
-				End If
-			Catch
-				Return "Unknown Error"
-			End Try
-		End Function)
+										Try
+											dlgProg.Text = "登录中"
+											Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
+											If loginResult("success") Then
+												dlgProg.Text = "获取歌单"
+												_cloudMusic.GetPlaylists()
+												Return ""
+											Else
+												Return loginResult("msg")
+											End If
+										Catch
+											Return "Unknown Error"
+										End Try
+									End Function)
 		Return result
 	End Function
 
@@ -121,28 +135,28 @@ Class MainWindow
 		End If
 
 		Dim newLost = Await Task.Run(Async Function()
-			Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
-			Dim lstLost = Await upd.FindLost()
-			_lstSongs = GetSongs()
-			Dim syncResult As String = ""
-			If lstNew.Count > 0 Then
-				syncResult = "=========================发现以下新项目=========================" & vbNewLine
-				For Each NewItem In lstNew
-					syncResult += NewItem & vbNewLine
-				Next
-			End If
-			If lstLost.Count > 0 Then
-				syncResult += "=========================发现已删除项目=========================" & vbNewLine
-				For Each LostItem In lstLost
-					syncResult += LostItem & vbNewLine
-				Next
-			End If
-			Return syncResult
-		End Function)
+										 Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
+										 Dim lstLost = Await upd.FindLost()
+										 _lstSongs = GetSongs()
+										 Dim syncResult As String = ""
+										 If lstNew.Count > 0 Then
+											 syncResult = "=========================发现以下新项目=========================" & vbNewLine
+											 For Each NewItem In lstNew
+												 syncResult += NewItem & vbNewLine
+											 Next
+										 End If
+										 If lstLost.Count > 0 Then
+											 syncResult += "=========================发现已删除项目=========================" & vbNewLine
+											 For Each LostItem In lstLost
+												 syncResult += LostItem & vbNewLine
+											 Next
+										 End If
+										 Return syncResult
+									 End Function)
 		Dim lstPlaylist = Await Task.Run(Function()
-			Dim r = GetPlaylists()
-			Return r
-		End Function)
+											 Dim r = GetPlaylists()
+											 Return r
+										 End Function)
 		For Each itm In lstPlaylist
 			Dim lbitm = New ListBoxItem() With {.Content = itm, .AllowDrop = True}
 			AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
@@ -167,7 +181,7 @@ Class MainWindow
 
 	Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
 		Handles DatSongList.MouseDoubleClick
-		If DatSongList.SelectedIndex <> - 1 Then
+		If DatSongList.SelectedIndex <> -1 Then
 			DlgWindowRoot.CloseOnClickAway = True
 			Dim detailDialog As New DlgSongDetail(DatSongList.SelectedItem.path)
 			Await DlgWindowRoot.ShowDialog(detailDialog)
@@ -230,7 +244,7 @@ Class MainWindow
 	End Sub
 
 	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs)
-		If sender.SelectedIndex <> - 1 And Not _isRightClickSelect Then
+		If sender.SelectedIndex <> -1 And Not _isRightClickSelect Then
 			If sender.SelectedItem.Tag = "NewPlaylist" Then
 				'if is button "NewPlaylist"
 				Dim dlg As New DlgNewPlaylist
@@ -241,7 +255,7 @@ Class MainWindow
 					AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
 					ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, lbitm)
 				End If
-				sender.SelectedIndex = - 1
+				sender.SelectedIndex = -1
 			Else
 				ButtonMusic.IsSelected = False
 				DatSongList.CanUserSortColumns = False
@@ -252,19 +266,19 @@ Class MainWindow
 				DialogHost.Show(dlg, "window-root")
 				Dim playlistName = sender.SelectedItem.Content
 				Dim lstSongs = Await Task.Run(Function()
-					Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
-					Dim conn = Connect()
-					Dim trans = conn.BeginTransaction()
-					Dim cmd = conn.CreateCommand()
-					cmd.Transaction = trans
-					Dim songs As New ObservableCollection(Of SongInfo)
-					For Each itm In songIds
-						songs.Add(GetSongById(itm, cmd))
-					Next
-					trans.Commit()
-					conn.Close()
-					Return songs
-				End Function)
+												  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
+												  Dim conn = Connect()
+												  Dim trans = conn.BeginTransaction()
+												  Dim cmd = conn.CreateCommand()
+												  cmd.Transaction = trans
+												  Dim songs As New ObservableCollection(Of SongInfo)
+												  For Each itm In songIds
+													  songs.Add(GetSongById(itm, cmd))
+												  Next
+												  trans.Commit()
+												  conn.Close()
+												  Return songs
+											  End Function)
 				DatSongList.ItemsSource = lstSongs
 				DlgWindowRoot.IsOpen = False
 			End If
@@ -280,7 +294,7 @@ Class MainWindow
 		Handles ButtonMusic.MouseLeftButtonUp
 		DatSongList.ItemsSource = Nothing
 		DatSongList.ItemsSource = _lstSongs
-		ListBoxPlaylist.SelectedIndex = - 1
+		ListBoxPlaylist.SelectedIndex = -1
 		DatSongList.CanUserSortColumns = False
 		PanelSearchLocalMusic.Visibility = Visibility.Visible
 		ButtonSaveSorting.Visibility = Visibility.Collapsed
@@ -328,7 +342,7 @@ Class MainWindow
 			End If
 		Else
 			'Remove from whole library
-			If DatSongList.SelectedIndex <> - 1 Then
+			If DatSongList.SelectedIndex <> -1 Then
 				Dim conn = Connect()
 				Dim cmd = conn.CreateCommand()
 				Dim trans = conn.BeginTransaction()
@@ -358,7 +372,7 @@ Class MainWindow
 	End Sub
 
 	Private Async Sub SavePlaylistSorting(sender As Object, e As EventArgs) Handles ButtonSaveSorting.Click
-		If ListBoxPlaylist.SelectedIndex <> - 1 Then
+		If ListBoxPlaylist.SelectedIndex <> -1 Then
 			Dim conn = Connect()
 			Dim cmd = conn.CreateCommand()
 			Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content)
@@ -371,14 +385,23 @@ Class MainWindow
 			Dim dlg As New dlg_progress
 			DlgWindowRoot.Show(dlg)
 			Await Task.Run(Sub()
-				For Each songInfo As SongInfo In lst
-					AddSongToPlaylist(id, songInfo.Id, cmd)
-				Next
-			End Sub)
+							   For Each songInfo As SongInfo In lst
+								   AddSongToPlaylist(id, songInfo.Id, cmd)
+							   Next
+						   End Sub)
 			trans.Commit()
 			conn.Close()
 			DatSongList.ItemsSource = lst
 			DlgWindowRoot.IsOpen = False
 		End If
+	End Sub
+
+	Private Sub ButtonCloudMusicLogout_Click(sender As Object, e As RoutedEventArgs) Handles ButtonCloudMusicLogout.Click
+		_cloudMusic = Nothing
+		_cloudMusic = New CloudMusic
+		_isCloudMusicLoggedIn = False
+		ImageCloudMusicAvatar.Source = Nothing
+		TabCloudMusic.IsSelected = False
+		TabLocal.IsSelected = True
 	End Sub
 End Class
