@@ -293,7 +293,7 @@ Class MainWindow
 	'End Sub
 
 	Private Async Sub DeletePlaylist_Click(sender As Object, e As EventArgs) Handles MenuDeletePlaylist.Click
-		If ListBoxPlaylist.SelectedIndex <> - 1 Then
+		If ListBoxPlaylist.SelectedIndex <> -1 And ListBoxPlaylist.SelectedIndex <> ListBoxPlaylist.Items.Count - 1 Then
 			Dim dlg As New DlgYesNoDialog("删除播放列表", "要删除播放列表 """ & ListBoxPlaylist.SelectedItem.Content & """ 吗")
 			Dim r = Await DlgWindowRoot.ShowDialog(dlg)
 			If r = True Then

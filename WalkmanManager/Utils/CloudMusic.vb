@@ -224,7 +224,7 @@ Public Class CloudMusic
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
-		params("uid") = UserInfo("id")
+		params("uid") = customUid
 		Dim r = Curl("https://music.163.com/weapi/user/playlist", Prepare(JsonConvert.SerializeObject(params)))
 		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 		Dim result As New List(Of Dictionary(Of String, Object))
@@ -239,6 +239,18 @@ Public Class CloudMusic
 		Return result
 	End Function
 
+	''' <summary>
+	''' Get playlists
+	''' </summary>
+	''' <param name="offset">offset default: 0</param>
+	''' <param name="limit">limit default: 100</param>
+	''' <returns>
+	''' {
+	'''		"id"
+	'''		"name"
+	'''		"coverImgUrl"
+	''' }
+	''' </returns>
 	Public Overloads Function GetPlaylists(Optional offset As Integer = 0, Optional limit As Integer = 100) _
 		As List(Of Dictionary(Of String, Object))
 
@@ -260,14 +272,50 @@ Public Class CloudMusic
 		Return result
 	End Function
 
-	Public Function GetPlaylistDetail(id As Integer) As List(Of Dictionary(Of String, Object))
+	''' <summary>
+	''' Get Songs in Playlist
+	''' </summary>
+	''' <param name="id">playlist ID</param>
+	''' <returns>
+	''' {
+	'''		"name"
+	'''		"coverImgUrl"
+	'''		"tracks" : [
+	'''			"name"
+	'''			"artists"
+	'''			"album"
+	'''			"picUrl"
+	'''		]
+	''' }
+	''' </returns>
+	Public Function GetPlaylistDetail(id As Integer) As Dictionary(Of String, Object)
 		Dim params = New Dictionary(Of String, String)()
 		Dim r = Curl("http://music.163.com/api/playlist/detail", Prepare(JsonConvert.SerializeObject(params)))
 		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
-		Dim result As New List(Of Dictionary(Of String, Object))
+		Dim result As New Dictionary(Of String, Object)
+		'Read Basic Info (in /result: Object)
+		result("name") = cloudMusicDeserialize("result")("name")
+		result("coverImgUrl") = cloudMusicDeserialize("result")("coverImgUrl")
 		'Read Tracks (in /result: Object/tracks: List, list of Objects)
-
-		Return Nothing
+		Dim tracks As New List(Of Dictionary(Of String, Object))
+		For Each track In cloudMusicDeserialize("result")("tracks")
+			Dim t As New Dictionary(Of String, Object)
+			'Read Track Name
+			t("name") = track("name")
+			'Read Track Artists
+			For Each artist As String In track("artists")
+				t("artists") += artist("name") & "/"
+			Next
+			'remove the last slash
+			t("artists") = Mid(t("artists"), 1, t("artists").Length - 1)
+			'Read Album Info
+			t("album") = track("album")("name")
+			t("picUrl") = track("album")("picUrl")
+			tracks.Add(t)
+		Next
+		result("tracks") = tracks
+		cloudMusicDeserialize = Nothing
+		Return result
 	End Function
 
 End Class
