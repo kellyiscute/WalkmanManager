@@ -5,24 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:dd="urn:gong-wpf-dragdrop"
-		mc:Ignorable="d"
+        mc:Ignorable="d"
         Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen"
         Background="White">
 	<Grid>
 		<mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="35">
 			<Grid>
-				<Label Margin="10,2,0,0" Foreground="#DDFFFFFF" FontSize="16" HorizontalAlignment="Left" Width="154" Height="30" VerticalAlignment="Top">Walkman Manager</Label>
-				<Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent" BorderThickness="0"
+				<Label Margin="10,2,0,0" Foreground="#DDFFFFFF" FontSize="16" HorizontalAlignment="Left" Width="154" Height="30"
+				       VerticalAlignment="Top">
+					Walkman Manager
+				</Label>
+				<Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+				        BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0">
 					<mD:PackIcon Kind="Close" />
 				</Button>
-				<Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent" BorderThickness="0"
+				<Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+				        BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,50,0">
 					<mD:PackIcon Kind="WindowMinimize" />
 				</Button>
-				<Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent" BorderThickness="0"
+				<Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+				        BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,100,0">
 					<mD:PackIcon Kind="Settings" />
@@ -71,8 +77,8 @@
 									         PreviewMouseRightButtonDown="BlockRightClickSelectoin">
 										<ListBox.ContextMenu>
 											<ContextMenu>
-												<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150" Height="50"/>
-												<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="150" Height="50"/>
+												<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150" Height="50" />
+												<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="150" Height="50" />
 											</ContextMenu>
 										</ListBox.ContextMenu>
 										<ListBoxItem Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
@@ -131,36 +137,46 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" Visibility="Hidden">
-					<!---->
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0">
+					<!-- Visibility="Hidden"-->
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
-							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70" VerticalAlignment="Top">
+							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70"
+							        VerticalAlignment="Top">
 								<Grid>
-									<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" FontSize="16" Margin="92,10,10,10" Content="登录"/>
-									<mD:ColorZone Background="White" CornerRadius="3" Width="60" Margin="15,4.5,191,0" Height="60" VerticalAlignment="Top" mD:ShadowAssist.ShadowDepth="Depth1">
+									<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" FontSize="16" Margin="92,10,10,10"
+									       Content="登录" />
+									<mD:ColorZone Background="White" CornerRadius="3" Width="60" Margin="15,4.5,191,0" Height="60"
+									              VerticalAlignment="Top" mD:ShadowAssist.ShadowDepth="Depth1">
 										<mD:PopupBox mD:ShadowAssist.ShadowDepth="Depth3" Margin="0" HorizontalAlignment="Stretch">
 											<mD:PopupBox.ToggleContent>
-												<Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top" Height="50" Width="55" Stretch="Uniform" HorizontalAlignment="Left"/>
+												<Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top"
+												       Height="60" Width="60" Stretch="Uniform" HorizontalAlignment="Left" />
 											</mD:PopupBox.ToggleContent>
 											<StackPanel Width="200">
 												<Button x:Name="ButtonCloudMusicSyncAll" Height="45">
 													<WrapPanel>
-														<mD:PackIcon Kind="Sync"/>
-														<TextBlock Margin="10,0,0,0"><Run Text="同步所有歌单到本地"/></TextBlock>
+														<mD:PackIcon Kind="Sync" />
+														<TextBlock Margin="10,0,0,0">
+															<Run Text="同步所有歌单到本地" />
+														</TextBlock>
 													</WrapPanel>
 												</Button>
 												<Button x:Name="ButtonCloudMusicRefresh" Height="45">
 													<WrapPanel>
-														<mD:PackIcon Kind="Refresh"/>
-														<TextBlock Margin="10,0,0,0"><Run Text="刷新"/></TextBlock>
+														<mD:PackIcon Kind="Refresh" />
+														<TextBlock Margin="10,0,0,0">
+															<Run Text="刷新" />
+														</TextBlock>
 													</WrapPanel>
 												</Button>
-												<Separator/>
+												<Separator />
 												<Button x:Name="ButtonCloudMusicLogout" Height="45">
 													<WrapPanel>
-														<mD:PackIcon Kind="Logout"/>
-														<TextBlock Margin="10,0,0,0"><Run Text="退出登录"/></TextBlock>
+														<mD:PackIcon Kind="Logout" />
+														<TextBlock Margin="10,0,0,0">
+															<Run Text="退出登录" />
+														</TextBlock>
 													</WrapPanel>
 												</Button>
 											</StackPanel>
@@ -168,21 +184,35 @@
 									</mD:ColorZone>
 								</Grid>
 							</Border>
-							<ListBox x:Name="ListBoxCloudMusicPlaylists" BorderThickness="0,0,1,0" BorderBrush="LightGray" HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
+							<ListBox x:Name="ListBoxCloudMusicPlaylists" BorderThickness="0,0,1,0" BorderBrush="LightGray"
+							         HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
 
 							<Grid Margin="270,0,0,0">
-								<mD:ColorZone Background="White" mD:ShadowAssist.ShadowDepth="Depth1" CornerRadius="3" Margin="20,20,0,0" HorizontalAlignment="Left" Width="150">
-									<Image x:Name="ImagePlaylistCover" HorizontalAlignment="Left" Width="150" Height="150" VerticalAlignment="Top"/>
+								<mD:ColorZone Background="White" mD:ShadowAssist.ShadowDepth="Depth1" CornerRadius="3" Margin="10,10,0,0"
+								              HorizontalAlignment="Left" Width="130" Height="130">
+									<Image x:Name="ImagePlaylistCover" HorizontalAlignment="Stretch" Width="130" Height="130" VerticalAlignment="Stretch"
+									       RenderOptions.BitmapScalingMode="Fant" />
 								</mD:ColorZone>
-								<Grid Margin="175,20,10,0" Height="150" VerticalAlignment="Top">
-									<Label x:Name="LabelCloudMusicPlaylistName" Foreground="#333333" VerticalContentAlignment="Center" FontSize="35" Height="59" VerticalAlignment="Top" Content="" Margin="0,10,0,0"/>
-									<Button Margin="10,90,0,0" HorizontalAlignment="Left" Width="194" VerticalAlignment="Top" Background="#c62f2f" BorderBrush="#a82828">
+								<Grid Margin="155,10,10,0" Height="130" VerticalAlignment="Top">
+									<Label x:Name="LabelCloudMusicPlaylistName" Foreground="#333333" VerticalContentAlignment="Center"
+									       FontSize="30" Height="56" VerticalAlignment="Top" Content="" />
+									<Button Margin="10,80,0,0" HorizontalAlignment="Left" Width="194" VerticalAlignment="Top" Background="#c62f2f"
+									        BorderBrush="#a82828">
 										<WrapPanel>
-											<mD:PackIcon Kind="Sync"></mD:PackIcon>
+											<mD:PackIcon Kind="Sync" />
 											<TextBlock Margin="10,0,0,0">同步当前歌单到本地</TextBlock>
 										</WrapPanel>
 									</Button>
 								</Grid>
+								<DataGrid x:Name="DataGridCloudMusic" Margin="0,150,0,0" AutoGenerateColumns="False" IsReadOnly="True"
+								          CanUserSortColumns="False">
+									<DataGrid.Columns>
+										<DataGridTextColumn Binding="{Binding Title}" Width="250" ClipboardContentBinding="{x:Null}" Header="标题" />
+										<DataGridTextColumn Binding="{Binding Artists}" Width="250" ClipboardContentBinding="{x:Null}" Header="艺术家" />
+										<DataGridTextColumn Binding="{Binding Album}" Width="200" ClipboardContentBinding="{x:Null}" Header="专辑" />
+									</DataGrid.Columns>
+
+								</DataGrid>
 							</Grid>
 						</Grid>
 					</mD:DialogHost>

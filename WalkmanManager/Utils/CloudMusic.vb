@@ -66,6 +66,12 @@ Public Class CloudMusic
 		_cookie.Add(New Cookie With {.Name = "channel", .Value = "netease", .Domain = "music.163.com"})
 	End Sub
 
+	Structure CloudMusicTracks
+		Property Title As String
+		Property Artists As String
+		Property Album As String
+	End Structure
+
 	Private Function CreateSecretKey(length As Integer) As String
 		Dim str = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		Dim r = ""
@@ -88,7 +94,7 @@ Public Class CloudMusic
 		Dim dec As New BigInteger(0)
 		For i = 0 To hex.Length - 1
 			dec += BigInteger.Multiply(New BigInteger(Convert.ToInt32(hex(i).ToString, 16)),
-										BigInteger.Pow(New BigInteger(16), hex.Length - i - 1))
+									   BigInteger.Pow(New BigInteger(16), hex.Length - i - 1))
 		Next
 		Return dec
 	End Function
@@ -220,7 +226,7 @@ Public Class CloudMusic
 	End Function
 
 	Public Overloads Function GetPlaylists(customUid As String, Optional offset As Integer = 0,
-											Optional limit As Integer = 100) As List(Of Dictionary(Of String, Object))
+										   Optional limit As Integer = 100) As List(Of Dictionary(Of String, Object))
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
@@ -281,43 +287,48 @@ Public Class CloudMusic
 	'''		"name"
 	'''		"coverImgUrl"
 	'''		"tracks" : [
-	'''			"name"
+	'''			{
+	'''			"title"
 	'''			"artists"
 	'''			"album"
 	'''			"picUrl"
+	'''			}
 	'''		]
 	''' }
 	''' </returns>
-	Public Function GetPlaylistDetail(id As Integer) As Dictionary(Of String, Object)
+	Public Function GetPlaylistDetail(id As Long) As Dictionary(Of String, Object)
 		Dim params = New Dictionary(Of String, String)()
-		Dim r = Curl("http://music.163.com/api/playlist/detail", Prepare(JsonConvert.SerializeObject(params)))
+		Dim r = Curl("http://music.163.com/api/playlist/detail?id=" & id.ToString, params)
 		Dim cloudMusicDeserialize = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 		Dim result As New Dictionary(Of String, Object)
 		'Read Basic Info (in /result: Object)
 		result("name") = cloudMusicDeserialize("result")("name")
 		result("coverImgUrl") = cloudMusicDeserialize("result")("coverImgUrl")
 		'Read Tracks (in /result: Object/tracks: List, list of Objects)
-		Dim tracks As New List(Of Dictionary(Of String, Object))
+		Dim tracks As New List(Of CloudMusicTracks)
 		For Each track In cloudMusicDeserialize("result")("tracks")
-			Dim t As New Dictionary(Of String, Object)
+			Dim t As CloudMusicTracks
 			'Read Track Name
-			t("name") = track("name")
+			t.Title = track("name")
 			'Read Track Artists
-			For Each artist As String In track("artists")
-				t("artists") += artist("name") & "/"
+			t.Artists = ""
+			For Each artist In track("artists")
+				t.Artists += artist("name") & "/"
 			Next
 			'remove the last slash
-			t("artists") = Mid(t("artists"), 1, t("artists").Length - 1)
+			If t.Artists <> "" Then
+				t.Artists = Mid(t.Artists, 1, t.Artists.Length - 1)
+			End If
 			'Read Album Info
-			t("album") = track("album")("name")
-			t("picUrl") = track("album")("picUrl")
+			If track("album").Count <> 0 Then
+				t.Album = track("album")("name")
+			End If
 			tracks.Add(t)
 		Next
 		result("tracks") = tracks
 		cloudMusicDeserialize = Nothing
 		Return result
 	End Function
-
 End Class
 
 Public Class CookieAwareWebClient

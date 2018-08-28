@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.ObjectModel
-Imports System.Net
 Imports System.Windows.Shell
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
@@ -81,6 +80,9 @@ Class MainWindow
 							GridCloudMusic.Visibility = Visibility.Visible
 							_isCloudMusicLoggedIn = True
 							DlgWindowRoot.IsOpen = False
+							If ListBoxCloudMusicPlaylists.Items.Count > 0 Then
+								ListBoxCloudMusicPlaylists.SelectedIndex = 0
+							End If
 							Exit While
 						Else
 							lastPhone = dlgLogin.TextBoxPhone.Text
@@ -175,10 +177,10 @@ Class MainWindow
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
 									New WindowChrome() _
-										With {.GlassFrameThickness = New Thickness(7),
+										With {.GlassFrameThickness = New Thickness(1),
 										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
 										.CornerRadius = New CornerRadius(10),
-										.CaptionHeight = 50})
+										.CaptionHeight = 34})
 	End Sub
 
 	Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
@@ -406,4 +408,38 @@ Class MainWindow
 		TabCloudMusic.IsSelected = False
 		TabLocal.IsSelected = True
 	End Sub
+
+	Private Async Sub ListBoxCloudMusicPlaylists_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ListBoxCloudMusicPlaylists.SelectionChanged
+		If ListBoxCloudMusicPlaylists.SelectedIndex <> -1 Then
+			Dim id = _cloudMusic.Playlists(ListBoxCloudMusicPlaylists.SelectedIndex)("id")
+			Dim dlg As New dlg_progress
+			dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
+			DlgCloudMusic.ShowDialog(dlg)
+
+			Dim detail = Await Task.Run(Function()
+											Dim r = _cloudMusic.GetPlaylistDetail(id)
+											Return r
+										End Function)
+			DataGridCloudMusic.ItemsSource = detail("tracks")
+			Dim img As New BitmapImage
+			img.BeginInit()
+			img.UriSource = New Uri(detail("coverImgUrl"))
+			img.CacheOption = BitmapCacheOption.OnLoad
+			img.EndInit()
+			LabelCloudMusicPlaylistName.Content = detail("name")
+			ImagePlaylistCover.Source = img
+			DlgCloudMusic.IsOpen = False
+		End If
+		GC.Collect()
+	End Sub
+
+	Private Sub RefreshCloudMusicPlaylists(sender As Object, e As EventArgs) Handles ButtonCloudMusicRefresh.Click
+		_cloudmusic.GetPlaylists()
+		ListBoxCloudMusicPlaylists.Items.Clear()
+		For Each p In _cloudMusic.Playlists
+			ListBoxCloudMusicPlaylists.Items.Add(
+				New ListBoxItem() With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
+		Next
+	End Sub
+
 End Class
