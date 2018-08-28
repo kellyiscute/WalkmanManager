@@ -189,20 +189,18 @@
       <DependentUpon>DlgYesNoDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\CloudMusic.vb" />
-    <Compile Include="Utils\CloudMusicAPITypes.vb" />
     <Compile Include="Utils\Database.vb" />
     <Compile Include="Utils\db_updater.vb" />
     <Compile Include="Dialogs\dlg_progress.xaml.vb">
       <DependentUpon>dlg_progress.xaml</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
-    <Compile Include="music_files_management\RefreshDatabase.vb" />
-    <Compile Include="music_files_management\search_music_files.vb" />
     <Compile Include="SongItm.xaml.vb">
       <DependentUpon>SongItm.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\Searching.vb" />
     <Compile Include="Utils\ExtensionMethods.vb" />
+    <Compile Include="Utils\SyncAnalyzer.vb" />
     <Page Include="Dialogs\DlgCloudMusicLogin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

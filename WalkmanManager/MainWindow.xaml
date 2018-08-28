@@ -188,7 +188,7 @@
 							         HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
 
 							<Grid Margin="270,0,0,0">
-								<mD:ColorZone Background="White" mD:ShadowAssist.ShadowDepth="Depth1" CornerRadius="3" Margin="10,10,0,0"
+								<mD:ColorZone Background="White" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="3" Margin="10,10,0,0"
 								              HorizontalAlignment="Left" Width="130" Height="130">
 									<Image x:Name="ImagePlaylistCover" HorizontalAlignment="Stretch" Width="130" Height="130" VerticalAlignment="Stretch"
 									       RenderOptions.BitmapScalingMode="Fant" />

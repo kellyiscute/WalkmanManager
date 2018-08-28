@@ -6,7 +6,6 @@ Imports ATL
 Imports GongSolutions.Wpf.DragDrop
 
 Class MainWindow
-
 	ReadOnly NETEASE_RED = Color.FromRgb(198, 47, 47)
 	ReadOnly DEFAULT_COLOR = Color.FromRgb(103, 58, 183)
 
@@ -62,7 +61,7 @@ Class MainWindow
 						If result = "" Then
 							For Each p In _cloudMusic.Playlists
 								ListBoxCloudMusicPlaylists.Items.Add(
-								New ListBoxItem() With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
+									New ListBoxItem() With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
 							Next
 							Try
 								Dim img As New BitmapImage
@@ -106,20 +105,20 @@ Class MainWindow
 
 	Private Async Function UiCloudMusicLogin(dlgLogin As DlgCloudMusicLogin, dlgProg As dlg_progress) As Task(Of String)
 		Dim result = Await Task.Run(Function()
-										Try
-											dlgProg.Text = "登录中"
-											Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
-											If loginResult("success") Then
-												dlgProg.Text = "获取歌单"
-												_cloudMusic.GetPlaylists()
-												Return ""
-											Else
-												Return loginResult("msg")
-											End If
-										Catch
-											Return "Unknown Error"
-										End Try
-									End Function)
+			Try
+				dlgProg.Text = "登录中"
+				Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
+				If loginResult("success") Then
+					dlgProg.Text = "获取歌单"
+					_cloudMusic.GetPlaylists()
+					Return ""
+				Else
+					Return loginResult("msg")
+				End If
+			Catch
+				Return "Unknown Error"
+			End Try
+		End Function)
 		Return result
 	End Function
 
@@ -139,28 +138,28 @@ Class MainWindow
 		PageSwitcher(Nothing, Nothing)
 
 		Dim newLost = Await Task.Run(Async Function()
-										 Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
-										 Dim lstLost = Await upd.FindLost()
-										 _lstSongs = GetSongs()
-										 Dim syncResult As String = ""
-										 If lstNew.Count > 0 Then
-											 syncResult = "=========================发现以下新项目=========================" & vbNewLine
-											 For Each NewItem In lstNew
-												 syncResult += NewItem & vbNewLine
-											 Next
-										 End If
-										 If lstLost.Count > 0 Then
-											 syncResult += "=========================发现已删除项目=========================" & vbNewLine
-											 For Each LostItem In lstLost
-												 syncResult += LostItem & vbNewLine
-											 Next
-										 End If
-										 Return syncResult
-									 End Function)
+			Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
+			Dim lstLost = Await upd.FindLost()
+			_lstSongs = GetSongs()
+			Dim syncResult As String = ""
+			If lstNew.Count > 0 Then
+				syncResult = "=========================发现以下新项目=========================" & vbNewLine
+				For Each NewItem In lstNew
+					syncResult += NewItem & vbNewLine
+				Next
+			End If
+			If lstLost.Count > 0 Then
+				syncResult += "=========================发现已删除项目=========================" & vbNewLine
+				For Each LostItem In lstLost
+					syncResult += LostItem & vbNewLine
+				Next
+			End If
+			Return syncResult
+		End Function)
 		Dim lstPlaylist = Await Task.Run(Function()
-											 Dim r = GetPlaylists()
-											 Return r
-										 End Function)
+			Dim r = GetPlaylists()
+			Return r
+		End Function)
 		For Each itm In lstPlaylist
 			Dim lbitm = New ListBoxItem() With {.Content = itm, .AllowDrop = True}
 			AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
@@ -176,16 +175,16 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-									New WindowChrome() _
-										With {.GlassFrameThickness = New Thickness(1),
-										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
-										.CornerRadius = New CornerRadius(10),
-										.CaptionHeight = 34})
+		                             New WindowChrome() _
+			                            With {.GlassFrameThickness = New Thickness(1),
+			                            .UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
+			                            .CornerRadius = New CornerRadius(10),
+			                            .CaptionHeight = 34})
 	End Sub
 
 	Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
 		Handles DatSongList.MouseDoubleClick
-		If DatSongList.SelectedIndex <> -1 Then
+		If DatSongList.SelectedIndex <> - 1 Then
 			DlgWindowRoot.CloseOnClickAway = True
 			Dim detailDialog As New DlgSongDetail(DatSongList.SelectedItem.path)
 			Await DlgWindowRoot.ShowDialog(detailDialog)
@@ -248,7 +247,7 @@ Class MainWindow
 	End Sub
 
 	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs)
-		If sender.SelectedIndex <> -1 And Not _isRightClickSelect Then
+		If sender.SelectedIndex <> - 1 And Not _isRightClickSelect Then
 			If sender.SelectedItem.Tag = "NewPlaylist" Then
 				'if is button "NewPlaylist"
 				Dim dlg As New DlgNewPlaylist
@@ -259,7 +258,7 @@ Class MainWindow
 					AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
 					ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, lbitm)
 				End If
-				sender.SelectedIndex = -1
+				sender.SelectedIndex = - 1
 			Else
 				ButtonMusic.IsSelected = False
 				DatSongList.CanUserSortColumns = False
@@ -270,19 +269,19 @@ Class MainWindow
 				DialogHost.Show(dlg, "window-root")
 				Dim playlistName = sender.SelectedItem.Content
 				Dim lstSongs = Await Task.Run(Function()
-												  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
-												  Dim conn = Connect()
-												  Dim trans = conn.BeginTransaction()
-												  Dim cmd = conn.CreateCommand()
-												  cmd.Transaction = trans
-												  Dim songs As New ObservableCollection(Of SongInfo)
-												  For Each itm In songIds
-													  songs.Add(GetSongById(itm, cmd))
-												  Next
-												  trans.Commit()
-												  conn.Close()
-												  Return songs
-											  End Function)
+					Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
+					Dim conn = Connect()
+					Dim trans = conn.BeginTransaction()
+					Dim cmd = conn.CreateCommand()
+					cmd.Transaction = trans
+					Dim songs As New ObservableCollection(Of SongInfo)
+					For Each itm In songIds
+						songs.Add(GetSongById(itm, cmd))
+					Next
+					trans.Commit()
+					conn.Close()
+					Return songs
+				End Function)
 				DatSongList.ItemsSource = lstSongs
 				DlgWindowRoot.IsOpen = False
 			End If
@@ -298,7 +297,7 @@ Class MainWindow
 		Handles ButtonMusic.MouseLeftButtonUp
 		DatSongList.ItemsSource = Nothing
 		DatSongList.ItemsSource = _lstSongs
-		ListBoxPlaylist.SelectedIndex = -1
+		ListBoxPlaylist.SelectedIndex = - 1
 		DatSongList.CanUserSortColumns = False
 		PanelSearchLocalMusic.Visibility = Visibility.Visible
 		ButtonSaveSorting.Visibility = Visibility.Collapsed
@@ -311,7 +310,7 @@ Class MainWindow
 	'End Sub
 
 	Private Async Sub DeletePlaylist_Click(sender As Object, e As EventArgs) Handles MenuDeletePlaylist.Click
-		If ListBoxPlaylist.SelectedIndex <> -1 And ListBoxPlaylist.SelectedIndex <> ListBoxPlaylist.Items.Count - 1 Then
+		If ListBoxPlaylist.SelectedIndex <> - 1 And ListBoxPlaylist.SelectedIndex <> ListBoxPlaylist.Items.Count - 1 Then
 			Dim dlg As New DlgYesNoDialog("删除播放列表", "要删除播放列表 """ & ListBoxPlaylist.SelectedItem.Content & """ 吗")
 			Dim r = Await DlgWindowRoot.ShowDialog(dlg)
 			If r = True Then
@@ -346,7 +345,7 @@ Class MainWindow
 			End If
 		Else
 			'Remove from whole library
-			If DatSongList.SelectedIndex <> -1 Then
+			If DatSongList.SelectedIndex <> - 1 Then
 				Dim conn = Connect()
 				Dim cmd = conn.CreateCommand()
 				Dim trans = conn.BeginTransaction()
@@ -376,7 +375,7 @@ Class MainWindow
 	End Sub
 
 	Private Async Sub SavePlaylistSorting(sender As Object, e As EventArgs) Handles ButtonSaveSorting.Click
-		If ListBoxPlaylist.SelectedIndex <> -1 Then
+		If ListBoxPlaylist.SelectedIndex <> - 1 Then
 			Dim conn = Connect()
 			Dim cmd = conn.CreateCommand()
 			Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content)
@@ -389,10 +388,10 @@ Class MainWindow
 			Dim dlg As New dlg_progress
 			DlgWindowRoot.Show(dlg)
 			Await Task.Run(Sub()
-							   For Each songInfo As SongInfo In lst
-								   AddSongToPlaylist(id, songInfo.Id, cmd)
-							   Next
-						   End Sub)
+				For Each songInfo As SongInfo In lst
+					AddSongToPlaylist(id, songInfo.Id, cmd)
+				Next
+			End Sub)
 			trans.Commit()
 			conn.Close()
 			DatSongList.ItemsSource = lst
@@ -409,17 +408,18 @@ Class MainWindow
 		TabLocal.IsSelected = True
 	End Sub
 
-	Private Async Sub ListBoxCloudMusicPlaylists_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ListBoxCloudMusicPlaylists.SelectionChanged
-		If ListBoxCloudMusicPlaylists.SelectedIndex <> -1 Then
+	Private Async Sub ListBoxCloudMusicPlaylists_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) _
+		Handles ListBoxCloudMusicPlaylists.SelectionChanged
+		If ListBoxCloudMusicPlaylists.SelectedIndex <> - 1 Then
 			Dim id = _cloudMusic.Playlists(ListBoxCloudMusicPlaylists.SelectedIndex)("id")
 			Dim dlg As New dlg_progress
 			dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
 			DlgCloudMusic.ShowDialog(dlg)
 
 			Dim detail = Await Task.Run(Function()
-											Dim r = _cloudMusic.GetPlaylistDetail(id)
-											Return r
-										End Function)
+				Dim r = _cloudMusic.GetPlaylistDetail(id)
+				Return r
+			End Function)
 			DataGridCloudMusic.ItemsSource = detail("tracks")
 			Dim img As New BitmapImage
 			img.BeginInit()
@@ -433,13 +433,18 @@ Class MainWindow
 		GC.Collect()
 	End Sub
 
-	Private Sub RefreshCloudMusicPlaylists(sender As Object, e As EventArgs) Handles ButtonCloudMusicRefresh.Click
-		_cloudmusic.GetPlaylists()
+	Private async Sub RefreshCloudMusicPlaylists(sender As Object, e As EventArgs) Handles ButtonCloudMusicRefresh.Click
+		Dim dlg As New dlg_progress
+		dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
+		DlgCloudMusic.ShowDialog(dlg)
+		await Task.Run(Sub()
+			_cloudmusic.GetPlaylists()
+		End Sub)
 		ListBoxCloudMusicPlaylists.Items.Clear()
 		For Each p In _cloudMusic.Playlists
 			ListBoxCloudMusicPlaylists.Items.Add(
 				New ListBoxItem() With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
 		Next
+		DlgCloudMusic.IsOpen = False
 	End Sub
-
 End Class
