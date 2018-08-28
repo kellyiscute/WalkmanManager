@@ -1,5 +1,6 @@
 ﻿Imports System.Data
 Imports System.Data.SQLite
+Imports System.Net
 
 Public Module ExtensionMethods
 	Sub New()
@@ -83,5 +84,14 @@ Public Module ExtensionMethods
 			counter += 1
 		Next
 	End Sub
+
+	<System.Runtime.CompilerServices.Extension>
+	Public Function ToCookieString(lst As List(Of Cookie)) As String
+		Dim r As String = ""
+		For Each c In lst
+			r += c.Name & "=" & c.Value & ";"
+		Next
+		Return r
+	End Function
 
 End Module

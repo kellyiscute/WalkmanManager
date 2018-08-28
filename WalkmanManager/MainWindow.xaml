@@ -191,7 +191,7 @@
 								<mD:ColorZone Background="White" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="3" Margin="10,10,0,0"
 								              HorizontalAlignment="Left" Width="130" Height="130">
 									<Image x:Name="ImagePlaylistCover" HorizontalAlignment="Stretch" Width="130" Height="130" VerticalAlignment="Stretch"
-									       RenderOptions.BitmapScalingMode="Fant" />
+									       RenderOptions.BitmapScalingMode="Fant" Stretch="UniformToFill" />
 								</mD:ColorZone>
 								<Grid Margin="155,10,10,0" Height="130" VerticalAlignment="Top">
 									<Label x:Name="LabelCloudMusicPlaylistName" Foreground="#333333" VerticalContentAlignment="Center"

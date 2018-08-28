@@ -45,7 +45,6 @@ Public Class CloudMusic
 	Const Useragent =
 		"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"
 
-	Dim _cookie As New CookieContainer
 
 	Const Referer = "http://music.163.com/"
 	Private ReadOnly _secretKey As String
@@ -57,14 +56,22 @@ Public Class CloudMusic
 
 #End Region
 
+	Private _lstCookies As List(Of Cookie)
+
 	Sub New()
 		_secretKey = CreateSecretKey(16)
 		_encSecKey = RsaEncode(_secretKey)
-		_cookie.Add(New Cookie With {.Name = "os", .Value = "pc", .Domain = "music.163.com"})
-		_cookie.Add(New Cookie With {.Name = "osver", .Value = "Ubuntu 18.04", .Domain = "music.163.com"})
-		_cookie.Add(New Cookie With {.Name = "appver", .Value = "2.0.3.131777", .Domain = "music.163.com"})
-		_cookie.Add(New Cookie With {.Name = "channel", .Value = "netease", .Domain = "music.163.com"})
+		_lstCookies = InitCookies()
 	End Sub
+
+	Private Function InitCookies()
+		Dim cookie = New List(Of Cookie)
+		'cookie.Add(New Cookie With {.Name = "os", .Value = "pc", .Domain = "music.163.com"})
+		'cookie.Add(New Cookie With {.Name = "osver", .Value = "Ubuntu 18.04", .Domain = "music.163.com"})
+		cookie.Add(New Cookie With {.Name = "appver", .Value = "2.0.3.131777", .Domain = "music.163.com"})
+		cookie.Add(New Cookie With {.Name = "channel", .Value = "netease", .Domain = "music.163.com"})
+		Return cookie
+	End Function
 
 	Structure CloudMusicTracks
 		Property Title As String
@@ -94,7 +101,7 @@ Public Class CloudMusic
 		Dim dec As New BigInteger(0)
 		For i = 0 To hex.Length - 1
 			dec += BigInteger.Multiply(New BigInteger(Convert.ToInt32(hex(i).ToString, 16)),
-									   BigInteger.Pow(New BigInteger(16), hex.Length - i - 1))
+										BigInteger.Pow(New BigInteger(16), hex.Length - i - 1))
 		Next
 		Return dec
 	End Function
@@ -158,32 +165,39 @@ Public Class CloudMusic
 	End Function
 
 	'fake curl
-	Private Function Curl(url As String, parms As Dictionary(Of String, String), Optional method As String = "POST") _
+	Private Function Curl(url As String, params As Dictionary(Of String, String), Optional method As String = "POST") _
 		As String
 		Dim result As String
-		Using wc = New CookieAwareWebClient
-			wc.Headers.Add(HttpRequestHeader.Referer, Referer)
-			wc.Headers.Add(HttpRequestHeader.UserAgent, Useragent)
-			wc.CookieContainer = _cookie
-			Dim reqParam = New Specialized.NameValueCollection()
-			For Each keyPair As KeyValuePair(Of String, String) In parms
-				reqParam.Add(keyPair.Key, keyPair.Value)
-			Next
+		Dim wc = New CookieAwareWebClient
+		wc.Headers.Add(HttpRequestHeader.Referer, Referer)
+		wc.Headers.Add(HttpRequestHeader.UserAgent, Useragent)
+		For Each c In _lstCookies
+			wc.CookieContainer.Add(c)
+		Next
+		Dim reqParam = New Specialized.NameValueCollection()
+		For Each keyPair As KeyValuePair(Of String, String) In params
+			reqParam.Add(keyPair.Key, keyPair.Value)
+		Next
 
-			Dim responseBytes = wc.UploadValues(url, method, reqParam)
+		Dim responseBytes = wc.UploadValues(url, method, reqParam)
 
-			Debug.Print("=================Cookies=================")
-			For i = 0 To wc.ResponseCookies.Count - 1
-				_cookie.Add(wc.ResponseCookies.Item(i))
-			Next
+		Debug.Print("=================Cookies=================")
+		For i = 0 To wc.ResponseCookies.Count - 1
+			With wc.ResponseCookies.Item(i)
+				Dim c As New Cookie
+				c.Name = .Name.ToString
+				c.Value = .Value.ToString
+				c.Domain = .Domain.ToString
+				_lstCookies.Add(c)
+			End With
+		Next
+		Debug.Print(_lstCookies.ToCookieString)
 
-			result = Encoding.UTF8.GetString(responseBytes)
-		End Using
+		result = Encoding.UTF8.GetString(responseBytes)
 		Return result
 	End Function
 
 	Public Function Login(phone As String, password As String) As Dictionary(Of String, Object)
-		Dim api = New CloudMusic
 		Dim params = New Dictionary(Of String, String)()
 		params("phone") = phone
 		Dim md5Pwd = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(password))
@@ -194,7 +208,7 @@ Public Class CloudMusic
 		params("password") = b.ToString().ToLower
 		Dim j = JsonConvert.SerializeObject(params)
 		Debug.Print(j)
-		Dim r = api.Curl("https://music.163.com/weapi/login/cellphone/", api.Prepare(j))
+		Dim r = Curl("https://music.163.com/weapi/login/cellphone/", Prepare(j))
 
 		Dim returnJson = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(r)
 		If returnJson.Keys.Contains("msg") Then
@@ -226,7 +240,7 @@ Public Class CloudMusic
 	End Function
 
 	Public Overloads Function GetPlaylists(customUid As String, Optional offset As Integer = 0,
-										   Optional limit As Integer = 100) As List(Of Dictionary(Of String, Object))
+											Optional limit As Integer = 100) As List(Of Dictionary(Of String, Object))
 		Dim params = New Dictionary(Of String, String)()
 		params("offset") = offset
 		params("limit") = limit
