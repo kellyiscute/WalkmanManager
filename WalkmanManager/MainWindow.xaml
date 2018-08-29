@@ -63,7 +63,7 @@
 						</ListBox>
 					</Grid>
 				</mD:ColorZone>
-				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible">
+				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible" d:IsHidden="True">
 					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
 						<Grid>
 							<StackPanel x:Name="LstLocalSidebar" HorizontalAlignment="Left" Width="220">
@@ -137,7 +137,7 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" d:IsHidden="True">
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0">
 					<!-- Visibility="Hidden"-->
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
@@ -196,7 +196,7 @@
 								<Grid Margin="155,10,10,0" Height="130" VerticalAlignment="Top">
 									<Label x:Name="LabelCloudMusicPlaylistName" Foreground="#333333" VerticalContentAlignment="Center"
 									       FontSize="30" Height="56" VerticalAlignment="Top" Content="" />
-									<Button Margin="10,80,0,0" HorizontalAlignment="Left" Width="194" VerticalAlignment="Top" Background="#c62f2f"
+									<Button x:Name="ButtonSyncCurrent" Margin="10,80,0,0" HorizontalAlignment="Left" Width="194" VerticalAlignment="Top" Background="#c62f2f"
 									        BorderBrush="#a82828">
 										<WrapPanel>
 											<mD:PackIcon Kind="Sync" />

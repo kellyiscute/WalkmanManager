@@ -436,7 +436,19 @@ Public Class Database
 		If reader.Read() Then
 			Dim id = reader(0)
 			reader.Close()
-			conn.Close()
+			Return id
+		Else
+			reader.Close()
+			Return Nothing
+		End If
+	End Function
+
+	Public Overloads Shared Function GetSongId(path As String, cmd As SQLiteCommand) As Integer
+		cmd.BuildQuery("select * from songs where path = ?", New Object() {path})
+		Dim reader = cmd.ExecuteReader()
+		If reader.Read() Then
+			Dim id = reader(0)
+			reader.Close()
 			Return id
 		Else
 			reader.Close()
@@ -747,45 +759,53 @@ Public Class Database
 	''' </summary>
 	''' <param name="title">song title</param>
 	''' <param name="artists">song artists</param>
-	''' <returns>0 as None found, 1 as exactly 1 found, 2 as multiple songs found</returns>
-	Public Overloads Function SongExists(title As String, artists As String) As Integer
+	''' <returns>return path if found, empty string if not found</returns>
+	Public Overloads Shared Function SongExists(title As String, artists As String) As String
 		Dim conn = Connect()
 		Dim cmd = conn.CreateCommand()
-		cmd.BuildQuery("select count(*) from songs where title = ? and artists = ?", New Object() {title, artists})
+		cmd.BuildQuery("select * from songs where title = ? and artists = ?", New Object() {title, artists})
 		Dim r = cmd.ExecuteReader()
-		r.Read()
-		If r(0) = 0 Then
+		If r.HasRows Then
+			r.Read()
+			Dim result = r("path")
 			r.Close()
 			conn.Close()
-			Return 0
-		ElseIf r(0) = 1 Then
-			r.Close()
-			conn.Close()
-			Return 1
+			Return result
 		Else
 			r.Close()
 			conn.Close()
-			Return 2
+			Return ""
 		End If
 	End Function
 
-	Public Overloads Function SongExists(title As String, artists As String, conn As SQLiteConnection) As Integer
+	Public Overloads Shared Function SongExists(title As String, artists As String, conn As SQLiteConnection) As String
 		Dim cmd = conn.CreateCommand()
-		cmd.BuildQuery("select count(*) from songs where title = ? and artists = ?", New Object() {title, artists})
+		cmd.BuildQuery("select * from songs where title = ? and artists = ?", New Object() {title, artists})
 		Dim r = cmd.ExecuteReader()
-		r.Read()
-		If r(0) = 0 Then
+		If r.HasRows Then
+			r.Read()
+			Dim result = r("path")
 			r.Close()
-			Return 0
-		ElseIf r(0) = 1 Then
-			r.Close()
-			Return 1
+			Return result
 		Else
 			r.Close()
-
-			Return 2
+			Return ""
 		End If
 	End Function
 
+	Public Overloads Shared Function SongExists(title As String, artists As String, cmd As SQLiteCommand) As String
+		cmd.BuildQuery("select * from songs where title = ? and artists = ?", New Object() {title, artists})
+		Dim r = cmd.ExecuteReader()
+		If r.HasRows Then
+			r.Read()
+			Dim result = r("path")
+			r.Close()
+			Return result
+		Else
+			r.Close()
+			Return ""
+		End If
+
+	End Function
 
 End Class
