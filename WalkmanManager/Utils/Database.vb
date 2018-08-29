@@ -742,24 +742,50 @@ Public Class Database
 		cmd.ExecuteNonQuery()
 	End Sub
 
-	'TODO: This Function has NOT been debugged!
-	Public Shared Function GetSong_id(Optional ByVal songName As String = Nothing,
-									  Optional ByVal songArtist As String = Nothing) As List(Of Integer)
-		Dim lstId As New List(Of Integer)
+	''' <summary>
+	''' To check if there is an identical song in the database
+	''' </summary>
+	''' <param name="title">song title</param>
+	''' <param name="artists">song artists</param>
+	''' <returns>0 as None found, 1 as exactly 1 found, 2 as multiple songs found</returns>
+	Public Overloads Function SongExists(title As String, artists As String) As Integer
 		Dim conn = Connect()
-		Dim cmd = New SQLiteCommand(conn)
-		If Not songArtist = Nothing And Not songName = Nothing Then
-			cmd.CommandText = String.Format("select id from songs where title = '{0}' and artists = '{1}'", songName, songArtist)
-		ElseIf songArtist = Nothing And Not songName = Nothing Then
-			cmd.CommandText = String.Format("select id from songs where title = '{0}'", songName)
-		ElseIf songArtist = Nothing And songName = Nothing Then
-			cmd.CommandText = String.Format("select id from songs")
+		Dim cmd = conn.CreateCommand()
+		cmd.BuildQuery("select count(*) from songs where title = ? and artists = ?", New Object() {title, artists})
+		Dim r = cmd.ExecuteReader()
+		r.Read()
+		If r(0) = 0 Then
+			r.Close()
+			conn.Close()
+			Return 0
+		ElseIf r(0) = 1 Then
+			r.Close()
+			conn.Close()
+			Return 1
+		Else
+			r.Close()
+			conn.Close()
+			Return 2
 		End If
-		Dim r = cmd.ExecuteReader
-		While r.Read()
-			lstId.Add(Int(r("id")))
-		End While
-		conn.Close()
-		Return lstId
 	End Function
+
+	Public Overloads Function SongExists(title As String, artists As String, conn As SQLiteConnection) As Integer
+		Dim cmd = conn.CreateCommand()
+		cmd.BuildQuery("select count(*) from songs where title = ? and artists = ?", New Object() {title, artists})
+		Dim r = cmd.ExecuteReader()
+		r.Read()
+		If r(0) = 0 Then
+			r.Close()
+			Return 0
+		ElseIf r(0) = 1 Then
+			r.Close()
+			Return 1
+		Else
+			r.Close()
+
+			Return 2
+		End If
+	End Function
+
+
 End Class

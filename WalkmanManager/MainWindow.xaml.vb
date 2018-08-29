@@ -447,4 +447,17 @@ Class MainWindow
 		Next
 		DlgCloudMusic.IsOpen = False
 	End Sub
+
+	Private Sub BtnSearchSong_Click(sender As Object, e As RoutedEventArgs) Handles BtnSearchSong.Click
+		If TextBoxSearchLocal.Text = "" Then
+			DatSongList.ItemsSource = _lstSongs
+		Else
+			Dim r = Searching.SearchSongs(_lstSongs, TextBoxSearchLocal.Text)
+			DatSongList.ItemsSource = r
+		End If
+	End Sub
+
+	Private Sub TextBoxSearchLocal_TextChanged(sender As Object, e As TextChangedEventArgs) Handles TextBoxSearchLocal.TextChanged
+		BtnSearchSong_Click(sender, Nothing)
+	End Sub
 End Class
