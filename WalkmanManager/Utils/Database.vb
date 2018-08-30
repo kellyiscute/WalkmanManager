@@ -257,13 +257,13 @@ Public Class Database
 	''' <param name="order">order, start from ZERO</param>
 	''' <param name="cmd">SQLiteCommand Object</param>
 	Public Overloads Shared Sub AddSongToPlaylist(playlistId As Integer, songId As Integer,
-												  cmd As SQLiteCommand, Optional order As Integer = -1)
+												  cmd As SQLiteCommand, Optional order As Integer = -1, Optional ignoreDuplicate As Boolean = False)
 
 		cmd.BuildQuery("select count(*) from playlist_detail WHERE playlist_id = ? and song_id = ?",
 					   New Object() {playlistId, songId})
 		Dim r = cmd.ExecuteReader
 		r.Read()
-		If r(0) = 0 Then
+		If r(0) = 0 Or ignoreDuplicate Then
 			r.Close()
 			If order = -1 Then
 				cmd.BuildQuery("select count(*) from playlist_detail where playlist_id = ?", New Object() {playlistId})
@@ -568,7 +568,7 @@ Public Class Database
 	''' </summary>
 	''' <param name="playlistName">name</param>
 	''' <returns>True if not used</returns>
-	Public Shared Function CheckPlaylistNameAvailability(playlistName As String) As Boolean
+	Public Overloads Shared Function CheckPlaylistNameAvailability(playlistName As String) As Boolean
 		Dim conn = Connect()
 		Dim cmd = conn.CreateCommand()
 		cmd.BuildQuery("select count(*) from playlists where name = ?", New Object() {playlistName})
@@ -581,6 +581,19 @@ Public Class Database
 		Else
 			reader.Close()
 			conn.Close()
+			Return False
+		End If
+	End Function
+
+	Public Overloads Shared Function CheckPlaylistNameAvailability(playlistName As String, cmd As SQLiteCommand) As Boolean
+		cmd.BuildQuery("select count(*) from playlists where name = ?", New Object() {playlistName})
+		Dim reader = cmd.ExecuteReader()
+		reader.Read()
+		If reader(0) = 0 Then
+			reader.Close()
+			Return True
+		Else
+			reader.Close()
 			Return False
 		End If
 	End Function

@@ -181,6 +181,9 @@
     <Compile Include="Dialogs\DlgCloudMusicLogin.xaml.vb">
       <DependentUpon>DlgCloudMusicLogin.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\dlgPlaylistSyncResult.xaml.vb">
+      <DependentUpon>dlgPlaylistSyncResult.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\dlgDirSyncResult.xaml.vb">
       <DependentUpon>dlgDirSyncResult.xaml</DependentUpon>
     </Compile>
@@ -212,6 +215,10 @@
     <Page Include="Dialogs\DlgCloudMusicLogin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\dlgPlaylistSyncResult.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Dialogs\dlgDirSyncResult.xaml">
       <SubType>Designer</SubType>

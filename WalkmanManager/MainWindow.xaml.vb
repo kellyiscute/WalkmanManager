@@ -175,7 +175,7 @@ Class MainWindow
 		ListBoxPlaylist.Items.Clear()
 
 		For Each itm In lstPlaylist
-			Dim lbitm = New ListBoxItem() With {.Content = itm, .AllowDrop = True}
+			Dim lbitm = New ListBoxItem() With {.Content = itm, .AllowDrop = True, .Padding = New Thickness(15, 7, 0, 7)}
 			AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
 			ListBoxPlaylist.Items.Add(lbitm)
 		Next
@@ -419,27 +419,35 @@ Class MainWindow
 
 	Private Async Sub ListBoxCloudMusicPlaylists_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) _
 		Handles ListBoxCloudMusicPlaylists.SelectionChanged
-		If ListBoxCloudMusicPlaylists.SelectedIndex <> -1 Then
-			Dim id = _cloudMusic.Playlists(ListBoxCloudMusicPlaylists.SelectedIndex)("id")
-			Dim dlg As New dlg_progress
-			dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
-			DlgCloudMusic.ShowDialog(dlg)
+		Try
+			If ListBoxCloudMusicPlaylists.SelectedIndex <> -1 Then
+				Dim id = _cloudMusic.Playlists(ListBoxCloudMusicPlaylists.SelectedIndex)("id")
+				Dim dlg As New dlg_progress
+				dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
+				DlgCloudMusic.ShowDialog(dlg)
 
-			Dim detail = Await Task.Run(Function()
-											Dim r = _cloudMusic.GetPlaylistDetail(id)
-											Return r
-										End Function)
-			DataGridCloudMusic.ItemsSource = detail("tracks")
-			Dim img As New BitmapImage
-			img.BeginInit()
-			img.UriSource = New Uri(detail("coverImgUrl"))
-			img.CacheOption = BitmapCacheOption.OnLoad
-			img.EndInit()
-			LabelCloudMusicPlaylistName.Content = detail("name")
-			ImagePlaylistCover.Source = img
-			DlgCloudMusic.IsOpen = False
-		End If
-		GC.Collect()
+				Dim detail = Await Task.Run(Function()
+												Dim r = _cloudMusic.GetPlaylistDetail(id)
+												Return r
+											End Function)
+				DataGridCloudMusic.ItemsSource = detail("tracks")
+				Dim img As New BitmapImage
+				img.BeginInit()
+				img.UriSource = New Uri(detail("coverImgUrl"))
+				img.CacheOption = BitmapCacheOption.OnLoad
+				img.EndInit()
+				LabelCloudMusicPlaylistName.Content = detail("name")
+				ImagePlaylistCover.Source = img
+				DlgCloudMusic.IsOpen = False
+			End If
+			GC.Collect()
+		Catch ex As Exception
+			If DlgWindowRoot.IsOpen Then
+				DlgWindowRoot.IsOpen = False
+				Dim dlg As New DlgMessageDialog("错误", ex.Message)
+				DlgWindowRoot.ShowDialog(dlg)
+			End If
+		End Try
 	End Sub
 
 	Private Async Sub RefreshCloudMusicPlaylists(sender As Object, e As EventArgs) Handles ButtonCloudMusicRefresh.Click
@@ -487,6 +495,25 @@ Class MainWindow
 		Dim failed = Await Task.Run(Function()
 										Return SyncAnalyzer.SyncPlaylist(plName, lst, dlg)
 									End Function)
-		DlgWindowRoot.IsOpen = False
+		Dim rString As String
+		rString = "同步 """ & plName & """ 完成" & vbTab & "失败 " & failed.Count & " 个"
+		rString += vbNewLine & StrDup(rString.Length, "=")
+		For Each itmCloudMusicTracks As CloudMusic.CloudMusicTracks In failed
+			rString += vbNewLine & itmCloudMusicTracks.Title & " - " & itmCloudMusicTracks.Artists
+		Next
+		Dim dlgResult As New dlgPlaylistSyncResult(rString)
+		DlgWindowRoot.DialogContent = dlgResult
 	End Sub
+
+	Private Async Sub ButtonCloudMusicSyncAll_Click(sender As Object, e As RoutedEventArgs) Handles ButtonCloudMusicSyncAll.Click
+		Dim dlg As New dlg_progress
+		dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
+		DlgWindowRoot.ShowDialog(dlg)
+		Dim failed = Await Task.Run(Function()
+										Return SyncAnalyzer.SyncAllPlaylists(_cloudMusic, dlg)
+									End Function)
+		Dim dlgResult As New dlgPlaylistSyncResult(failed)
+		DlgWindowRoot.DialogContent = dlgResult
+	End Sub
+
 End Class
