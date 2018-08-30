@@ -116,4 +116,37 @@ Public Class SyncAnalyzer
 		Return rString
 	End Function
 
+	''' <summary>
+	''' check 
+	''' </summary>
+	''' <param name="drive"></param>
+	''' <returns></returns>
+	Public Shared Function CheckDirectoryStructure(drive As String) As List(Of String)
+		If My.Computer.FileSystem.DirectoryExists(drive & "\MUSIC") Then
+			Dim r = New List(Of String)
+			Return r
+		End If
+
+		Dim result As New List(Of String)
+		Dim dirs = My.Computer.FileSystem.GetDirectories(drive & "\MUSIC")
+		Dim playlists = Database.GetPlaylists()
+
+		Dim found As Boolean = False
+		For Each playlist As String In playlists
+			found = False
+
+			For Each dir As String In dirs
+				If dir.Contains(playlist) Then
+					found = True
+				End If
+			Next
+
+			If Not found Then
+				result.Add(playlist)
+			End If
+		Next
+
+		Return result
+	End Function
+
 End Class
