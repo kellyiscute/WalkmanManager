@@ -3,6 +3,11 @@ Imports WalkmanManager.CloudMusic
 
 Public Class SyncAnalyzer
 
+	Public Structure LostFileInfo
+		Public Origin As String
+		Public Remote As String
+	End Structure
+
 	Public Shared Function SyncPlaylist(playlistName As String, musicTracks As List(Of CloudMusicTracks), Optional dlg As dlg_progress = Nothing) As List(Of CloudMusicTracks)
 
 		Dim lstFailed As New List(Of CloudMusicTracks)
@@ -122,16 +127,15 @@ Public Class SyncAnalyzer
 	''' <param name="drive"></param>
 	''' <returns></returns>
 	Public Shared Function CheckDirectoryStructure(drive As String) As List(Of String)
-		If My.Computer.FileSystem.DirectoryExists(drive & "\MUSIC") Then
-			Dim r = New List(Of String)
-			Return r
+		If My.Computer.FileSystem.DirectoryExists(drive & "\wmManaged") Then
+			Return Nothing
 		End If
 
 		Dim result As New List(Of String)
-		Dim dirs = My.Computer.FileSystem.GetDirectories(drive & "\MUSIC")
+		Dim dirs = My.Computer.FileSystem.GetDirectories(drive & "\wmManaged")
 		Dim playlists = Database.GetPlaylists()
 
-		Dim found As Boolean = False
+		Dim found
 		For Each playlist As String In playlists
 			found = False
 
@@ -147,6 +151,31 @@ Public Class SyncAnalyzer
 		Next
 
 		Return result
+	End Function
+
+	Private Shared Function ChangePath(filename As String, newDirPath As String) As String
+		filename = filename.Split("\")(filename.Split("\").Length - 1)
+		If Not My.Computer.FileSystem.DirectoryExists(newDirPath) Then
+			Return ""
+		End If
+		If Not newDirPath.EndsWith("\") Then
+			newDirPath += "\"
+		End If
+
+		Return newDirPath & filename
+
+	End Function
+
+	Public Shared Function CheckFiles(pathOnRemoteDrive As String, files As List(Of SongInfo)) As List(Of SongInfo)
+		Dim lstResult As New List(Of SongInfo)
+
+		For Each songInfo As SongInfo In files
+			If Not My.Computer.FileSystem.FileExists(ChangePath(songInfo.Path, pathOnRemoteDrive)) Then
+				lstResult.Add(songInfo)
+			End If
+		Next
+
+		Return lstResult
 	End Function
 
 End Class

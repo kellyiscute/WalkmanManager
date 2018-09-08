@@ -63,7 +63,7 @@
 						</ListBox>
 					</Grid>
 				</mD:ColorZone>
-				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible">
+				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible" d:IsHidden="True">
 					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
 						<Grid>
 							<Grid x:Name="LstLocalSidebar" Width="220" HorizontalAlignment="Left">
@@ -72,7 +72,8 @@
 										<Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center" Content="音乐" />
 									</ListBoxItem>
 								</ListBox>
-								<Label Padding="20,10,5,5" Content="本地播放列表" Margin="0,67,0,0" BorderThickness="0,1,0,1" BorderBrush="LightGray" Height="35" VerticalAlignment="Top"/>
+								<Label Padding="20,10,5,5" Content="本地播放列表" Margin="0,67,0,0" BorderThickness="0,1,0,1" BorderBrush="LightGray"
+								       Height="35" VerticalAlignment="Top" />
 								<ListBox x:Name="ListBoxPlaylist" SelectionChanged="ListItem_SelectionChange"
 								         PreviewMouseRightButtonDown="BlockRightClickSelectoin" Width="220" Margin="0,107,0,0">
 									<ListBox.ContextMenu>
@@ -226,8 +227,8 @@
 					</mD:DialogHost>
 				</Grid>
 
-				<Grid x:Name="GridRemote">
-
+				<Grid x:Name="GridRemote" Margin="0,55,0,0">
+					<mD:ColorZone VerticalAlignment="Bottom" Margin="10,0,10,10" Height="70" CornerRadius="10" mD:ShadowAssist.ShadowDepth="Depth2"></mD:ColorZone>
 				</Grid>
 			</Grid>
 		</mD:DialogHost>
