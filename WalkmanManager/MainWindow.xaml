@@ -238,6 +238,10 @@
 								</Grid>
 							</Border>
 
+							<Grid Margin="248,0,275,0">
+
+							</Grid>
+
 							<Border HorizontalAlignment="Right" Margin="10" Width="250" BorderThickness="1,0,0,0" BorderBrush="LightGray"
 							        Padding="10,0,0,0">
 								<StackPanel>
