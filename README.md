@@ -5,7 +5,18 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
 ## Current Progress
-The new semester has begun... The Progress will slow down.
+My Walkman was taken away by teachers, so, the development have to pause ~~mostly because I don't have any design ideas right now~~. If anyone want to help me complete this project, it is welcomed to do so. 
+
+## TODO 
+### `First thing first` - what I have done so far  
+I most parts of this project are finished and there should only be minor bugs that I have still not found yet. The only two major things I have left are the GUI design of the sync page and the settings dialog.
+### `Things I have not done yet`  
+* The sync page GUI (_It's gonna be your design idea_)
+* The settings dialog (_It will also be your design_)
+  * **here are the things I want to have on the settings dialog**  
+  * The ability to Show and also Change the Music Library directory
+  * The ability to Clear Music Records and Clear Playlist Records in the database
+  * A about page that puts the open source licenses
 
 ## The author says `!Important`
 
