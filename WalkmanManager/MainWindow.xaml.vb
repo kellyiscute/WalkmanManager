@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.ObjectModel
+Imports System.Drawing
 Imports System.Windows.Shell
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
@@ -6,8 +7,8 @@ Imports ATL
 Imports GongSolutions.Wpf.DragDrop
 
 Class MainWindow
-	ReadOnly NETEASE_RED = Color.FromRgb(198, 47, 47)
-	ReadOnly DEFAULT_COLOR = Color.FromRgb(103, 58, 183)
+	ReadOnly NETEASE_RED = Media.Color.FromRgb(198, 47, 47)
+	ReadOnly DEFAULT_COLOR = Media.Color.FromRgb(103, 58, 183)
 
 	Dim _lstSongs As ObservableCollection(Of SongInfo)
 	Dim _isRightClickSelect As Boolean = False

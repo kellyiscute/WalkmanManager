@@ -228,6 +228,21 @@
 				</Grid>
 
 				<Grid x:Name="GridRemote" Margin="0,55,0,0">
+					<Grid Margin="0,0,0,95">
+						<mD:ColorZone Height="100" Margin="10,50,10,0" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
+							<Grid>
+								<ScrollViewer Margin="10,15,10,5" VerticalScrollBarVisibility="Auto">
+									<WrapPanel>
+										<CheckBox FontSize="14" Margin="10,0,0,0">删除多余项目</CheckBox>
+										<CheckBox FontSize="14" Margin="10,0,0,0">不检查空间</CheckBox>
+										<CheckBox FontSize="14" Margin="10,0,0,0">不验证文件完整性</CheckBox>
+										<CheckBox FontSize="14" Margin="10,0,0,0">不同步歌词</CheckBox>
+									</WrapPanel>
+								</ScrollViewer>
+							</Grid>
+						</mD:ColorZone>
+						<Label VerticalAlignment="Top" HorizontalAlignment="Left" Margin="35,34,0,0" FontSize="16">同步选项</Label>
+					</Grid>
 					<mD:ColorZone VerticalAlignment="Bottom" Margin="10,0,10,10" Height="70" CornerRadius="10"
 					              mD:ShadowAssist.ShadowDepth="Depth2">
 						<Grid>
@@ -239,7 +254,7 @@
 							</Border>
 
 							<Grid Margin="248,0,275,0">
-
+								
 							</Grid>
 
 							<Border HorizontalAlignment="Right" Margin="10" Width="250" BorderThickness="1,0,0,0" BorderBrush="LightGray"

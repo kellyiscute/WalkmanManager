@@ -321,7 +321,7 @@ Public Class CloudMusic
 		'Read Tracks (in /result: Object/tracks: List, list of Objects)
 		Dim tracks As New List(Of CloudMusicTracks)
 		For Each track In cloudMusicDeserialize("result")("tracks")
-			Dim t As CloudMusicTracks
+			Dim t As New CloudMusicTracks
 			'Read Track Name
 			t.Title = track("name")
 			'Read Track Artists
