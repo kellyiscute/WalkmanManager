@@ -47,6 +47,11 @@ Class MainWindow
 		Else
 			GridLocal.Visibility = Visibility.Hidden
 		End If
+		If TabRemote.IsSelected Then
+			GridRemote.Visibility = Visibility.Visible
+		Else
+			GridRemote.Visibility = Visibility.Hidden
+		End If
 		If TabCloudMusic.IsSelected Then
 			If _isCloudMusicLoggedIn Then
 				GridCloudMusic.Visibility = Visibility.Visible
@@ -517,4 +522,27 @@ Class MainWindow
 		DlgWindowRoot.DialogContent = dlgResult
 	End Sub
 
+	Private Sub ButtonRefreshDeviceList_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRefreshDeviceList.Click
+		ComboBoxDevices.Items.Clear()
+		For Each dev In My.Computer.FileSystem.Drives
+			If dev.DriveType = IO.DriveType.Removable Then
+				If dev.VolumeLabel = "" Then
+					ComboBoxDevices.Items.Add(dev.Name & " (没有卷标)")
+				Else
+					ComboBoxDevices.Items.Add(dev.Name & " (" & dev.VolumeLabel & ")")
+				End If
+
+			End If
+		Next
+	End Sub
+
+	Private Sub ComboBoxDevices_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ComboBoxDevices.SelectionChanged
+		Dim dir = ComboBoxDevices.SelectedItem.ToString.Substring(0, 3)
+		For Each dev In My.Computer.FileSystem.Drives
+			If dev.Name.ToUpper = dir.ToUpper Then
+				LabelDeviceTotalVolume.Content = "总容量：" & dev.TotalSize / 1024 ^ 2 & " MB"
+				LabelDeviceFreeVolume.Content = "剩余空间：" & dev.AvailableFreeSpace / 1024 ^ 2 & " MB"
+			End If
+		Next
+	End Sub
 End Class

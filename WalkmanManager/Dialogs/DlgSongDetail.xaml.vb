@@ -68,4 +68,8 @@ Public Class DlgSongDetail
 	Private Sub ButtonDelete_Click(sender As Object, e As RoutedEventArgs) Handles ButtonDelete.Click
 		IsDeleted = True
 	End Sub
+
+	Private Sub ButtonViewInExplorer_Click(sender As Object, e As RoutedEventArgs) Handles ButtonViewInExplorer.Click
+		Process.Start("explorer", "/select," & Chr(34) & _songInfo.Path & Chr(34))
+	End Sub
 End Class

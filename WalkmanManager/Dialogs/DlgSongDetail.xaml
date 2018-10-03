@@ -68,14 +68,14 @@
 				</Grid>
 			</StackPanel>
 
-			<WrapPanel Margin="21,218,19,20">
-				<Button Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0">
+			<WrapPanel Margin="102,218,102,20">
+				<!--<Button Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0">
 					<WrapPanel>
 						<mD:PackIcon Kind="PlaylistPlus" VerticalAlignment="Center" />
 						<TextBlock Margin="5,0,0,0">添加到播放列表</TextBlock>
 					</WrapPanel>
-				</Button>
-				<Button Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0">
+				</Button>-->
+				<Button x:Name="ButtonViewInExplorer" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,10,0">
 					<WrapPanel>
 						<mD:PackIcon Kind="FolderOpen" VerticalAlignment="Center" />
 						<TextBlock Margin="5,0,0,0">打开所在文件夹</TextBlock>
