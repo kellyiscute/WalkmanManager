@@ -5,7 +5,7 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
 ## Current Progress
-My Walkman was taken away by teachers, so, the development have to pause ~~mostly because I don't have any design ideas right now~~. If anyone want to help me complete this project, it is welcomed to do so. 
+Project development in progress... Writing the last feature...before beta release
 
 ## TODO 
 ### `First thing first` - what I have done so far  
