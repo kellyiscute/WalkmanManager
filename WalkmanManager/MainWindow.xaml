@@ -261,7 +261,32 @@
 							</Border>
 						</Grid>
 					</mD:ColorZone>
-					<mD:ColorZone Margin="10,130,10,0" VerticalAlignment="Top" Height="300" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5"></mD:ColorZone>
+					<mD:ColorZone Margin="10,130,10,0" VerticalAlignment="Top" Height="330" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
+						<Grid>
+							<ProgressBar x:Name="ProgressBarSyncCopy" VerticalAlignment="Top" Height="35" Margin="20,20,20,0"/>
+							<ProgressBar x:Name="ProgressBarSyncTotal" VerticalAlignment="Top" Height="35" Margin="20,70,20,0"/>
+							<Grid Margin="20,120,20,10">
+								<StackPanel HorizontalAlignment="Left">
+									<Label Height="25">当前操作：</Label>
+									<Label Height="25">已完成：</Label>
+									<Label Height="25">总大小：</Label>
+									<Label Height="25">写入块大小：</Label>
+									<Label Height="25">读取速度：</Label>
+									<Label Height="25">写入速度：</Label>
+									<Label Height="25">剩余时间：</Label>
+								</StackPanel>
+								<StackPanel HorizontalAlignment="Left" Margin="90,0,0,0">
+									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+								</StackPanel>
+							</Grid>
+						</Grid>
+					</mD:ColorZone>
 				</Grid>
 			</Grid>
 		</mD:DialogHost>
