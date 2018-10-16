@@ -261,7 +261,8 @@
 							</Border>
 						</Grid>
 					</mD:ColorZone>
-					<mD:ColorZone Margin="10,130,10,0" VerticalAlignment="Top" Height="330" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
+					<Button HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,110,0,0" Width="200" Height="70" Style="{DynamicResource MaterialDesignRaisedButton}">同步</Button>
+					<mD:ColorZone Margin="10,190,10,0" VerticalAlignment="Top" Height="330" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
 						<Grid>
 							<ProgressBar x:Name="ProgressBarSyncCopy" VerticalAlignment="Top" Height="35" Margin="20,20,20,0"/>
 							<ProgressBar x:Name="ProgressBarSyncTotal" VerticalAlignment="Top" Height="35" Margin="20,70,20,0"/>
@@ -276,13 +277,13 @@
 									<Label Height="25">剩余时间：</Label>
 								</StackPanel>
 								<StackPanel HorizontalAlignment="Left" Margin="90,0,0,0">
-									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox x:Name="TextBoxOp" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox x:Name="TextBoxComplete" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox x:Name="TextBoxTotal" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox x:Name="TextBoxBlock" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox x:Name="TextBoxReadSpd" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox x:Name="TextBoxWriteSpd" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+									<TextBox x:Name="TextBoxEst" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
 								</StackPanel>
 							</Grid>
 						</Grid>
