@@ -166,12 +166,31 @@ Public Class SyncAnalyzer
 
 	End Function
 
+	''' <summary>
+	''' Find files not on device
+	''' </summary>
+	''' <param name="pathOnRemoteDrive">SongDir</param>
+	''' <param name="files">list(of songInfo)</param>
+	''' <returns></returns>
 	Public Shared Function CheckFiles(pathOnRemoteDrive As String, files As List(Of SongInfo)) As List(Of SongInfo)
 		Dim lstResult As New List(Of SongInfo)
 
 		For Each songInfo As SongInfo In files
 			If Not My.Computer.FileSystem.FileExists(ChangePath(songInfo.Path, pathOnRemoteDrive)) Then
 				lstResult.Add(songInfo)
+			End If
+		Next
+
+		Return lstResult
+	End Function
+
+	Public Shared Function FindDeleted(pathOnRemoteDrive As String, files As List(Of SongInfo)) As List(Of String)
+		Dim lstResult As New List(Of String)
+
+		For Each f In My.Computer.FileSystem.GetFiles(pathOnRemoteDrive)
+			If (From path In files Where path.Path = f Select path).Count = 0 Then
+				'If file is not found in playlist
+				lstResult.Add(f)
 			End If
 		Next
 

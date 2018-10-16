@@ -261,10 +261,15 @@
 							</Border>
 						</Grid>
 					</mD:ColorZone>
-					<Button HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,110,0,0" Width="200" Height="70" Style="{DynamicResource MaterialDesignRaisedButton}">同步</Button>
+					<Button x:Name="ButtonRemoteSync" HorizontalAlignment="Center" FontSize="23" VerticalAlignment="Top" Margin="452,102,451,0" Width="200" Height="70" Style="{DynamicResource MaterialDesignFlatButton}">
+						<WrapPanel>
+							<mD:PackIcon Height="29" Width="29" Kind="Sync"/>
+							<TextBlock Margin="5,0,0,0">同步</TextBlock>
+						</WrapPanel>
+					</Button>
 					<mD:ColorZone Margin="10,190,10,0" VerticalAlignment="Top" Height="330" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
 						<Grid>
-							<ProgressBar x:Name="ProgressBarSyncCopy" VerticalAlignment="Top" Height="35" Margin="20,20,20,0"/>
+							<ProgressBar x:Name="ProgressBarSyncSub" VerticalAlignment="Top" Height="35" Margin="20,20,20,0"/>
 							<ProgressBar x:Name="ProgressBarSyncTotal" VerticalAlignment="Top" Height="35" Margin="20,70,20,0"/>
 							<Grid Margin="20,120,20,10">
 								<StackPanel HorizontalAlignment="Left">

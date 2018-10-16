@@ -1,5 +1,4 @@
 ﻿Imports System.Collections.ObjectModel
-Imports System.Drawing
 Imports System.Windows.Shell
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
@@ -543,6 +542,31 @@ Class MainWindow
 				LabelDeviceTotalVolume.Content = "总容量：" & dev.TotalSize / 1024 ^ 2 & " MB"
 				LabelDeviceFreeVolume.Content = "剩余空间：" & dev.AvailableFreeSpace / 1024 ^ 2 & " MB"
 			End If
+		Next
+	End Sub
+
+	Private Async Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
+		ProgressBarSyncTotal.IsIndeterminate = True
+		ButtonRemoteSync.IsEnabled = False
+		Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
+
+		TextBoxOp.Text = "检查目录结构"
+		Dim lstDirLost = SyncAnalyzer.CheckDirectoryStructure(drivePath)
+		If IsNothing(lstDirLost) Then
+			'No analysis, copy all files
+
+			Exit Sub
+		End If
+
+		'Analyze and copy
+		Dim playlists = GetPlaylists()
+		ProgressBarSyncSub.Maximum = playlists.Count
+		For Each pl In playlists
+			Dim p = GetSongsFromPlaylist(GetPlaylistIdByName(pl))
+			TextBoxOp.Text = "检查播放列表文件"
+			ProgressBarSyncSub.AddOne()
+
+
 		Next
 	End Sub
 End Class

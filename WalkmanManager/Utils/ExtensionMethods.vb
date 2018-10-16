@@ -94,4 +94,9 @@ Public Module ExtensionMethods
 		Return r
 	End Function
 
+	<System.Runtime.CompilerServices.Extension>
+	Public Sub AddOne(prog As ProgressBar)
+		prog.Value += 1
+	End Sub
+
 End Module
