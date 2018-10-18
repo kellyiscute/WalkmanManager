@@ -549,14 +549,22 @@ Class MainWindow
 		ProgressBarSyncTotal.IsIndeterminate = True
 		ButtonRemoteSync.IsEnabled = False
 		Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
+		Dim wmManagedPath = drivePath & "\wmManaged"
+		TextBoxOp.Text = "连接数据库"
+		Dim conn = Connect()
 
 		TextBoxOp.Text = "检查目录结构"
 		Dim lstDirLost = SyncAnalyzer.CheckDirectoryStructure(drivePath)
 		If IsNothing(lstDirLost) Then
 			'No analysis, copy all files
-
+			If Not My.Computer.FileSystem.DirectoryExists(wmManagedPath) Then
+				My.Computer.FileSystem.CreateDirectory(wmManagedPath)
+			End If
 			Exit Sub
 		End If
+
+		Dim lstCopy As New List(Of String)
+		Dim lstDelete As New List(Of String)
 
 		'Analyze and copy
 		Dim playlists = GetPlaylists()
@@ -564,9 +572,21 @@ Class MainWindow
 		For Each pl In playlists
 			Dim p = GetSongsFromPlaylist(GetPlaylistIdByName(pl))
 			TextBoxOp.Text = "检查播放列表文件"
+			Dim lstSongs As New List(Of SongInfo)
+			For Each itm In p
+				lstSongs.Add(GetSongById(itm, conn))
+			Next
+			Dim n = SyncAnalyzer.CheckFiles(wmManagedPath, lstSongs)
+			For Each itm In n
+				lstCopy.Add(itm.Path)
+			Next
+			Dim d = SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs)
+			For Each itm In d
+				lstDelete.Add(itm)
+			Next
 			ProgressBarSyncSub.AddOne()
-
-
 		Next
+
+
 	End Sub
 End Class
