@@ -565,6 +565,11 @@ Class MainWindow
 
 		Dim lstCopy As New List(Of String)
 		Dim lstDelete As New List(Of String)
+		Dim lstLyrics As New List(Of String)
+		Dim totalCopySize As Long
+		Dim spaceNeeded As Long
+		Dim flagCopyLrc As Boolean = Not CheckBoxSyncOptionDoNotCopyLyric.IsChecked
+
 
 		'Analyze and copy
 		Dim playlists = GetPlaylists()
@@ -587,6 +592,41 @@ Class MainWindow
 			ProgressBarSyncSub.AddOne()
 		Next
 
+		TextBoxOp.Text = "计算文件大小"
+		ProgressBarSyncSub.Maximum = lstCopy.Count + lstDelete.Count
+		ProgressBarSyncSub.Value = 0
+
+		For Each cp In lstCopy
+			If My.Computer.FileSystem.FileExists(cp) Then
+				totalCopySize += My.Computer.FileSystem.GetFileInfo(cp).Length
+				spaceNeeded += My.Computer.FileSystem.GetFileInfo(cp).Length
+
+				'What the fuck?
+				Dim fileInfo = My.Computer.FileSystem.GetFileInfo(cp)
+				If flagCopyLrc Then
+					Dim lrc = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
+					If My.Computer.FileSystem.FileExists(lrc) Then
+						lstLyrics.Add(lrc)
+						spaceNeeded += fileInfo.Length
+						totalCopySize += fileInfo.Length
+					End If
+				End If
+				ProgressBarSyncSub.AddOne(Me)
+			End If
+		Next
+
+		For Each dl In lstDelete
+			If My.Computer.FileSystem.FileExists(dl) Then
+				spaceNeeded -= My.Computer.FileSystem.GetFileInfo(dl).Length
+				ProgressBarSyncSub.AddOne(Me)
+			End If
+		Next
+
+		If Not CheckBoxSyncOptionNoSpaceCheck.IsChecked Then
+			If My.Computer.FileSystem.GetDriveInfo(drivePath).AvailableFreeSpace >= spaceNeeded Then
+
+			End If
+		End If
 
 	End Sub
 End Class

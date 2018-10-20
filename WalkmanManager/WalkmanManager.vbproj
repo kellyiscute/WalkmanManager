@@ -210,6 +210,7 @@
     <Compile Include="Utils\ExtensionMethods.vb" />
     <Compile Include="Utils\SyncAnalyzer.vb" />
     <Compile Include="Utils\Synchronizer.vb" />
+    <Compile Include="Utils\USBWatcher.vb" />
     <Page Include="Dialogs\DlgCloudMusicLogin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -101,4 +101,13 @@ Public Module ExtensionMethods
 		End If
 	End Sub
 
+	<System.Runtime.CompilerServices.Extension>
+	Public Sub AddOne(prog As ProgressBar, window As MainWindow)
+		window.Dispatcher.Invoke(Sub()
+									 If prog.Value.Equals(prog.Maximum) Then
+										 prog.Value += 1
+									 End If
+								 End Sub)
+	End Sub
+
 End Module
