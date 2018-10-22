@@ -572,61 +572,68 @@ Class MainWindow
 
 
 		'Analyze and copy
-		Dim playlists = GetPlaylists()
-		ProgressBarSyncSub.Maximum = playlists.Count
-		For Each pl In playlists
-			Dim p = GetSongsFromPlaylist(GetPlaylistIdByName(pl))
-			TextBoxOp.Text = "检查播放列表文件"
-			Dim lstSongs As New List(Of SongInfo)
-			For Each itm In p
-				lstSongs.Add(GetSongById(itm, conn))
-			Next
-			Dim n = SyncAnalyzer.CheckFiles(wmManagedPath, lstSongs)
-			For Each itm In n
-				lstCopy.Add(itm.Path)
-			Next
-			Dim d = SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs)
-			For Each itm In d
-				lstDelete.Add(itm)
-			Next
-			ProgressBarSyncSub.AddOne()
-		Next
+		Await Task.Run(Sub()
+						   Dim playlists = GetPlaylists()
+						   ProgressBarSyncSub.Maximum = playlists.Count
+						   For Each pl In playlists
+							   Dim p = GetSongsFromPlaylist(GetPlaylistIdByName(pl))
+							   TextBoxOp.Text = "检查播放列表文件"
+							   Dim lstSongs As New List(Of SongInfo)
+							   For Each itm In p
+								   lstSongs.Add(GetSongById(itm, conn))
+							   Next
+							   Dim n = SyncAnalyzer.CheckFiles(wmManagedPath, lstSongs)
+							   For Each itm In n
+								   lstCopy.Add(itm.Path)
+							   Next
+							   Dim d = SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs)
+							   For Each itm In d
+								   lstDelete.Add(itm)
+							   Next
+							   ProgressBarSyncSub.AddOne(Me)
+						   Next
+					   End Sub)
 
 		TextBoxOp.Text = "计算文件大小"
 		ProgressBarSyncSub.Maximum = lstCopy.Count + lstDelete.Count
 		ProgressBarSyncSub.Value = 0
 
-		For Each cp In lstCopy
-			If My.Computer.FileSystem.FileExists(cp) Then
-				totalCopySize += My.Computer.FileSystem.GetFileInfo(cp).Length
-				spaceNeeded += My.Computer.FileSystem.GetFileInfo(cp).Length
+		Await Task.Run(Sub()
+						   For Each cp In lstCopy
+							   If My.Computer.FileSystem.FileExists(cp) Then
+								   totalCopySize += My.Computer.FileSystem.GetFileInfo(cp).Length
+								   spaceNeeded += My.Computer.FileSystem.GetFileInfo(cp).Length
 
-				'What the fuck?
-				Dim fileInfo = My.Computer.FileSystem.GetFileInfo(cp)
-				If flagCopyLrc Then
-					Dim lrc = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
-					If My.Computer.FileSystem.FileExists(lrc) Then
-						lstLyrics.Add(lrc)
-						spaceNeeded += fileInfo.Length
-						totalCopySize += fileInfo.Length
-					End If
-				End If
-				ProgressBarSyncSub.AddOne(Me)
-			End If
-		Next
+								   'What the fuck?
+								   Dim fileInfo = My.Computer.FileSystem.GetFileInfo(cp)
+								   If flagCopyLrc Then
+									   Dim lrc = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
+									   If My.Computer.FileSystem.FileExists(lrc) Then
+										   lstLyrics.Add(lrc)
+										   spaceNeeded += fileInfo.Length
+										   totalCopySize += fileInfo.Length
+									   End If
+								   End If
+								   ProgressBarSyncSub.AddOne(Me)
+							   End If
+						   Next
 
-		For Each dl In lstDelete
-			If My.Computer.FileSystem.FileExists(dl) Then
-				spaceNeeded -= My.Computer.FileSystem.GetFileInfo(dl).Length
-				ProgressBarSyncSub.AddOne(Me)
-			End If
-		Next
+						   For Each dl In lstDelete
+							   If My.Computer.FileSystem.FileExists(dl) Then
+								   spaceNeeded -= My.Computer.FileSystem.GetFileInfo(dl).Length
+								   ProgressBarSyncSub.AddOne(Me)
+							   End If
+						   Next
+					   End Sub)
 
 		If Not CheckBoxSyncOptionNoSpaceCheck.IsChecked Then
 			If My.Computer.FileSystem.GetDriveInfo(drivePath).AvailableFreeSpace >= spaceNeeded Then
-
+				Await DialogHost.Show("window-root", New DlgMessageDialog("同步时出现错误", "空间不足"))
+				Exit Sub
 			End If
 		End If
+
+		'Copy files
 
 	End Sub
 End Class
