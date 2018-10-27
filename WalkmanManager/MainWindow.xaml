@@ -6,7 +6,7 @@
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
-        Title="MainWindow" Height="697.639" Width="1111.075" WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="823.639" Width="1111.075" WindowStartupLocation="CenterScreen"
         Background="White">
 	<Grid>
 		<mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="35">
@@ -292,6 +292,10 @@
 								</StackPanel>
 							</Grid>
 						</Grid>
+					</mD:ColorZone>
+
+					<mD:ColorZone VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Mode="Standard" Margin="10,538,10,20" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
+						<ListBox x:Name="ListBoxSyncEventLog" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
 					</mD:ColorZone>
 				</Grid>
 			</Grid>

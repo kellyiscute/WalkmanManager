@@ -460,7 +460,7 @@ Class MainWindow
 		dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
 		DlgCloudMusic.ShowDialog(dlg)
 		Await Task.Run(Sub()
-						   _cloudmusic.GetPlaylists()
+						   _cloudMusic.GetPlaylists()
 					   End Sub)
 		ListBoxCloudMusicPlaylists.Items.Clear()
 		For Each p In _cloudMusic.Playlists
@@ -479,7 +479,8 @@ Class MainWindow
 		End If
 	End Sub
 
-	Private Sub TextBoxSearchLocal_TextChanged(sender As Object, e As TextChangedEventArgs) Handles TextBoxSearchLocal.TextChanged
+	Private Sub TextBoxSearchLocal_TextChanged(sender As Object, e As TextChangedEventArgs) _
+		Handles TextBoxSearchLocal.TextChanged
 		If _lstSongs.Count < 1300 Then
 			BtnSearchSong_Click(sender, Nothing)
 		End If
@@ -510,7 +511,8 @@ Class MainWindow
 		DlgWindowRoot.DialogContent = dlgResult
 	End Sub
 
-	Private Async Sub ButtonCloudMusicSyncAll_Click(sender As Object, e As RoutedEventArgs) Handles ButtonCloudMusicSyncAll.Click
+	Private Async Sub ButtonCloudMusicSyncAll_Click(sender As Object, e As RoutedEventArgs) _
+		Handles ButtonCloudMusicSyncAll.Click
 		Dim dlg As New dlg_progress
 		dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
 		DlgWindowRoot.ShowDialog(dlg)
@@ -535,7 +537,8 @@ Class MainWindow
 		Next
 	End Sub
 
-	Private Sub ComboBoxDevices_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) Handles ComboBoxDevices.SelectionChanged
+	Private Sub ComboBoxDevices_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) _
+		Handles ComboBoxDevices.SelectionChanged
 		Dim dir = ComboBoxDevices.SelectedItem.ToString.Substring(0, 3)
 		For Each dev In My.Computer.FileSystem.Drives
 			If dev.Name.ToUpper = dir.ToUpper Then
@@ -544,6 +547,12 @@ Class MainWindow
 			End If
 		Next
 	End Sub
+
+	Private Structure CpInfo
+		Public Source As String
+		Public Destination As String
+		Public Lyric As Boolean
+	End Structure
 
 	Private Async Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
 		ProgressBarSyncTotal.IsIndeterminate = True
@@ -582,11 +591,11 @@ Class MainWindow
 							   For Each itm In p
 								   lstSongs.Add(GetSongById(itm, conn))
 							   Next
-							   Dim n = SyncAnalyzer.CheckFiles(wmManagedPath, lstSongs)
+							   Dim n = SyncAnalyzer.CheckFiles(wmManagedPath & "\" & pl, lstSongs)
 							   For Each itm In n
 								   lstCopy.Add(itm.Path)
 							   Next
-							   Dim d = SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs)
+							   Dim d = SyncAnalyzer.FindDeleted(wmManagedPath & "\" & pl, lstSongs)
 							   For Each itm In d
 								   lstDelete.Add(itm)
 							   Next
@@ -633,7 +642,59 @@ Class MainWindow
 			End If
 		End If
 
-		'Copy files
+		Await Task.Run(Sub()
+						   ''Create Directory
+						   For Each d In lstDirLost
+							   AddSyncLog(LogType.Information, "创建文件夹 " & d)
+							   Try
+								   My.Computer.FileSystem.CreateDirectory(wmManagedPath & "\" & d)
+							   Catch ex As Exception
+								   AddSyncLog(LogType.Err, ex.Message)
+							   End Try
+						   Next
 
+						   'Delete Files
+						   For Each d In lstDelete
+							   AddSyncLog(LogType.Information, "删除文件 " & d)
+							   Try
+								   My.Computer.FileSystem.DeleteFile(d)
+							   Catch ex As Exception
+								   AddSyncLog(LogType.Warning, ex.Message)
+							   End Try
+						   Next
+
+						   'Copy files
+					   End Sub)
+	End Sub
+
+	Private Enum LogType
+		Information
+		Warning
+		Err
+	End Enum
+
+	Private Sub AddSyncLog(type As LogType, message As String, Optional reqDelegate As Boolean = True)
+		Dim dispColor As Color
+
+		Select Case type
+			Case LogType.Information
+				dispColor = Colors.Black
+			Case LogType.Warning
+				dispColor = Colors.DarkOrange
+			Case LogType.Err
+				dispColor = Colors.Red
+		End Select
+
+		If reqDelegate Then
+			ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
+											 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+											 .Foreground = New SolidColorBrush(dispColor)})
+		Else
+			Me.Dispatcher.Invoke(Sub()
+									 ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
+												 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+												 .Foreground = New SolidColorBrush(dispColor)})
+								 End Sub)
+		End If
 	End Sub
 End Class

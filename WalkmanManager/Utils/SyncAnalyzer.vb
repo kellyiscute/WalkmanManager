@@ -154,7 +154,7 @@ Public Class SyncAnalyzer
 	End Function
 
 	Private Shared Function ChangePath(filename As String, newDirPath As String) As String
-		filename = filename.Split("\")(filename.Split("\").Length - 1)
+		filename = filename.Split("\").Last
 		If Not My.Computer.FileSystem.DirectoryExists(newDirPath) Then
 			Return ""
 		End If
