@@ -551,7 +551,7 @@ Class MainWindow
 	Private Structure CpInfo
 		Public Source As String
 		Public Destination As String
-		Public Lyric As Boolean
+		Public Lyric As String
 	End Structure
 
 	Private Async Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
@@ -559,11 +559,15 @@ Class MainWindow
 		ButtonRemoteSync.IsEnabled = False
 		Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
 		Dim wmManagedPath = drivePath & "\wmManaged"
-		TextBoxOp.Text = "连接数据库"
+		AddSyncLog(LogType.Information, "连接数据库")
 		Dim conn = Connect()
 
-		TextBoxOp.Text = "检查目录结构"
+		AddSyncLog(LogType.Information, "检查目录结构")
 		Dim lstDirLost = SyncAnalyzer.CheckDirectoryStructure(drivePath)
+		If Not My.Computer.FileSystem.DirectoryExists(wmManagedPath) Then
+			AddSyncLog(LogType.Information, "创建文件夹： " & wmManagedPath)
+			My.Computer.FileSystem.CreateDirectory(wmManagedPath)
+		End If
 		If IsNothing(lstDirLost) Then
 			'No analysis, copy all files
 			If Not My.Computer.FileSystem.DirectoryExists(wmManagedPath) Then
@@ -572,9 +576,8 @@ Class MainWindow
 			Exit Sub
 		End If
 
-		Dim lstCopy As New List(Of String)
+		Dim lstCopy As New List(Of CpInfo)
 		Dim lstDelete As New List(Of String)
-		Dim lstLyrics As New List(Of String)
 		Dim totalCopySize As Long
 		Dim spaceNeeded As Long
 		Dim flagCopyLrc As Boolean = Not CheckBoxSyncOptionDoNotCopyLyric.IsChecked
@@ -586,14 +589,16 @@ Class MainWindow
 						   ProgressBarSyncSub.Maximum = playlists.Count
 						   For Each pl In playlists
 							   Dim p = GetSongsFromPlaylist(GetPlaylistIdByName(pl))
-							   TextBoxOp.Text = "检查播放列表文件"
+							   AddSyncLog(LogType.Information, "检查文件")
 							   Dim lstSongs As New List(Of SongInfo)
 							   For Each itm In p
 								   lstSongs.Add(GetSongById(itm, conn))
 							   Next
 							   Dim n = SyncAnalyzer.CheckFiles(wmManagedPath & "\" & pl, lstSongs)
 							   For Each itm In n
-								   lstCopy.Add(itm.Path)
+								   Dim cp As New CpInfo With
+										   {.Source = itm.Path, .Destination = wmManagedPath & "\" & pl}
+								   lstCopy.Add(cp)
 							   Next
 							   Dim d = SyncAnalyzer.FindDeleted(wmManagedPath & "\" & pl, lstSongs)
 							   For Each itm In d
@@ -608,17 +613,17 @@ Class MainWindow
 		ProgressBarSyncSub.Value = 0
 
 		Await Task.Run(Sub()
-						   For Each cp In lstCopy
-							   If My.Computer.FileSystem.FileExists(cp) Then
-								   totalCopySize += My.Computer.FileSystem.GetFileInfo(cp).Length
-								   spaceNeeded += My.Computer.FileSystem.GetFileInfo(cp).Length
+						   For i = 0 To lstCopy.Count
+							   If My.Computer.FileSystem.FileExists(lstCopy(i).Source) Then
+								   totalCopySize += My.Computer.FileSystem.GetFileInfo(lstCopy(i).Source).Length
+								   spaceNeeded += My.Computer.FileSystem.GetFileInfo(lstCopy(i).Source).Length
 
-								   'What the fuck?
-								   Dim fileInfo = My.Computer.FileSystem.GetFileInfo(cp)
+								   Dim fileInfo = My.Computer.FileSystem.GetFileInfo(lstCopy(i).Source)
 								   If flagCopyLrc Then
 									   Dim lrc = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
 									   If My.Computer.FileSystem.FileExists(lrc) Then
-										   lstLyrics.Add(lrc)
+										   lstCopy(i) = New CpInfo With
+															{.Source = lstCopy(i).Source, .Destination = lstCopy(i).Destination, .Lyric = lrc}
 										   spaceNeeded += fileInfo.Length
 										   totalCopySize += fileInfo.Length
 									   End If
@@ -664,7 +669,28 @@ Class MainWindow
 						   Next
 
 						   'Copy files
+						   Dim sync As New Synchronizer
+						   AddHandler sync.Update, AddressOf CopyingDetailUpdateEventHandler
+						   For Each c In lstCopy
+							   Try
+								   AddSyncLog(LogType.Information, "复制文件：" & c.Source)
+								   sync.CopyFile(c.Source, c.Destination)
+								   If c.Lyric <> "" Then
+									   AddSyncLog(LogType.Information, "复制文件：" & c.Lyric)
+									   sync.CopyFile(c.Lyric, c.Destination)
+								   End If
+							   Catch ex As Exception
+								   AddSyncLog(LogType.Warning, ex.Message)
+							   End Try
+						   Next
+
 					   End Sub)
+	End Sub
+
+	Private Sub CopyingDetailUpdateEventHandler(sender As Object)
+		Dispatcher.Invoke(Sub()
+
+						  End Sub)
 	End Sub
 
 	Private Enum LogType
@@ -673,7 +699,7 @@ Class MainWindow
 		Err
 	End Enum
 
-	Private Sub AddSyncLog(type As LogType, message As String, Optional reqDelegate As Boolean = True)
+	Private Sub AddSyncLog(type As LogType, message As String, Optional reqDelegate As Boolean = True, Optional dispOnCpDetail As Boolean = True)
 		Dim dispColor As Color
 
 		Select Case type
@@ -692,8 +718,11 @@ Class MainWindow
 		Else
 			Me.Dispatcher.Invoke(Sub()
 									 ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
-												 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
-												 .Foreground = New SolidColorBrush(dispColor)})
+																	  String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+																	  .Foreground = New SolidColorBrush(dispColor)})
+									 If dispOnCpDetail Then
+										 TextBoxOp.Text = message
+									 End If
 								 End Sub)
 		End If
 	End Sub

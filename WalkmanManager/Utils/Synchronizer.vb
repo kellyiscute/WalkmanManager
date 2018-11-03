@@ -54,6 +54,8 @@ Public Class Synchronizer
 		End Get
 	End Property
 
+	Public Event Update(sender As Object)
+
 	Public Sub CopyFile(source As String, destination As String)
 		_copiedLength = 0
 
@@ -79,8 +81,8 @@ Public Class Synchronizer
 				'add to copied
 				_copiedLength += _chunkSize
 				data = Nothing
-				'regulate chunk size If it is not maximum(20 MB)
-				If _chunkSize < 20 * 1024 ^ 2 Then
+				'regulate chunk size If it is not maximum(10 MB)
+				If _chunkSize < 10 * 1024 ^ 2 Then
 					'If readSpeed is slower, which is not quiet possible, use readSpeed as standard
 					If _readSpeed > _writeSpeed Then
 						'make it write twice every second
@@ -90,7 +92,7 @@ Public Class Synchronizer
 					End If
 				End If
 			Else
-				Dim data() = sourceFile.ReadBytes(_chunkSize)
+				Dim data() = sourceFile.ReadBytes(_totalLength - _copiedLength)
 				destinationFile.Write(data)
 				_copiedLength = _totalLength
 				sourceFile.Close()
@@ -100,6 +102,7 @@ Public Class Synchronizer
 				destinationFile.Dispose()
 				Exit Do
 			End If
+			RaiseEvent Update(Me)
 		Loop
 	End Sub
 
