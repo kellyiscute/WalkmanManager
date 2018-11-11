@@ -189,7 +189,7 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-									 New WindowChrome() _
+									New WindowChrome() _
 										With {.GlassFrameThickness = New Thickness(1),
 										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
 										.CornerRadius = New CornerRadius(10),
@@ -585,10 +585,10 @@ Class MainWindow
 
 		'Analyze and copy
 		Await Task.Run(Sub()
-						   Dim playlists = GetPlaylists()
+						   Dim playlists = GetPlaylists(conn)
 						   ProgressBarSyncSub.Maximum = playlists.Count
 						   For Each pl In playlists
-							   Dim p = GetSongsFromPlaylist(GetPlaylistIdByName(pl))
+							   Dim p = GetSongsFromPlaylist(pl)
 							   AddSyncLog(LogType.Information, "检查文件")
 							   Dim lstSongs As New List(Of SongInfo)
 							   For Each itm In p
@@ -623,7 +623,7 @@ Class MainWindow
 									   Dim lrc = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
 									   If My.Computer.FileSystem.FileExists(lrc) Then
 										   lstCopy(i) = New CpInfo With
-															{.Source = lstCopy(i).Source, .Destination = lstCopy(i).Destination, .Lyric = lrc}
+									   {.Source = lstCopy(i).Source, .Destination = lstCopy(i).Destination, .Lyric = lrc}
 										   spaceNeeded += fileInfo.Length
 										   totalCopySize += fileInfo.Length
 									   End If
@@ -648,7 +648,7 @@ Class MainWindow
 		End If
 
 		Await Task.Run(Sub()
-						   ''Create Directory
+						   'Create Directory
 						   For Each d In lstDirLost
 							   AddSyncLog(LogType.Information, "创建文件夹 " & d)
 							   Try
@@ -684,12 +684,20 @@ Class MainWindow
 							   End Try
 						   Next
 
+						   'Create Playlist
+						   Dim playlists = GetPlaylists(conn)
+						   For Each playlist In playlists
+							   Dim lstSongs = My.Computer.FileSystem.GetFiles(wmManagedPath & "\" & playlist)
+							   AddSyncLog(LogType.Information, "创建播放列表：" & playlist)
+							   sync.CreatePlaylist(lstSongs, wmManagedPath)
+							   ProgressBarSyncSub.AddOne()
+							   ProgressBarSyncTotal.AddOne()
+						   Next
 					   End Sub)
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Object)
 		Dispatcher.Invoke(Sub()
-
 						  End Sub)
 	End Sub
 
@@ -699,7 +707,8 @@ Class MainWindow
 		Err
 	End Enum
 
-	Private Sub AddSyncLog(type As LogType, message As String, Optional reqDelegate As Boolean = True, Optional dispOnCpDetail As Boolean = True)
+	Private Sub AddSyncLog(type As LogType, message As String, Optional reqDelegate As Boolean = True,
+							Optional dispOnCpDetail As Boolean = True)
 		Dim dispColor As Color
 
 		Select Case type
@@ -713,13 +722,13 @@ Class MainWindow
 
 		If reqDelegate Then
 			ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
-											 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
-											 .Foreground = New SolidColorBrush(dispColor)})
+											String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+											.Foreground = New SolidColorBrush(dispColor)})
 		Else
 			Me.Dispatcher.Invoke(Sub()
 									 ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
-																	  String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
-																	  .Foreground = New SolidColorBrush(dispColor)})
+																	 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+																	 .Foreground = New SolidColorBrush(dispColor)})
 									 If dispOnCpDetail Then
 										 TextBoxOp.Text = message
 									 End If

@@ -616,6 +616,18 @@ Public Class Database
 		Return result
 	End Function
 
+	Public Shared Function GetPlaylists(conn As SQLiteConnection) As List(Of String)
+		Dim cmd = conn.CreateCommand()
+		cmd.BuildQuery("select * from playlists")
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of String)
+		While reader.Read()
+			result.Add(reader(1))
+		End While
+		reader.Close()
+		Return result
+	End Function
+
 	''' <summary>
 	''' get song ids of a playlist
 	''' </summary>
@@ -625,6 +637,20 @@ Public Class Database
 		Dim conn = Connect()
 		Dim cmd = conn.CreateCommand()
 		cmd.BuildQuery("select * from playlist_detail where playlist_id = ? order by song_order", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of Integer)
+		While reader.Read
+			result.Add(reader(1))
+		End While
+		reader.Close()
+		conn.Close()
+		Return result
+	End Function
+
+	Public Overloads Shared Function GetSongsFromPlaylist(name As String) As List(Of Integer)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand()
+		cmd.BuildQuery("SELECT * FROM (playlist_detail INNER JOIN playlists ON playlist_detail.playlist_id = playlists.id) WHERE name = ?;", New Object() {name})
 		Dim reader = cmd.ExecuteReader()
 		Dim result As New List(Of Integer)
 		While reader.Read
@@ -647,8 +673,31 @@ Public Class Database
 		Return result
 	End Function
 
+	Public Overloads Shared Function GetSongsFromPlaylist(name As String, conn As SQLiteConnection) As List(Of Integer)
+		Dim cmd = conn.CreateCommand()
+		cmd.BuildQuery("SELECT * FROM (playlist_detail INNER JOIN playlists ON playlist_detail.playlist_id = playlists.id) WHERE name = ?;", New Object() {name})
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of Integer)
+		While reader.Read
+			result.Add(1)
+		End While
+		reader.Close()
+		Return result
+	End Function
+
 	Public Overloads Shared Function GetSongsFromPlaylist(id As Integer, cmd As SQLiteCommand) As List(Of Integer)
 		cmd.BuildQuery("select * from playlist_detail where playlist_id = ? orderby song_order", New Object() {id})
+		Dim reader = cmd.ExecuteReader()
+		Dim result As New List(Of Integer)
+		While reader.Read
+			result.Add(1)
+		End While
+		reader.Close()
+		Return result
+	End Function
+
+	Public Overloads Shared Function GetSongsFromPlaylist(name As String, cmd As SQLiteCommand) As List(Of Integer)
+		cmd.BuildQuery("SELECT * FROM (playlist_detail INNER JOIN playlists ON playlist_detail.playlist_id = playlists.id) WHERE name = ?;", New Object() {name})
 		Dim reader = cmd.ExecuteReader()
 		Dim result As New List(Of Integer)
 		While reader.Read

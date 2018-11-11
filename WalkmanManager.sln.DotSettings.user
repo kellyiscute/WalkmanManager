@@ -1,5 +1,7 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/CodeInspection/Highlighting/AnalysisEnabled/@EntryValue">VISIBLE_FILES</s:String>
+	
+	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpAutoNaming/IsNamingAutoDetectionCompleted/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/CodeStyle/Naming/CSharpAutoNaming/IsNotificationDisabled/@EntryValue">True</s:Boolean>
 	
 	
 	
@@ -11,6 +13,10 @@
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="F:\Megasync\WalkmanManager\packages\z440.atl.core.2.4.1\lib\net30\ATL.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=C65318E83F72A444B7E9CD6C3C6925F3/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=C65318E83F72A444B7E9CD6C3C6925F3/AbsolutePath/@EntryValue">D:\Program Files\JetBrains\apps\Rider\ch-0\183.4139.314\plugins\rider-unity\EditorPlugin\Unity.DotSettings</s:String>
+	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileC65318E83F72A444B7E9CD6C3C6925F3/@KeyIndexDefined">True</s:Boolean>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileC65318E83F72A444B7E9CD6C3C6925F3/RelativePriority/@EntryValue">1</s:Double>
 	<s:Boolean x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=34580ef4_002Dafc6_002D4f67_002Dab6a_002D9fa7ae88fe22/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=34580ef4_002Dafc6_002D4f67_002Dab6a_002D9fa7ae88fe22/Coords/@EntryValue">(Doc Ln 65 Col 26)</s:String>
 	<s:String x:Key="/Default/Housekeeping/Bookmarks/NumberedBookmarks/=34580ef4_002Dafc6_002D4f67_002Dab6a_002D9fa7ae88fe22/FileId/@EntryValue">918DC2FB-7054-47E2-B4AF-9B36843023F0/f:MainWindow.xaml</s:String>

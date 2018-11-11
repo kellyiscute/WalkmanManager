@@ -106,7 +106,12 @@ Public Class Synchronizer
 		Loop
 	End Sub
 
-	Public Shared Sub CreatePlaylist(lst As List(Of String), path As String)
+	''' <summary>
+	''' Create m3u playlist
+	''' </summary>
+	''' <param name="lst">file list</param>
+	''' <param name="path">remote path</param>
+	Public Shared Sub CreatePlaylist(lst As IEnumerable(Of String), path As String)
 		Dim m3u As New StreamWriter(New FileStream(path, FileMode.Create))
 		For Each itm In lst
 			m3u.WriteLine(itm)

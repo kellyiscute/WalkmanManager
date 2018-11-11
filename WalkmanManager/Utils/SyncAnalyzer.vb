@@ -2,13 +2,13 @@
 Imports WalkmanManager.CloudMusic
 
 Public Class SyncAnalyzer
-
 	Public Structure LostFileInfo
 		Public Origin As String
 		Public Remote As String
 	End Structure
 
-	Public Shared Function SyncPlaylist(playlistName As String, musicTracks As List(Of CloudMusicTracks), Optional dlg As dlg_progress = Nothing) As List(Of CloudMusicTracks)
+	Public Shared Function SyncPlaylist(playlistName As String, musicTracks As List(Of CloudMusicTracks),
+										Optional dlg As dlg_progress = Nothing) As List(Of CloudMusicTracks)
 
 		Dim lstFailed As New List(Of CloudMusicTracks)
 
@@ -51,7 +51,8 @@ Public Class SyncAnalyzer
 		Return lstFailed
 	End Function
 
-	Public Shared Function SyncAllPlaylists(cloudMusicObject As CloudMusic, Optional dlg As dlg_progress = Nothing) As String
+	Public Shared Function SyncAllPlaylists(cloudMusicObject As CloudMusic, Optional dlg As dlg_progress = Nothing) _
+		As String
 		Dim playlists = cloudMusicObject.GetPlaylists()
 		If Not IsNothing(dlg) Then
 			dlg.Text = "获取歌单"
@@ -163,7 +164,6 @@ Public Class SyncAnalyzer
 		End If
 
 		Return newDirPath & filename
-
 	End Function
 
 	''' <summary>
@@ -197,4 +197,26 @@ Public Class SyncAnalyzer
 		Return lstResult
 	End Function
 
+	Public Shared Function FindNotInPlaylists() As List(Of SongInfo)
+		Dim result As New List(Of SongInfo)
+
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		cmd.BuildQuery("SELECT * FROM songs WHERE id NOT IN (SELECT song_id FROM playlist_detail)")
+		Dim reader = cmd.ExecuteReader()
+		If reader.HasRows Then
+			Dim itm As New SongInfo With {
+				.Id = reader("id"),
+				.Path = reader("path"),
+				.Artists = reader("artists"),
+				.Title = reader("title")
+			}
+			result.Add(itm)
+		End If
+		reader.Close()
+		conn.Close()
+		conn.Dispose()
+
+		Return result
+	End Function
 End Class
