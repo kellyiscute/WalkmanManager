@@ -562,34 +562,36 @@ Class MainWindow
 		AddSyncLog(LogType.Information, "连接数据库")
 		Dim conn = Connect()
 
-		AddSyncLog(LogType.Information, "检查目录结构")
-		Dim lstDirLost = SyncAnalyzer.CheckDirectoryStructure(drivePath)
-		If Not My.Computer.FileSystem.DirectoryExists(wmManagedPath) Then
-			AddSyncLog(LogType.Information, "创建文件夹： " & wmManagedPath)
-			My.Computer.FileSystem.CreateDirectory(wmManagedPath)
-		End If
-		If IsNothing(lstDirLost) Then
-			'No analysis, copy all files
-			If Not My.Computer.FileSystem.DirectoryExists(wmManagedPath) Then
-				My.Computer.FileSystem.CreateDirectory(wmManagedPath)
-			End If
-			Exit Sub
-		End If
-
 		Dim lstCopy As New List(Of CpInfo)
 		Dim lstDelete As New List(Of String)
 		Dim totalCopySize As Long
 		Dim spaceNeeded As Long
 		Dim flagCopyLrc As Boolean = Not CheckBoxSyncOptionDoNotCopyLyric.IsChecked
 
+		AddSyncLog(LogType.Information, "检查目录结构")
+		Dim lstDirLost = SyncAnalyzer.CheckDirectoryStructure(drivePath)
+		If IsNothing(lstDirLost) Then
+			'No analysis, copy all files
+			AddSyncLog(LogType.Information, "创建文件夹： " & wmManagedPath)
+			My.Computer.FileSystem.CreateDirectory(wmManagedPath)
+			Dim playlists = GetPlaylists(conn)
+			For Each p In playlists
+				AddSyncLog(LogType.Information, "创建文件夹: " & p)
+				My.Computer.FileSystem.CreateDirectory(wmManagedPath & "\" & p)
+			Next
+			Dim lstSongs As New List(Of SongInfo)
+
+			Exit Sub
+		End If
+
 
 		'Analyze and copy
 		Await Task.Run(Sub()
 						   Dim playlists = GetPlaylists(conn)
-						   ProgressBarSyncSub.Maximum = playlists.Count
+						   ProgressBarSyncSub.Maximum = playlists.Count + 1
 						   For Each pl In playlists
 							   Dim p = GetSongsFromPlaylist(pl)
-							   AddSyncLog(LogType.Information, "检查文件")
+							   AddSyncLog(LogType.Information, "检查列表 " & pl & " 中的文件")
 							   Dim lstSongs As New List(Of SongInfo)
 							   For Each itm In p
 								   lstSongs.Add(GetSongById(itm, conn))
@@ -605,6 +607,17 @@ Class MainWindow
 								   lstDelete.Add(itm)
 							   Next
 							   ProgressBarSyncSub.AddOne(Me)
+						   Next
+						   Dim lstNotInPlaylists = SyncAnalyzer.FindNotInPlaylists(conn)
+						   Dim extra = SyncAnalyzer.CheckFiles(wmManagedPath, lstNotInPlaylists)
+						   For Each itm In extra
+							   Dim cp As New CpInfo With
+									   {.Source = itm.Path, .Destination = wmManagedPath}
+							   lstCopy.Add(cp)
+						   Next
+						   Dim del = SyncAnalyzer.FindDeleted(wmManagedPath & "\", lstNotInPlaylists)
+						   For Each itm In del
+							   lstDelete.Add(itm)
 						   Next
 					   End Sub)
 
@@ -646,9 +659,13 @@ Class MainWindow
 				Exit Sub
 			End If
 		End If
+		ProgressBarSyncTotal.Maximum = totalCopySize
 
 		Await Task.Run(Sub()
 						   'Create Directory
+						   Dispatcher.Invoke(Sub()
+												 ProgressBarSyncSub.Maximum = lstDirLost.Count
+											 End Sub)
 						   For Each d In lstDirLost
 							   AddSyncLog(LogType.Information, "创建文件夹 " & d)
 							   Try

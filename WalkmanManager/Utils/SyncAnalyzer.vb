@@ -1,5 +1,6 @@
 ﻿Imports WalkmanManager.Database
 Imports WalkmanManager.CloudMusic
+Imports System.Data.SQLite
 
 Public Class SyncAnalyzer
 	Public Structure LostFileInfo
@@ -197,7 +198,7 @@ Public Class SyncAnalyzer
 		Return lstResult
 	End Function
 
-	Public Shared Function FindNotInPlaylists() As List(Of SongInfo)
+	Public Overloads Shared Function FindNotInPlaylists() As List(Of SongInfo)
 		Dim result As New List(Of SongInfo)
 
 		Dim conn = Connect()
@@ -216,6 +217,26 @@ Public Class SyncAnalyzer
 		reader.Close()
 		conn.Close()
 		conn.Dispose()
+
+		Return result
+	End Function
+
+	Public Overloads Shared Function FindNotInPlaylists(conn As SQLiteConnection) As List(Of SongInfo)
+		Dim result As New List(Of SongInfo)
+
+		Dim cmd = conn.CreateCommand
+		cmd.BuildQuery("SELECT * FROM songs WHERE id NOT IN (SELECT song_id FROM playlist_detail)")
+		Dim reader = cmd.ExecuteReader()
+		If reader.HasRows Then
+			Dim itm As New SongInfo With {
+					.Id = reader("id"),
+					.Path = reader("path"),
+					.Artists = reader("artists"),
+					.Title = reader("title")
+					}
+			result.Add(itm)
+		End If
+		reader.Close()
 
 		Return result
 	End Function
