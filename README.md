@@ -1,11 +1,11 @@
 # WalkmanManager
 A easy-to-use app to replace Sony MediaCenter with more features and better design  
- **Project Launched: _3rd Jul_**
+ **Project Launched: _3rd Jul, 2018_**
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
 ## Current Progress
-Project development in progress... Writing the last feature...before beta release
+I currently cannot continue the development of this program since I don't have a clear mind as before. Please give me a month or two... if I am still able to keep myself alive...
 
 ## TODO 
 ### `First thing first` - what I have done so far  
