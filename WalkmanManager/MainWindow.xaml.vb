@@ -579,8 +579,19 @@ Class MainWindow
 				AddSyncLog(LogType.Information, "创建文件夹: " & p)
 				My.Computer.FileSystem.CreateDirectory(wmManagedPath & "\" & p)
 			Next
-			Dim lstSongs As New List(Of SongInfo)
+			Dim lstSongs = Database.GetSongs(conn)
+			AddSyncLog(LogType.Information, "计算文件大小: ")
+			Dim copySize As Long
+			For i = 0 To lstSongs.Count - 1
+				Dim fileInfo = My.Computer.FileSystem.GetFileInfo(lstSongs(i).Path)
+				If flagCopyLrc Then
+					Dim lrcPath = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
+					If My.Computer.FileSystem.FileExists(lrcPath) Then
+						copySize += My.Computer.FileSystem.GetFileInfo(lrcPath).Length
+					End If
+				End If
 
+			Next
 			Exit Sub
 		End If
 
