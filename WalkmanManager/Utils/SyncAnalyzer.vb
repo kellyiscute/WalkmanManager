@@ -1,5 +1,7 @@
 ﻿Imports WalkmanManager.Database
 Imports WalkmanManager.CloudMusic
+Imports System.IO
+Imports System.Security.Cryptography
 Imports System.Data.SQLite
 
 Public Class SyncAnalyzer
@@ -123,38 +125,6 @@ Public Class SyncAnalyzer
 		Return rString
 	End Function
 
-	''' <summary>
-	''' check 
-	''' </summary>
-	''' <param name="drive"></param>
-	''' <returns></returns>
-	Public Shared Function CheckDirectoryStructure(drive As String) As List(Of String)
-		If My.Computer.FileSystem.DirectoryExists(drive & "\wmManaged") Then
-			Return Nothing
-		End If
-
-		Dim result As New List(Of String)
-		Dim dirs = My.Computer.FileSystem.GetDirectories(drive & "\wmManaged")
-		Dim playlists = Database.GetPlaylists()
-
-		Dim found
-		For Each playlist As String In playlists
-			found = False
-
-			For Each dir As String In dirs
-				If dir.Contains(playlist) Then
-					found = True
-				End If
-			Next
-
-			If Not found Then
-				result.Add(playlist)
-			End If
-		Next
-
-		Return result
-	End Function
-
 	Public Shared Function ChangePath(filename As String, newDirPath As String) As String
 		filename = filename.Split("\").Last
 		If Not My.Computer.FileSystem.DirectoryExists(newDirPath) Then
@@ -167,25 +137,7 @@ Public Class SyncAnalyzer
 		Return newDirPath & filename
 	End Function
 
-	''' <summary>
-	''' Find files not on device
-	''' </summary>
-	''' <param name="pathOnRemoteDrive">SongDir</param>
-	''' <param name="files">list(of songInfo)</param>
-	''' <returns></returns>
-	Public Shared Function CheckFiles(pathOnRemoteDrive As String, files As List(Of SongInfo)) As List(Of SongInfo)
-		Dim lstResult As New List(Of SongInfo)
-
-		For Each songInfo As SongInfo In files
-			If Not My.Computer.FileSystem.FileExists(ChangePath(songInfo.Path, pathOnRemoteDrive)) Then
-				lstResult.Add(songInfo)
-			End If
-		Next
-
-		Return lstResult
-	End Function
-
-	Public Shared Function FindDeleted(pathOnRemoteDrive As String, files As List(Of SongInfo)) As List(Of String)
+	Public Shared Function FindDeleted(pathOnRemoteDrive As String, files As ICollection(Of SongInfo)) As List(Of String)
 		Dim lstResult As New List(Of String)
 
 		For Each f In My.Computer.FileSystem.GetFiles(pathOnRemoteDrive)
@@ -198,46 +150,40 @@ Public Class SyncAnalyzer
 		Return lstResult
 	End Function
 
-	Public Overloads Shared Function FindNotInPlaylists() As List(Of SongInfo)
-		Dim result As New List(Of SongInfo)
+	Private Shared Function GetFileHash(path As String) As String
+		Dim result As String
 
-		Dim conn = Connect()
-		Dim cmd = conn.CreateCommand
-		cmd.BuildQuery("SELECT * FROM songs WHERE id NOT IN (SELECT song_id FROM playlist_detail)")
-		Dim reader = cmd.ExecuteReader()
-		If reader.HasRows Then
-			Dim itm As New SongInfo With {
-				.Id = reader("id"),
-				.Path = reader("path"),
-				.Artists = reader("artists"),
-				.Title = reader("title")
-			}
-			result.Add(itm)
-		End If
-		reader.Close()
-		conn.Close()
-		conn.Dispose()
+		Try
+			Dim r = New BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read))
+			Dim data = r.ReadBytes(r.BaseStream.Length)
+			r.Close()
+			Dim md5 = New MD5CryptoServiceProvider()
+			Dim hashData = md5.ComputeHash(data)
+			result = BitConverter.ToString(hashData)
+			Dim hash = Nothing
+		Catch ex As Exception
+			Return ""
+		End Try
 
 		Return result
 	End Function
 
-	Public Overloads Shared Function FindNotInPlaylists(conn As SQLiteConnection) As List(Of SongInfo)
-		Dim result As New List(Of SongInfo)
+	Public Shared Function FindChangedFiles(pathOnRemoteDrive As String, lstSongs As List(Of SongInfo),
+											flgMd5Check As Boolean)
+		Dim lstResult As New List(Of String)
 
-		Dim cmd = conn.CreateCommand
-		cmd.BuildQuery("SELECT * FROM songs WHERE id NOT IN (SELECT song_id FROM playlist_detail)")
-		Dim reader = cmd.ExecuteReader()
-		If reader.HasRows Then
-			Dim itm As New SongInfo With {
-					.Id = reader("id"),
-					.Path = reader("path"),
-					.Artists = reader("artists"),
-					.Title = reader("title")
-					}
-			result.Add(itm)
-		End If
-		reader.Close()
+		For Each s In lstSongs
+			If My.Computer.FileSystem.FileExists(ChangePath(s.Path, pathOnRemoteDrive)) Then
+				If flgMd5Check Then
+					If Not GetFileHash(ChangePath(s.Path, pathOnRemoteDrive)) = GetFileHash(s.Path) Then
+						lstResult.Add(s.Path)
+					End If
+				End If
+			Else
+				lstResult.Add(s.Path)
+			End If
+		Next
 
-		Return result
+		Return lstResult
 	End Function
 End Class

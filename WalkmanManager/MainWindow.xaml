@@ -40,7 +40,7 @@
 				<mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50"
 				              Background="WhiteSmoke">
 					<Grid>
-						<ListBox x:Name="LstTopbar" Style="{StaticResource MaterialDesignToolToggleFlatListBox}" Height="50"
+						<ListBox x:Name="LstTopbar" Style="{DynamicResource MaterialDesignToolToggleFlatListBox}" Height="50"
 						         SelectedIndex="0" HorizontalAlignment="Left" Width="337">
 							<ListBoxItem Height="50" x:Name="TabLocal">
 								<WrapPanel>
@@ -75,7 +75,7 @@
 								<Label Padding="20,10,5,5" Content="本地播放列表" Margin="0,67,0,0" BorderThickness="0,1,0,1" BorderBrush="LightGray"
 								       Height="35" VerticalAlignment="Top" />
 								<ListBox x:Name="ListBoxPlaylist" SelectionChanged="ListItem_SelectionChange"
-								         PreviewMouseRightButtonDown="BlockRightClickSelectoin" Width="220" Margin="0,107,0,0">
+								         PreviewMouseRightButtonDown="BlockRightClickSelection" Width="220" Margin="0,107,0,0">
 									<ListBox.ContextMenu>
 										<ContextMenu>
 											<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150" Height="50" />

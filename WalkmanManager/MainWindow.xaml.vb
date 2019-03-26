@@ -189,7 +189,7 @@ Class MainWindow
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
 		WindowChrome.SetWindowChrome(Me,
-									New WindowChrome() _
+									 New WindowChrome() _
 										With {.GlassFrameThickness = New Thickness(1),
 										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
 										.CornerRadius = New CornerRadius(10),
@@ -303,7 +303,7 @@ Class MainWindow
 		_isRightClickSelect = False
 	End Sub
 
-	Private Sub BlockRightClickSelectoin(sender As Object, e As MouseButtonEventArgs)
+	Private Sub BlockRightClickSelection(sender As Object, e As MouseButtonEventArgs)
 		_isRightClickSelect = True
 	End Sub
 
@@ -567,161 +567,14 @@ Class MainWindow
 		Dim totalCopySize As Long
 		Dim spaceNeeded As Long
 		Dim flagCopyLrc As Boolean = Not CheckBoxSyncOptionDoNotCopyLyric.IsChecked
+		Dim lstSongs = GetSongs()
 
-		AddSyncLog(LogType.Information, "检查目录结构")
-		Dim lstDirLost = SyncAnalyzer.CheckDirectoryStructure(drivePath)
-		If IsNothing(lstDirLost) Then
-			'No analysis, copy all files
-			AddSyncLog(LogType.Information, "创建文件夹： " & wmManagedPath)
-			My.Computer.FileSystem.CreateDirectory(wmManagedPath)
-			Dim playlists = GetPlaylists(conn)
-			For Each p In playlists
-				AddSyncLog(LogType.Information, "创建文件夹: " & p)
-				My.Computer.FileSystem.CreateDirectory(wmManagedPath & "\" & p)
-			Next
-			Dim lstSongs = Database.GetSongs(conn)
-			AddSyncLog(LogType.Information, "计算文件大小: ")
-			Dim copySize As Long
-			For i = 0 To lstSongs.Count - 1
-				Dim fileInfo = My.Computer.FileSystem.GetFileInfo(lstSongs(i).Path)
-				If flagCopyLrc Then
-					Dim lrcPath = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
-					If My.Computer.FileSystem.FileExists(lrcPath) Then
-						copySize += My.Computer.FileSystem.GetFileInfo(lrcPath).Length
-					End If
-				End If
-
-			Next
-			Exit Sub
-		End If
-
-
-		'Analyze and copy
-		Await Task.Run(Sub()
-						   Dim playlists = GetPlaylists(conn)
-						   ProgressBarSyncSub.Maximum = playlists.Count + 1
-						   For Each pl In playlists
-							   Dim p = GetSongsFromPlaylist(pl)
-							   AddSyncLog(LogType.Information, "检查列表 " & pl & " 中的文件")
-							   Dim lstSongs As New List(Of SongInfo)
-							   For Each itm In p
-								   lstSongs.Add(GetSongById(itm, conn))
-							   Next
-							   Dim n = SyncAnalyzer.CheckFiles(wmManagedPath & "\" & pl, lstSongs)
-							   For Each itm In n
-								   Dim cp As New CpInfo With
-										   {.Source = itm.Path, .Destination = wmManagedPath & "\" & pl}
-								   lstCopy.Add(cp)
-							   Next
-							   Dim d = SyncAnalyzer.FindDeleted(wmManagedPath & "\" & pl, lstSongs)
-							   For Each itm In d
-								   lstDelete.Add(itm)
-							   Next
-							   ProgressBarSyncSub.AddOne(Me)
-						   Next
-						   Dim lstNotInPlaylists = SyncAnalyzer.FindNotInPlaylists(conn)
-						   Dim extra = SyncAnalyzer.CheckFiles(wmManagedPath, lstNotInPlaylists)
-						   For Each itm In extra
-							   Dim cp As New CpInfo With
-									   {.Source = itm.Path, .Destination = wmManagedPath}
-							   lstCopy.Add(cp)
-						   Next
-						   Dim del = SyncAnalyzer.FindDeleted(wmManagedPath & "\", lstNotInPlaylists)
-						   For Each itm In del
-							   lstDelete.Add(itm)
-						   Next
-					   End Sub)
-
-		TextBoxOp.Text = "计算文件大小"
-		ProgressBarSyncSub.Maximum = lstCopy.Count + lstDelete.Count
+		ProgressBarSyncSub.Maximum = 2
 		ProgressBarSyncSub.Value = 0
 
-		Await Task.Run(Sub()
-						   For i = 0 To lstCopy.Count
-							   If My.Computer.FileSystem.FileExists(lstCopy(i).Source) Then
-								   totalCopySize += My.Computer.FileSystem.GetFileInfo(lstCopy(i).Source).Length
-								   spaceNeeded += My.Computer.FileSystem.GetFileInfo(lstCopy(i).Source).Length
-
-								   Dim fileInfo = My.Computer.FileSystem.GetFileInfo(lstCopy(i).Source)
-								   If flagCopyLrc Then
-									   Dim lrc = fileInfo.FullName.Replace(fileInfo.Extension, "lrt")
-									   If My.Computer.FileSystem.FileExists(lrc) Then
-										   lstCopy(i) = New CpInfo With
-									   {.Source = lstCopy(i).Source, .Destination = lstCopy(i).Destination, .Lyric = lrc}
-										   spaceNeeded += fileInfo.Length
-										   totalCopySize += fileInfo.Length
-									   End If
-								   End If
-								   ProgressBarSyncSub.AddOne(Me)
-							   End If
-						   Next
-
-						   For Each dl In lstDelete
-							   If My.Computer.FileSystem.FileExists(dl) Then
-								   spaceNeeded -= My.Computer.FileSystem.GetFileInfo(dl).Length
-								   ProgressBarSyncSub.AddOne(Me)
-							   End If
-						   Next
-					   End Sub)
-
-		If Not CheckBoxSyncOptionNoSpaceCheck.IsChecked Then
-			If My.Computer.FileSystem.GetDriveInfo(drivePath).AvailableFreeSpace >= spaceNeeded Then
-				Await DialogHost.Show("window-root", New DlgMessageDialog("同步时出现错误", "空间不足"))
-				Exit Sub
-			End If
-		End If
-		ProgressBarSyncTotal.Maximum = totalCopySize
-
-		Await Task.Run(Sub()
-						   'Create Directory
-						   Dispatcher.Invoke(Sub()
-												 ProgressBarSyncSub.Maximum = lstDirLost.Count
-											 End Sub)
-						   For Each d In lstDirLost
-							   AddSyncLog(LogType.Information, "创建文件夹 " & d)
-							   Try
-								   My.Computer.FileSystem.CreateDirectory(wmManagedPath & "\" & d)
-							   Catch ex As Exception
-								   AddSyncLog(LogType.Err, ex.Message)
-							   End Try
-						   Next
-
-						   'Delete Files
-						   For Each d In lstDelete
-							   AddSyncLog(LogType.Information, "删除文件 " & d)
-							   Try
-								   My.Computer.FileSystem.DeleteFile(d)
-							   Catch ex As Exception
-								   AddSyncLog(LogType.Warning, ex.Message)
-							   End Try
-						   Next
-
-						   'Copy files
-						   Dim sync As New Synchronizer
-						   AddHandler sync.Update, AddressOf CopyingDetailUpdateEventHandler
-						   For Each c In lstCopy
-							   Try
-								   AddSyncLog(LogType.Information, "复制文件：" & c.Source)
-								   sync.CopyFile(c.Source, c.Destination)
-								   If c.Lyric <> "" Then
-									   AddSyncLog(LogType.Information, "复制文件：" & c.Lyric)
-									   sync.CopyFile(c.Lyric, c.Destination)
-								   End If
-							   Catch ex As Exception
-								   AddSyncLog(LogType.Warning, ex.Message)
-							   End Try
-						   Next
-
-						   'Create Playlist
-						   Dim playlists = GetPlaylists(conn)
-						   For Each playlist In playlists
-							   Dim lstSongs = My.Computer.FileSystem.GetFiles(wmManagedPath & "\" & playlist)
-							   AddSyncLog(LogType.Information, "创建播放列表：" & playlist)
-							   sync.CreatePlaylist(lstSongs, wmManagedPath)
-							   ProgressBarSyncSub.AddOne()
-							   ProgressBarSyncTotal.AddOne()
-						   Next
-					   End Sub)
+		lstDelete = Await Task.Run(Function()
+									   Return SyncAnalyzer.FindDeleted(drivePath, lstSongs)
+								   End Function)
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Object)
@@ -736,7 +589,7 @@ Class MainWindow
 	End Enum
 
 	Private Sub AddSyncLog(type As LogType, message As String, Optional reqDelegate As Boolean = True,
-							Optional dispOnCpDetail As Boolean = True)
+						   Optional dispOnCpDetail As Boolean = True)
 		Dim dispColor As Color
 
 		Select Case type
@@ -750,13 +603,13 @@ Class MainWindow
 
 		If reqDelegate Then
 			ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
-											String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
-											.Foreground = New SolidColorBrush(dispColor)})
+											 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+											 .Foreground = New SolidColorBrush(dispColor)})
 		Else
 			Me.Dispatcher.Invoke(Sub()
 									 ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
-																	 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
-																	 .Foreground = New SolidColorBrush(dispColor)})
+												 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+												 .Foreground = New SolidColorBrush(dispColor)})
 									 If dispOnCpDetail Then
 										 TextBoxOp.Text = message
 									 End If
