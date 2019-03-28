@@ -575,6 +575,11 @@ Class MainWindow
 		lstDelete = Await Task.Run(Function()
 									   Return SyncAnalyzer.FindDeleted(drivePath, lstSongs)
 								   End Function)
+		ProgressBarSyncSub.AddOne()
+		Dim lstChanged = Await Task.Run(Function()
+											Return SyncAnalyzer.FindChangedFiles(drivePath, lstSongs, True)
+										End Function)
+
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Object)
