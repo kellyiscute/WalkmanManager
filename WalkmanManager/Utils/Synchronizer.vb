@@ -54,7 +54,7 @@ Public Class Synchronizer
 		End Get
 	End Property
 
-	Public Event Update(sender As Object)
+	Public Event Update(sender As Synchronizer)
 
 	Public Sub CopyFile(source As String, destination As String)
 		_copiedLength = 0

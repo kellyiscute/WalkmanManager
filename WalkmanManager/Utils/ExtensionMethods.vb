@@ -49,7 +49,7 @@ Public Module ExtensionMethods
 			Return
 		End If
 
-		Dim counter As Integer = 0
+		Dim counter = 0
 		'convert all question mark to the form of @param#
 		While InStr(sql, "?") <> 0
 			sql = Replace(sql, "?", "@param" & counter, 1, 1)
@@ -87,7 +87,7 @@ Public Module ExtensionMethods
 
 	<System.Runtime.CompilerServices.Extension>
 	Public Function ToCookieString(lst As List(Of Cookie)) As String
-		Dim r As String = ""
+		Dim r = ""
 		For Each c In lst
 			r += c.Name & "=" & c.Value & ";"
 		Next

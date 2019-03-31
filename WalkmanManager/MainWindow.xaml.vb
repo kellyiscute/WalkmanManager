@@ -570,19 +570,51 @@ Class MainWindow
 		Dim lstSongs = GetSongs()
 
 		ProgressBarSyncSub.Maximum = 2
+		ProgressBarSyncSub.IsIndeterminate = False
 		ProgressBarSyncSub.Value = 0
 
+		AddSyncLog(LogType.Information, "查找删除项目", False)
 		lstDelete = Await Task.Run(Function()
 									   Return SyncAnalyzer.FindDeleted(drivePath, lstSongs)
 								   End Function)
 		ProgressBarSyncSub.AddOne()
+		AddSyncLog(LogType.Information, "发现需要删除的项目：" & lstDelete.Count, False)
+		AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
 		Dim lstChanged = Await Task.Run(Function()
 											Return SyncAnalyzer.FindChangedFiles(drivePath, lstSongs, True)
 										End Function)
+		AddSyncLog(LogType.Information, "发现需要复制/覆盖的项目：" & lstChanged.Count, False)
+		ProgressBarSyncSub.Value = 0
+
+		AddSyncLog(LogType.Information, "正在计算所需空间...", False)
+		ProgressBarSyncSub.Maximum = lstChanged.Count
+
+		Await Task.Run(Sub()
+						   For Each itm In lstChanged
+							   If My.Computer.FileSystem.FileExists(itm) Then
+								   Dim fInfo = My.Computer.FileSystem.GetFileInfo(itm)
+								   totalCopySize += fInfo.Length
+								   Dim sCopy As New CpInfo
+								   sCopy.Source = itm
+								   sCopy.Destination = wmManagedPath
+								   If My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc") Then
+									   sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
+									   totalCopySize += My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc").Length
+								   End If
+
+								   lstCopy.Add(sCopy)
+							   End If
+						   Next
+						   ProgressBarSyncSub.AddOne(Me)
+					   End Sub)
+
+		Dim cp As New Synchronizer
+		AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
+
 
 	End Sub
 
-	Private Sub CopyingDetailUpdateEventHandler(sender As Object)
+	Private Sub CopyingDetailUpdateEventHandler(sender As Synchronizer)
 		Dispatcher.Invoke(Sub()
 						  End Sub)
 	End Sub

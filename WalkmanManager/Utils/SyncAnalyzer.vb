@@ -169,7 +169,7 @@ Public Class SyncAnalyzer
 	End Function
 
 	Public Shared Function FindChangedFiles(pathOnRemoteDrive As String, lstSongs As ICollection(Of SongInfo),
-											flgMd5Check As Boolean)
+											flgMd5Check As Boolean) As ICollection(Of String)
 		Dim lstResult As New List(Of String)
 
 		For Each s In lstSongs
