@@ -562,6 +562,10 @@ Class MainWindow
 		AddSyncLog(LogType.Information, "连接数据库")
 		Dim conn = Connect()
 
+		If Not My.Computer.FileSystem.DirectoryExists(wmManagedPath) Then
+			My.Computer.FileSystem.CreateDirectory(wmManagedPath)
+		End If
+
 		Dim lstCopy As New List(Of CpInfo)
 		Dim lstDelete As New List(Of String)
 		Dim totalCopySize As Long
@@ -587,7 +591,7 @@ Class MainWindow
 		ProgressBarSyncSub.Value = 0
 
 		AddSyncLog(LogType.Information, "正在计算所需空间...", False)
-		ProgressBarSyncSub.Maximum = lstChanged.Count
+		ProgressBarSyncSub.Maximum = lstChanged.Count + lstDelete.Count
 
 		Await Task.Run(Sub()
 						   For Each itm In lstChanged
@@ -597,21 +601,41 @@ Class MainWindow
 								   Dim sCopy As New CpInfo
 								   sCopy.Source = itm
 								   sCopy.Destination = wmManagedPath
-								   If My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc") Then
+								   If flagCopyLrc And My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc") Then
 									   sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
 									   totalCopySize += My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc").Length
 								   End If
 
 								   lstCopy.Add(sCopy)
 							   End If
+							   ProgressBarSyncSub.AddOne(Me)
 						   Next
-						   ProgressBarSyncSub.AddOne(Me)
+						   spaceNeeded = totalCopySize
+
+						   For Each itm In lstDelete
+							   spaceNeeded -= My.Computer.FileSystem.GetFileInfo(itm).Length
+							   ProgressBarSyncSub.AddOne(Me)
+						   Next
 					   End Sub)
+
+		If Not spaceNeeded > drivePath Then
+			Dim errorDlg As New DlgMessageDialog("同步失败", "磁盘空间不足")
+			Await DialogHost.Show(errorDlg, "window-root")
+			ProgressBarSyncTotal.Value = 0
+			ProgressBarSyncTotal.Maximum = 0
+			ProgressBarSyncTotal.IsIndeterminate = False
+			ProgressBarSyncSub.Value = 0
+			ProgressBarSyncSub.Maximum = 0
+			ProgressBarSyncSub.IsIndeterminate = False
+			Exit Sub
+		End If
 
 		Dim cp As New Synchronizer
 		AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
 
+		Await Task.Run(Sub()
 
+					   End Sub)
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Synchronizer)
