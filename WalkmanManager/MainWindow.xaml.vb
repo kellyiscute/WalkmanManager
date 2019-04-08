@@ -634,12 +634,37 @@ Class MainWindow
 		AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
 
 		Await Task.Run(Sub()
+						   For Each itm In lstDelete
+							   AddSyncLog(LogType.Information, "删除文件：" & itm)
+							   Try
+								   My.Computer.FileSystem.DeleteFile(itm)
+							   Catch ex As Exception
+								   AddSyncLog(LogType.Err, "删除文件时出现错误：" & ex.Message)
+								   Exit Sub
+							   End Try
+							   ProgressBarSyncTotal.AddOne(Me)
+						   Next
 
+						   For Each itm In lstCopy
+							   Try
+								   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
+								   cp.CopyFile(itm.Source, itm.Destination)
+								   If itm.Lyric <> "" Then
+									   AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+									   cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+								   End If
+							   Catch ex As Exception
+								   AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
+								   Exit Sub
+							   End Try
+							   ProgressBarSyncTotal.AddOne(Me)
+						   Next
 					   End Sub)
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Synchronizer)
 		Dispatcher.Invoke(Sub()
+
 						  End Sub)
 	End Sub
 

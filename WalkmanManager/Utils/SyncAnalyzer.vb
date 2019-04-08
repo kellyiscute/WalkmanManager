@@ -2,7 +2,6 @@
 Imports WalkmanManager.CloudMusic
 Imports System.IO
 Imports System.Security.Cryptography
-Imports System.Data.SQLite
 
 Public Class SyncAnalyzer
 	Public Structure LostFileInfo

@@ -81,14 +81,14 @@ Public Class Synchronizer
 				'add to copied
 				_copiedLength += _chunkSize
 				data = Nothing
-				'regulate chunk size If it is not maximum(10 MB)
-				If _chunkSize < 10 * 1024 ^ 2 Then
+				'regulate chunk size If it is not maximum(4 MB)
+				If _chunkSize < 4 * 1024 ^ 2 Then
 					'If readSpeed is slower, which is not quiet possible, use readSpeed as standard
 					If _readSpeed > _writeSpeed Then
-						'make it write twice every second
-						_chunkSize = _readSpeed / 2
+						'make it write three times every second
+						_chunkSize = _readSpeed / 3
 					Else
-						_chunkSize = _writeSpeed / 2
+						_chunkSize = _writeSpeed / 3
 					End If
 				End If
 			Else
