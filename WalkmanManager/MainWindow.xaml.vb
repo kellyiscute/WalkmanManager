@@ -526,7 +526,7 @@ Class MainWindow
 	Private Sub ButtonRefreshDeviceList_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRefreshDeviceList.Click
 		ComboBoxDevices.Items.Clear()
 		For Each dev In My.Computer.FileSystem.Drives
-			If dev.DriveType = IO.DriveType.Removable Then
+			If dev.DriveType = IO.DriveType.Removable And dev.IsReady Then
 				If dev.VolumeLabel = "" Then
 					ComboBoxDevices.Items.Add(dev.Name & " (没有卷标)")
 				Else
@@ -539,6 +539,9 @@ Class MainWindow
 
 	Private Sub ComboBoxDevices_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) _
 		Handles ComboBoxDevices.SelectionChanged
+		If sender.SelectedIndex = -1 Then
+			Exit Sub
+		End If
 		Dim dir = ComboBoxDevices.SelectedItem.ToString.Substring(0, 3)
 		For Each dev In My.Computer.FileSystem.Drives
 			If dev.Name.ToUpper = dir.ToUpper Then
@@ -558,7 +561,7 @@ Class MainWindow
 		ProgressBarSyncTotal.IsIndeterminate = True
 		ButtonRemoteSync.IsEnabled = False
 		Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
-		Dim wmManagedPath = drivePath & "\wmManaged"
+		Dim wmManagedPath = drivePath & "\MUSIC\wmManaged"
 		AddSyncLog(LogType.Information, "连接数据库")
 		Dim conn = Connect()
 
@@ -579,13 +582,13 @@ Class MainWindow
 
 		AddSyncLog(LogType.Information, "查找删除项目", False)
 		lstDelete = Await Task.Run(Function()
-									   Return SyncAnalyzer.FindDeleted(drivePath, lstSongs)
+									   Return SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs)
 								   End Function)
 		ProgressBarSyncSub.AddOne()
 		AddSyncLog(LogType.Information, "发现需要删除的项目：" & lstDelete.Count, False)
 		AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
 		Dim lstChanged = Await Task.Run(Function()
-											Return SyncAnalyzer.FindChangedFiles(drivePath, lstSongs, True)
+											Return SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, True)
 										End Function)
 		AddSyncLog(LogType.Information, "发现需要复制/覆盖的项目：" & lstChanged.Count, False)
 		ProgressBarSyncSub.Value = 0
@@ -600,7 +603,7 @@ Class MainWindow
 								   totalCopySize += fInfo.Length
 								   Dim sCopy As New CpInfo
 								   sCopy.Source = itm
-								   sCopy.Destination = wmManagedPath
+								   sCopy.Destination = wmManagedPath & "\" & My.Computer.FileSystem.GetFileInfo(itm).Name
 								   If flagCopyLrc And My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc") Then
 									   sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
 									   totalCopySize += My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc").Length
@@ -618,7 +621,7 @@ Class MainWindow
 						   Next
 					   End Sub)
 
-		If Not spaceNeeded > drivePath Then
+		If spaceNeeded > My.Computer.FileSystem.GetDriveInfo(drivePath).TotalFreeSpace Then
 			Dim errorDlg As New DlgMessageDialog("同步失败", "磁盘空间不足")
 			Await DialogHost.Show(errorDlg, "window-root")
 			ProgressBarSyncTotal.Value = 0
@@ -627,8 +630,14 @@ Class MainWindow
 			ProgressBarSyncSub.Value = 0
 			ProgressBarSyncSub.Maximum = 0
 			ProgressBarSyncSub.IsIndeterminate = False
+			ProgressBarSyncSub.Value = 0
+			ProgressBarSyncTotal.Value = 0
+			ButtonRemoteSync.IsEnabled = True
 			Exit Sub
 		End If
+
+		ProgressBarSyncTotal.Maximum = lstCopy.Count + lstDelete.Count
+		ProgressBarSyncTotal.IsIndeterminate = False
 
 		Dim cp As New Synchronizer
 		AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
@@ -646,25 +655,33 @@ Class MainWindow
 						   Next
 
 						   For Each itm In lstCopy
-							   Try
-								   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
+							   'Try
+							   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
 								   cp.CopyFile(itm.Source, itm.Destination)
 								   If itm.Lyric <> "" Then
 									   AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
 									   cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
 								   End If
-							   Catch ex As Exception
-								   AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
-								   Exit Sub
-							   End Try
+							   'Catch ex As Exception
+							   'AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
+							   'Exit Sub
+							   'End Try
 							   ProgressBarSyncTotal.AddOne(Me)
 						   Next
 					   End Sub)
+
+		ProgressBarSyncSub.Value = 0
+		ProgressBarSyncTotal.Value = 0
+		ButtonRemoteSync.IsEnabled = True
+		Dim msgDlg As New DlgMessageDialog("", "同步完成")
+		Await DlgWindowRoot.ShowDialog(msgDlg)
+
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Synchronizer)
 		Dispatcher.Invoke(Sub()
-
+							  ProgressBarSyncSub.Maximum = sender.TotalLength
+							  ProgressBarSyncSub.Value = sender.CopiedLength
 						  End Sub)
 	End Sub
 
@@ -687,7 +704,7 @@ Class MainWindow
 				dispColor = Colors.Red
 		End Select
 
-		If reqDelegate Then
+		If Not reqDelegate Then
 			ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
 											 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
 											 .Foreground = New SolidColorBrush(dispColor)})

@@ -104,7 +104,7 @@ Public Module ExtensionMethods
 	<System.Runtime.CompilerServices.Extension>
 	Public Sub AddOne(prog As ProgressBar, window As MainWindow)
 		window.Dispatcher.Invoke(Sub()
-									 If prog.Value.Equals(prog.Maximum) Then
+									 If Not prog.Value = prog.Maximum Then
 										 prog.Value += 1
 									 End If
 								 End Sub)

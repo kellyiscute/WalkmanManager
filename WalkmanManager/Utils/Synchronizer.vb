@@ -61,8 +61,8 @@ Public Class Synchronizer
 
 		Dim sourceFile = New BinaryReader(New FileStream(source, FileMode.Open))
 		_totalLength = sourceFile.BaseStream.Length
-		_chunkSize = 1024 ^ 2 'Initial Chunk Size = 1MB
-		Dim destinationFile = New BinaryWriter(New FileStream(destination, FileMode.CreateNew))
+		_chunkSize = 512 'Initial Chunk Size = .5MB
+		Dim destinationFile = New BinaryWriter(New FileStream(destination, FileMode.OpenOrCreate))
 		'Prepare variables
 		Dim rTime As Long
 		Dim wTime As Long
@@ -73,24 +73,34 @@ Public Class Synchronizer
 				rTime = My.Computer.Clock.TickCount
 				Dim data() = sourceFile.ReadBytes(_chunkSize)
 				'Chunk_size / (time elapsed (ms)) * 1000 = avg speed (b/s)
-				_readSpeed = _chunkSize / (My.Computer.Clock.TickCount - rTime) * 1000
+
+				If My.Computer.Clock.TickCount - rTime = 0 Then
+					_readSpeed = _chunkSize * 2
+				Else
+					_readSpeed = _chunkSize / ((My.Computer.Clock.TickCount - rTime) * 1000)
+				End If
+
 				wTime = My.Computer.Clock.TickCount
 				destinationFile.Write(data)
 				destinationFile.Flush()
-				_writeSpeed = _chunkSize / (My.Computer.Clock.TickCount - wTime) * 1000
+				If My.Computer.Clock.TickCount - wTime = 0 Then
+					_writeSpeed = _chunkSize * 2
+				Else
+					_writeSpeed = _chunkSize / ((My.Computer.Clock.TickCount - wTime) * 1000)
+				End If
 				'add to copied
 				_copiedLength += _chunkSize
 				data = Nothing
 				'regulate chunk size If it is not maximum(4 MB)
-				If _chunkSize < 4 * 1024 ^ 2 Then
-					'If readSpeed is slower, which is not quiet possible, use readSpeed as standard
-					If _readSpeed > _writeSpeed Then
-						'make it write three times every second
-						_chunkSize = _readSpeed / 3
-					Else
-						_chunkSize = _writeSpeed / 3
-					End If
-				End If
+				''''If _chunkSize < 4 * 1024 ^ 2 Then
+				''''	'If readSpeed is slower, which is not quiet possible, use readSpeed as standard
+				''''	If _readSpeed > _writeSpeed Then
+				''''		'make it write five times every second
+				''''		_chunkSize = _readSpeed / 5
+				''''	Else
+				''''		_chunkSize = _writeSpeed / 5
+				''''	End If
+				''''End If
 			Else
 				Dim data() = sourceFile.ReadBytes(_totalLength - _copiedLength)
 				destinationFile.Write(data)
