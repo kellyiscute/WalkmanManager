@@ -56,12 +56,16 @@ Public Class Synchronizer
 
 	Public Event Update(sender As Synchronizer)
 
+	Sub New(Optional blockSize As Long = 512)
+
+	End Sub
+
 	Public Sub CopyFile(source As String, destination As String)
 		_copiedLength = 0
 
 		Dim sourceFile = New BinaryReader(New FileStream(source, FileMode.Open))
 		_totalLength = sourceFile.BaseStream.Length
-		_chunkSize = 512 'Initial Chunk Size = .5MB
+		_chunkSize = 512 * 1024 'Initial Chunk Size = .5MB
 		Dim destinationFile = New BinaryWriter(New FileStream(destination, FileMode.OpenOrCreate))
 		'Prepare variables
 		Dim rTime As Long
@@ -91,16 +95,6 @@ Public Class Synchronizer
 				'add to copied
 				_copiedLength += _chunkSize
 				data = Nothing
-				'regulate chunk size If it is not maximum(4 MB)
-				''''If _chunkSize < 4 * 1024 ^ 2 Then
-				''''	'If readSpeed is slower, which is not quiet possible, use readSpeed as standard
-				''''	If _readSpeed > _writeSpeed Then
-				''''		'make it write five times every second
-				''''		_chunkSize = _readSpeed / 5
-				''''	Else
-				''''		_chunkSize = _writeSpeed / 5
-				''''	End If
-				''''End If
 			Else
 				Dim data() = sourceFile.ReadBytes(_totalLength - _copiedLength)
 				destinationFile.Write(data)

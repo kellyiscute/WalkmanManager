@@ -13,6 +13,8 @@ Class MainWindow
 	Dim _isRightClickSelect As Boolean = False
 	Dim _isCloudMusicLoggedIn As Boolean = False
 	Dim _cloudMusic As New CloudMusic
+	Dim _syncRemoteDeviceContent As Object
+	Dim _flgSyncStop As Boolean
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -169,6 +171,7 @@ Class MainWindow
 			Dim dlgSyncResult = New dlgDirSyncResult(newLost)
 			Await DialogHost.Show(dlgSyncResult, "window-root")
 		End If
+		_syncRemoteDeviceContent = ButtonRemoteSync.Content
 	End Sub
 
 	Private Async Sub RefreshPlaylists()
@@ -557,9 +560,19 @@ Class MainWindow
 		Public Lyric As String
 	End Structure
 
-	Private Async Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
+	Private Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
+		If ButtonRemoteSync.Content.Equals(_syncRemoteDeviceContent) Then
+			_flgSyncStop = False
+			StartSync()
+		Else
+			_flgSyncStop = True
+		End If
+	End Sub
+
+	Private Async Sub StartSync()
+
 		ProgressBarSyncTotal.IsIndeterminate = True
-		ButtonRemoteSync.IsEnabled = False
+		ButtonRemoteSync.Content = "取消"
 		Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
 		Dim wmManagedPath = drivePath & "\MUSIC\wmManaged"
 		AddSyncLog(LogType.Information, "连接数据库")
@@ -612,12 +625,20 @@ Class MainWindow
 								   lstCopy.Add(sCopy)
 							   End If
 							   ProgressBarSyncSub.AddOne(Me)
+
+							   If _flgSyncStop Then
+								   Exit Sub
+							   End If
 						   Next
 						   spaceNeeded = totalCopySize
 
 						   For Each itm In lstDelete
 							   spaceNeeded -= My.Computer.FileSystem.GetFileInfo(itm).Length
 							   ProgressBarSyncSub.AddOne(Me)
+
+							   If _flgSyncStop Then
+								   Exit Sub
+							   End If
 						   Next
 					   End Sub)
 
@@ -632,8 +653,8 @@ Class MainWindow
 			ProgressBarSyncSub.IsIndeterminate = False
 			ProgressBarSyncSub.Value = 0
 			ProgressBarSyncTotal.Value = 0
-			ButtonRemoteSync.IsEnabled = True
-			Exit Sub
+			ButtonRemoteSync.Content = _syncRemoteDeviceContent
+			Return
 		End If
 
 		ProgressBarSyncTotal.Maximum = lstCopy.Count + lstDelete.Count
@@ -652,27 +673,35 @@ Class MainWindow
 								   Exit Sub
 							   End Try
 							   ProgressBarSyncTotal.AddOne(Me)
+
+							   If _flgSyncStop Then
+								   Exit Sub
+							   End If
 						   Next
 
 						   For Each itm In lstCopy
 							   'Try
 							   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
-								   cp.CopyFile(itm.Source, itm.Destination)
-								   If itm.Lyric <> "" Then
-									   AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
-									   cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
-								   End If
+							   cp.CopyFile(itm.Source, itm.Destination)
+							   If itm.Lyric <> "" Then
+								   AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+								   cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+							   End If
 							   'Catch ex As Exception
 							   'AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
 							   'Exit Sub
 							   'End Try
 							   ProgressBarSyncTotal.AddOne(Me)
+
+							   If _flgSyncStop Then
+								   Exit Sub
+							   End If
 						   Next
 					   End Sub)
 
 		ProgressBarSyncSub.Value = 0
 		ProgressBarSyncTotal.Value = 0
-		ButtonRemoteSync.IsEnabled = True
+		ButtonRemoteSync.Content = _syncRemoteDeviceContent
 		Dim msgDlg As New DlgMessageDialog("", "同步完成")
 		Await DlgWindowRoot.ShowDialog(msgDlg)
 

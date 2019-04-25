@@ -1,76 +1,1 @@
-# WalkmanManager
-A easy-to-use app to replace Sony MediaCenter with more features and better design  
- **Project Launched: _3rd Jul, 2018_**
-
-[![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
-
-## Current Progress
-I currently cannot continue the development of this program since I don't have a clear mind as before. Please give me a month or two... if I am still able to keep myself alive...
-
-## TODO 
-### `First thing first` - what I have done so far  
-I most parts of this project are finished and there should only be minor bugs that I have still not found yet. The only two major things I have left are the GUI design of the sync page and the settings dialog.
-### `Things I have not done yet`  
-* The sync page GUI (_It's gonna be your design idea_)
-* The settings dialog (_It will also be your design_)
-  * **here are the things I want to have on the settings dialog**  
-  * The ability to Show and also Change the Music Library directory
-  * The ability to Clear Music Records and Clear Playlist Records in the database
-  * A about page that puts the open source licenses
-
-## The author says `!Important`
-
-**This project is still under construction** and the first release will probably come **before October**.
-I will put a lot of hard work on performance and resource usage. I have been putting a lot of time testing and finding the best solution and the algorithm. Therefore, the release date may delay. I will do whatever I can to create the best user experience because I really understand how it feels using buggy and slow apps.
-**If you want to contribute to this project, continue reading.**
-
-## Getting Started
-
-This project is designed under WPF which gives a better user experience. The following sections will get you started to contribute your code to this project if you are interested.
-
-## Building
-
-To build this project, you need the following software
-
-- Visual Studio 2017 (Visual Studio 2015 should work also but not tested)
-
-You will also need to install the following packages in order to build this project successfully
- - MaterialDesignThemes
- - SQLite
- - atl
- - gong-wpf-dragdrop
-
- To Install Packages, open up the nuget package manager console and copy the code
- Packages should be already installed and ready to build, but in case something strange happens
-
-    Install-Package MaterialDesignThemes -Version 2.5.0-ci1122
-	Install-Package System.Data.SQLite -Version 1.0.108
-	Install-Package z440.atl.core -Version 2.4.2
-	Install-Package gong-wpf-dragdrop -Version 1.1.0
-
-## Third-Party Library
-
-* [MaterialDesignThemes](https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit) - As theme of the Application
-* SQLite
-* [atldotnet](https://github.com/Zeugma440/atldotnet) - To read IDv3 from audio files
-* [gong-wpf-dragdrop](https://github.com/punker76/gong-wpf-dragdrop) - To Complete Drag-and-Drop feature
-
-## Contributing
-
-Fork our code to your repository and make changes directly. Send us a pull request when you are done. If you have any questions on anything, feel free to ask. Create an issue and I will reply you as soon as possible (probably within 10 minutes if I have network).
-
-### Utility Classes
-I made a few classes to manage the database and I wrote usage on almost all of them. Please use those methods if there is one suits your situation. You can add more functions to those classes if you feel the method will be reused for times. On those methods, I commonly wrote 3 overloads, one using short connection to the database, one uses custom `SQLiteConnection` Object and one uses custom `SQLiteCommand` Object. These methods should help you write more efficient code. If you are processing a bunch of data, please use a transaction to improve efficiency.
-**Thank you for reading this far. We are really looking forward to your pull request. If you need help, I am always here. Thanks again.**
-
-## Authors
-
-* [**Kelly**](https://github.com/guo40020) - *Initial work*
-* [**Banyc**](https://github.com/Banyc) - *Initial work* for files in ".\WalkmanManager\music_files_management\" and for this "README.md"
-
-See also [contributors](https://github.com/guo40020/WalkmanManager/graphs/contributors)
-
-## License
-
-This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details
-
+﻿﻿﻿﻿# WalkmanManagerA easy-to-use app to replace Sony MediaCenter with more features and better design   **Project Launched: _3rd Jul, 2018_**[![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)## Current ProgressThe Project is approaching to be **Done!!!** Watch this repo if you want to know updates!!! I will be putting more effort on writing commit comments to tell you what are actually added in the update  **BE READY** I AM GOING TO RELEASE THE **BETA** VERSION SOON !!!## Authors* [**Kelly**](https://github.com/guo40020) - *Initial work** [**Banyc**](https://github.com/Banyc) - *Initial work* for files in ".\WalkmanManager\music_files_management\" and for this "README.md"See also [contributors](https://github.com/guo40020/WalkmanManager/graphs/contributors)## LicenseThis project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details

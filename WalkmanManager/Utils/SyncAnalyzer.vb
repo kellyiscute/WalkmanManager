@@ -140,7 +140,7 @@ Public Class SyncAnalyzer
 		Dim lstResult As New List(Of String)
 
 		For Each f In My.Computer.FileSystem.GetFiles(pathOnRemoteDrive)
-			If (From path In files Where path.Path = f Select path).Count = 0 Then
+			If (From path In files Where ChangePath(path.Path, pathOnRemoteDrive) = f Select path).Count = 0 Then
 				'If file is not found in playlist
 				lstResult.Add(f)
 			End If
