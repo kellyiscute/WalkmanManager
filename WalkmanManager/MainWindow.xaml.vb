@@ -1,4 +1,5 @@
 ﻿Imports System.Collections.ObjectModel
+Imports System.Threading
 Imports System.Windows.Shell
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
@@ -565,6 +566,8 @@ Class MainWindow
 			_flgSyncStop = False
 			StartSync()
 		Else
+			ButtonRemoteSync.Content = "正在取消"
+			ButtonRemoteSync.IsEnabled = False
 			_flgSyncStop = True
 		End If
 	End Sub
@@ -588,20 +591,48 @@ Class MainWindow
 		Dim spaceNeeded As Long
 		Dim flagCopyLrc As Boolean = Not CheckBoxSyncOptionDoNotCopyLyric.IsChecked
 		Dim lstSongs = GetSongs()
+		Dim progressSubscriber() As Long = {0, 0}
+		Dim progressUpdateThread As Thread
+		Dim flgProgressUpdateThreadStop = False
+		Dim flgProgressUpdateThreadPause = False
 
 		ProgressBarSyncSub.Maximum = 2
 		ProgressBarSyncSub.IsIndeterminate = False
 		ProgressBarSyncSub.Value = 0
 
+		progressUpdateThread = New Thread(Sub()
+											  Do
+												  Dispatcher.Invoke(Sub()
+																		If flgProgressUpdateThreadPause Then
+																			Exit Sub
+																		End If
+																		If progressSubscriber(1) <> 0 Then
+																			ProgressBarSyncSub.IsIndeterminate = False
+																			ProgressBarSyncSub.Maximum = progressSubscriber(1)
+																			ProgressBarSyncSub.Value = progressSubscriber(0)
+																		Else
+																			ProgressBarSyncSub.IsIndeterminate = True
+																		End If
+																	End Sub)
+												  Thread.Sleep(300)
+												  If flgProgressUpdateThreadStop Then
+													  Exit Do
+												  End If
+											  Loop
+										  End Sub)
+		progressUpdateThread.IsBackground = True
+		progressUpdateThread.Start()
+
 		AddSyncLog(LogType.Information, "查找删除项目", False)
 		lstDelete = Await Task.Run(Function()
-									   Return SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs)
+									   Return SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs, progressSubscriber, _flgSyncStop)
 								   End Function)
 		ProgressBarSyncSub.AddOne()
+
 		AddSyncLog(LogType.Information, "发现需要删除的项目：" & lstDelete.Count, False)
 		AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
 		Dim lstChanged = Await Task.Run(Function()
-											Return SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, True)
+											Return SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, True, progressSubscriber, _flgSyncStop)
 										End Function)
 		AddSyncLog(LogType.Information, "发现需要复制/覆盖的项目：" & lstChanged.Count, False)
 		ProgressBarSyncSub.Value = 0
@@ -609,6 +640,7 @@ Class MainWindow
 		AddSyncLog(LogType.Information, "正在计算所需空间...", False)
 		ProgressBarSyncSub.Maximum = lstChanged.Count + lstDelete.Count
 
+		flgProgressUpdateThreadStop = True
 		Await Task.Run(Sub()
 						   For Each itm In lstChanged
 							   If My.Computer.FileSystem.FileExists(itm) Then
@@ -703,7 +735,11 @@ Class MainWindow
 		ProgressBarSyncTotal.Value = 0
 		ButtonRemoteSync.Content = _syncRemoteDeviceContent
 		Dim msgDlg As New DlgMessageDialog("", "同步完成")
+		If progressUpdateThread.IsAlive Then
+			progressUpdateThread.Abort()
+		End If
 		Await DlgWindowRoot.ShowDialog(msgDlg)
+		ButtonRemoteSync.IsEnabled = True
 
 	End Sub
 
@@ -737,6 +773,9 @@ Class MainWindow
 			ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
 											 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
 											 .Foreground = New SolidColorBrush(dispColor)})
+			If dispOnCpDetail Then
+				TextBoxOp.Text = message
+			End If
 		Else
 			Me.Dispatcher.Invoke(Sub()
 									 ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =

@@ -136,13 +136,26 @@ Public Class SyncAnalyzer
 		Return newDirPath & filename
 	End Function
 
-	Public Shared Function FindDeleted(pathOnRemoteDrive As String, files As ICollection(Of SongInfo)) As List(Of String)
+	Public Shared Function FindDeleted(pathOnRemoteDrive As String, files As ICollection(Of SongInfo),
+									   Optional ByRef progressSubscriber() As Long = Nothing, Optional ByRef stopIndicator As Boolean = False) _
+		As List(Of String)
 		Dim lstResult As New List(Of String)
+		Dim progCounter = 0
+		Dim lstFiles = My.Computer.FileSystem.GetFiles(pathOnRemoteDrive)
 
-		For Each f In My.Computer.FileSystem.GetFiles(pathOnRemoteDrive)
+		For Each f In lstFiles
 			If (From path In files Where ChangePath(path.Path, pathOnRemoteDrive) = f Select path).Count = 0 Then
 				'If file is not found in playlist
 				lstResult.Add(f)
+			End If
+			progCounter += 1
+
+			If Not IsNothing(progressSubscriber) Then
+				progressSubscriber = {progCounter, lstFiles.Count}
+			End If
+
+			If stopIndicator Then
+				Exit Function
 			End If
 		Next
 
@@ -168,8 +181,10 @@ Public Class SyncAnalyzer
 	End Function
 
 	Public Shared Function FindChangedFiles(pathOnRemoteDrive As String, lstSongs As ICollection(Of SongInfo),
-											flgMd5Check As Boolean) As ICollection(Of String)
+											flgMd5Check As Boolean, Optional ByRef progressSubscriber() As Long = Nothing,
+											Optional ByRef stopIndicator As Boolean = False) As ICollection(Of String)
 		Dim lstResult As New List(Of String)
+		Dim progCounter = 0
 
 		For Each s In lstSongs
 			If My.Computer.FileSystem.FileExists(ChangePath(s.Path, pathOnRemoteDrive)) Then
@@ -181,8 +196,20 @@ Public Class SyncAnalyzer
 			Else
 				lstResult.Add(s.Path)
 			End If
+			progCounter += 1
+
+			If Not IsNothing(progressSubscriber) Then
+				progressSubscriber = {progCounter, lstSongs.Count}
+			End If
+
+			If stopIndicator Then
+				Exit For
+			End If
 		Next
 
+		If stopIndicator Then
+			Exit Function
+		End If
 		Return lstResult
 	End Function
 End Class
