@@ -194,16 +194,13 @@ Public Class SyncAnalyzer
 		Dim lstResult As New List(Of String)
 		Dim lstMd5Check As New List(Of Md5CheckInfo)
 		Dim progCounter = 0
-		Dim Md5CheckThreads As New List(Of Thread)
 
 		For Each s In lstSongs
 			If My.Computer.FileSystem.FileExists(ChangePath(s.Path, pathOnRemoteDrive)) Then
 				If flgMd5Check Then
-					'If Not GetFileHash(ChangePath(s.Path, pathOnRemoteDrive)) = GetFileHash(s.Path) Then
-					'	lstResult.Add(s.Path)
-					'End If
-					Dim itm As New Md5CheckInfo With {.file1 = ChangePath(s.Path, pathOnRemoteDrive),
-							.file2 = s.Path}
+					If Not GetFileHash(ChangePath(s.Path, pathOnRemoteDrive)) = GetFileHash(s.Path) Then
+						lstResult.Add(s.Path)
+					End If
 				End If
 			Else
 				lstResult.Add(s.Path)
@@ -219,44 +216,8 @@ Public Class SyncAnalyzer
 			End If
 		Next
 
-		'Run Check Threads
-		For i = 1 To Md5ConcurrentCheckThreads
-			Dim t As New Thread(Sub()
-									Dim indexCounter = i
-									While indexCounter < lstMd5Check.Count
-										If Not GetFileHash(lstMd5Check(indexCounter).file1) = GetFileHash(lstMd5Check(indexCounter).file2) Then
-											lstResult.Add(lstMd5Check(indexCounter).file2)
-										End If
-
-										indexCounter += Md5ConcurrentCheckThreads
-									End While
-								End Sub)
-			t.IsBackground = True
-			t.Start()
-			Md5CheckThreads.Add(t)
-		Next
-
-		Dim threadsAllEnds As Boolean
-		Do
-			threadsAllEnds = True
-			For Each t In Md5CheckThreads
-				If t.IsAlive Then
-					threadsAllEnds = False
-				End If
-			Next
-			If threadsAllEnds Then
-				Exit Do
-			End If
-			If stopIndicator Then
-				For Each t In Md5CheckThreads
-					t.Abort()
-				Next
-			End If
-			Thread.Sleep(100)
-		Loop
-
 		If stopIndicator Then
-			Exit Function
+			Return lstResult
 		End If
 		Return lstResult
 	End Function

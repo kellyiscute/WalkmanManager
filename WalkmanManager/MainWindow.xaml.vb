@@ -173,6 +173,14 @@ Class MainWindow
 			Await DialogHost.Show(dlgSyncResult, "window-root")
 		End If
 		_syncRemoteDeviceContent = ButtonRemoteSync.Content
+		Dim t As New Thread(Sub()
+								Do
+									Dispatcher.Invoke(Sub() ButtonRefreshDeviceList_Click(Nothing, Nothing))
+									Thread.Sleep(300)
+								Loop
+							End Sub)
+		t.IsBackground = True
+		t.Start()
 	End Sub
 
 	Private Async Sub RefreshPlaylists()
@@ -539,6 +547,10 @@ Class MainWindow
 
 			End If
 		Next
+
+		If ComboBoxDevices.Items.Count > 0 Then
+			ComboBoxDevices.SelectedIndex = 0
+		End If
 	End Sub
 
 	Private Sub ComboBoxDevices_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) _
@@ -718,17 +730,17 @@ Class MainWindow
 						   Next
 
 						   For Each itm In lstCopy
-							   'Try
-							   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
-							   cp.CopyFile(itm.Source, itm.Destination)
-							   If itm.Lyric <> "" Then
-								   AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
-								   cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
-							   End If
-							   'Catch ex As Exception
-							   'AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
-							   'Exit Sub
-							   'End Try
+							   Try
+								   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
+								   cp.CopyFile(itm.Source, itm.Destination)
+								   If itm.Lyric <> "" Then
+									   AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+									   cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+								   End If
+							   Catch ex As Exception
+								   AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
+								   Exit Sub
+							   End Try
 							   ProgressBarSyncTotal.AddOne(Me)
 
 							   If _flgSyncStop Then
