@@ -628,12 +628,18 @@ Class MainWindow
 									   Return SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs, progressSubscriber, _flgSyncStop)
 								   End Function)
 		ProgressBarSyncSub.AddOne()
+		If _flgSyncStop Then
+			Exit Sub
+		End If
 
 		AddSyncLog(LogType.Information, "发现需要删除的项目：" & lstDelete.Count, False)
 		AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
 		Dim lstChanged = Await Task.Run(Function()
 											Return SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, True, progressSubscriber, _flgSyncStop)
 										End Function)
+		If _flgSyncStop Then
+			Exit Sub
+		End If
 		AddSyncLog(LogType.Information, "发现需要复制/覆盖的项目：" & lstChanged.Count, False)
 		ProgressBarSyncSub.Value = 0
 

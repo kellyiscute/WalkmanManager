@@ -2,8 +2,11 @@
 Imports WalkmanManager.CloudMusic
 Imports System.IO
 Imports System.Security.Cryptography
+Imports System.Threading
 
 Public Class SyncAnalyzer
+	Const Md5ConcurrentCheckThreads = 8
+
 	Public Structure LostFileInfo
 		Public Origin As String
 		Public Remote As String
@@ -180,18 +183,27 @@ Public Class SyncAnalyzer
 		Return result
 	End Function
 
+	Structure Md5CheckInfo
+		Public file1 As String
+		Public file2 As String
+	End Structure
+
 	Public Shared Function FindChangedFiles(pathOnRemoteDrive As String, lstSongs As ICollection(Of SongInfo),
 											flgMd5Check As Boolean, Optional ByRef progressSubscriber() As Long = Nothing,
 											Optional ByRef stopIndicator As Boolean = False) As ICollection(Of String)
 		Dim lstResult As New List(Of String)
+		Dim lstMd5Check As New List(Of Md5CheckInfo)
 		Dim progCounter = 0
+		Dim Md5CheckThreads As New List(Of Thread)
 
 		For Each s In lstSongs
 			If My.Computer.FileSystem.FileExists(ChangePath(s.Path, pathOnRemoteDrive)) Then
 				If flgMd5Check Then
-					If Not GetFileHash(ChangePath(s.Path, pathOnRemoteDrive)) = GetFileHash(s.Path) Then
-						lstResult.Add(s.Path)
-					End If
+					'If Not GetFileHash(ChangePath(s.Path, pathOnRemoteDrive)) = GetFileHash(s.Path) Then
+					'	lstResult.Add(s.Path)
+					'End If
+					Dim itm As New Md5CheckInfo With {.file1 = ChangePath(s.Path, pathOnRemoteDrive),
+							.file2 = s.Path}
 				End If
 			Else
 				lstResult.Add(s.Path)
@@ -206,6 +218,42 @@ Public Class SyncAnalyzer
 				Exit For
 			End If
 		Next
+
+		'Run Check Threads
+		For i = 1 To Md5ConcurrentCheckThreads
+			Dim t As New Thread(Sub()
+									Dim indexCounter = i
+									While indexCounter < lstMd5Check.Count
+										If Not GetFileHash(lstMd5Check(indexCounter).file1) = GetFileHash(lstMd5Check(indexCounter).file2) Then
+											lstResult.Add(lstMd5Check(indexCounter).file2)
+										End If
+
+										indexCounter += Md5ConcurrentCheckThreads
+									End While
+								End Sub)
+			t.IsBackground = True
+			t.Start()
+			Md5CheckThreads.Add(t)
+		Next
+
+		Dim threadsAllEnds As Boolean
+		Do
+			threadsAllEnds = True
+			For Each t In Md5CheckThreads
+				If t.IsAlive Then
+					threadsAllEnds = False
+				End If
+			Next
+			If threadsAllEnds Then
+				Exit Do
+			End If
+			If stopIndicator Then
+				For Each t In Md5CheckThreads
+					t.Abort()
+				Next
+			End If
+			Thread.Sleep(100)
+		Loop
 
 		If stopIndicator Then
 			Exit Function
