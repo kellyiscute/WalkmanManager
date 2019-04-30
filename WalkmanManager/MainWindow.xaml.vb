@@ -16,6 +16,7 @@ Class MainWindow
 	Dim _cloudMusic As New CloudMusic
 	Dim _syncRemoteDeviceContent As Object
 	Dim _flgSyncStop As Boolean
+	Dim _flgUSBRefreshPause As Boolean = False
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -175,8 +176,10 @@ Class MainWindow
 		_syncRemoteDeviceContent = ButtonRemoteSync.Content
 		Dim t As New Thread(Sub()
 								Do
-									Dispatcher.Invoke(Sub() ButtonRefreshDeviceList_Click(Nothing, Nothing))
-									Thread.Sleep(300)
+									If Not _flgUSBRefreshPause Then
+										ButtonRefreshDeviceList_Click(Nothing, Nothing)
+										Thread.Sleep(1000)
+									End If
 								Loop
 							End Sub)
 		t.IsBackground = True
@@ -272,6 +275,7 @@ Class MainWindow
 		End Try
 	End Sub
 
+	'Playlist Selected
 	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs)
 		If sender.SelectedIndex <> -1 And Not _isRightClickSelect Then
 			If sender.SelectedItem.Tag = "NewPlaylist" Then
@@ -286,30 +290,34 @@ Class MainWindow
 				End If
 				sender.SelectedIndex = -1
 			Else
-				ButtonMusic.IsSelected = False
-				DatSongList.CanUserSortColumns = False
-				ButtonSaveSorting.Visibility = Visibility.Visible
-				PanelSearchLocalMusic.Visibility = Visibility.Collapsed
-				Dim dlg As New dlg_progress
-				DatSongList.ItemsSource = Nothing
-				DialogHost.Show(dlg, "window-root")
-				Dim playlistName = sender.SelectedItem.Content
-				Dim lstSongs = Await Task.Run(Function()
-												  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
-												  Dim conn = Connect()
-												  Dim trans = conn.BeginTransaction()
-												  Dim cmd = conn.CreateCommand()
-												  cmd.Transaction = trans
-												  Dim songs As New ObservableCollection(Of SongInfo)
-												  For Each itm In songIds
-													  songs.Add(GetSongById(itm, cmd))
-												  Next
-												  trans.Commit()
-												  conn.Close()
-												  Return songs
-											  End Function)
-				DatSongList.ItemsSource = lstSongs
-				DlgWindowRoot.IsOpen = False
+				'if not editing
+				If ListBoxPlaylist.SelectedItem.Content.GetType = GetType(String) Then
+					ButtonMusic.IsSelected = False
+					DatSongList.CanUserSortColumns = False
+					ButtonSaveSorting.Visibility = Visibility.Visible
+					PanelSearchLocalMusic.Visibility = Visibility.Collapsed
+					Dim dlg As New dlg_progress
+					DatSongList.ItemsSource = Nothing
+					DialogHost.Show(dlg, "window-root")
+					Dim playlistName = sender.SelectedItem.Content
+					Dim lstSongs = Await Task.Run(Function()
+													  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
+													  Dim conn = Connect()
+													  Dim trans = conn.BeginTransaction()
+													  Dim cmd = conn.CreateCommand()
+													  cmd.Transaction = trans
+													  Dim songs As New ObservableCollection(Of SongInfo)
+													  For Each itm In songIds
+														  songs.Add(GetSongById(itm, cmd))
+													  Next
+													  trans.Commit()
+													  conn.Close()
+													  Return songs
+												  End Function)
+					DatSongList.ItemsSource = lstSongs
+					DlgWindowRoot.IsOpen = False
+					ListBoxPlaylist.Focus()
+				End If
 			End If
 		End If
 		_isRightClickSelect = False
@@ -536,20 +544,20 @@ Class MainWindow
 	End Sub
 
 	Private Sub ButtonRefreshDeviceList_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRefreshDeviceList.Click
-		ComboBoxDevices.Items.Clear()
+		Dispatcher.Invoke(Sub() ComboBoxDevices.Items.Clear())
 		For Each dev In My.Computer.FileSystem.Drives
 			If dev.DriveType = IO.DriveType.Removable And dev.IsReady Then
 				If dev.VolumeLabel = "" Then
-					ComboBoxDevices.Items.Add(dev.Name & " (没有卷标)")
+					Dispatcher.Invoke(Sub() ComboBoxDevices.Items.Add(dev.Name & " (没有卷标)"))
 				Else
-					ComboBoxDevices.Items.Add(dev.Name & " (" & dev.VolumeLabel & ")")
+					Dispatcher.Invoke(Sub() ComboBoxDevices.Items.Add(dev.Name & " (" & dev.VolumeLabel & ")"))
 				End If
 
 			End If
 		Next
 
 		If ComboBoxDevices.Items.Count > 0 Then
-			ComboBoxDevices.SelectedIndex = 0
+			Dispatcher.Invoke(Sub() ComboBoxDevices.SelectedIndex = 0)
 		End If
 	End Sub
 
@@ -576,11 +584,13 @@ Class MainWindow
 	Private Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
 		If ButtonRemoteSync.Content.Equals(_syncRemoteDeviceContent) Then
 			_flgSyncStop = False
+			_flgUSBRefreshPause = True
 			StartSync()
 		Else
 			ButtonRemoteSync.Content = "正在取消"
 			ButtonRemoteSync.IsEnabled = False
 			_flgSyncStop = True
+			_flgUSBRefreshPause = False
 		End If
 	End Sub
 
@@ -641,7 +651,7 @@ Class MainWindow
 								   End Function)
 		ProgressBarSyncSub.AddOne()
 		If _flgSyncStop Then
-			Exit Sub
+			GoTo Complete
 		End If
 
 		AddSyncLog(LogType.Information, "发现需要删除的项目：" & lstDelete.Count, False)
@@ -650,7 +660,7 @@ Class MainWindow
 											Return SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, True, progressSubscriber, _flgSyncStop)
 										End Function)
 		If _flgSyncStop Then
-			Exit Sub
+			GoTo Complete
 		End If
 		AddSyncLog(LogType.Information, "发现需要复制/覆盖的项目：" & lstChanged.Count, False)
 		ProgressBarSyncSub.Value = 0
@@ -692,7 +702,7 @@ Class MainWindow
 						   Next
 					   End Sub)
 
-		If spaceNeeded > My.Computer.FileSystem.GetDriveInfo(drivePath).TotalFreeSpace Then
+		If spaceNeeded > My.Computer.FileSystem.GetDriveInfo(drivePath).TotalFreeSpace And Not CheckBoxSyncOptionNoSpaceCheck.IsChecked Then
 			Dim errorDlg As New DlgMessageDialog("同步失败", "磁盘空间不足")
 			Await DialogHost.Show(errorDlg, "window-root")
 			ProgressBarSyncTotal.Value = 0
@@ -749,6 +759,7 @@ Class MainWindow
 						   Next
 					   End Sub)
 
+Complete:
 		ProgressBarSyncSub.Value = 0
 		ProgressBarSyncTotal.Value = 0
 		ButtonRemoteSync.Content = _syncRemoteDeviceContent
@@ -758,7 +769,6 @@ Class MainWindow
 		End If
 		Await DlgWindowRoot.ShowDialog(msgDlg)
 		ButtonRemoteSync.IsEnabled = True
-
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Synchronizer)
@@ -797,12 +807,51 @@ Class MainWindow
 		Else
 			Me.Dispatcher.Invoke(Sub()
 									 ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
-												 String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
-												 .Foreground = New SolidColorBrush(dispColor)})
+																	  String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
+																	  .Foreground = New SolidColorBrush(dispColor)})
 									 If dispOnCpDetail Then
 										 TextBoxOp.Text = message
 									 End If
 								 End Sub)
+		End If
+	End Sub
+
+	Private Sub MenuRenamePlaylist_Click(sender As Object, e As RoutedEventArgs) Handles MenuRenamePlaylist.Click
+		If ListBoxPlaylist.SelectedIndex <> -1 Then
+			If ListBoxPlaylist.SelectedItem.Content.GetType = GetType(String) Then
+				Dim textBoxRenamePlaylist = New TextBox _
+						With {.Tag = New Object() {ListBoxPlaylist.SelectedItem, ListBoxPlaylist.SelectedItem.Content},
+												.Width = ListBoxPlaylist.Width - 20,
+												.Text = ListBoxPlaylist.SelectedItem.Content}
+				AddHandler textBoxRenamePlaylist.KeyDown, AddressOf TextBoxRenamePlaylist_KeyDown
+				ListBoxPlaylist.SelectedItem.Content = textBoxRenamePlaylist
+				textBoxRenamePlaylist.Focus()
+			End If
+		End If
+	End Sub
+
+	Private Async Sub TextBoxRenamePlaylist_KeyDown(sender As TextBox, e As KeyEventArgs)
+		If e.Key = Key.Escape Then
+			sender.Tag(0).Content = sender.Tag(1)
+			sender = Nothing
+		ElseIf e.Key = Key.Enter Or e.Key = Key.Return Then
+			If CheckPlaylistNameAvailability(sender.Text) Then
+				RenamePlaylist(sender.Tag(1), sender.Text)
+				sender.Tag(0).Content = sender.Text
+				sender = Nothing
+			Else
+				Dim dlg As New DlgMessageDialog("重命名歌单失败", "有重名的歌单")
+				Await DlgWindowRoot.ShowDialog(dlg)
+				sender.Tag(0).Content = sender.Tag(1)
+				sender = Nothing
+			End If
+		End If
+
+	End Sub
+
+	Private Sub ListBoxPlaylist_KeyDown(sender As Object, e As KeyEventArgs) Handles ListBoxPlaylist.KeyDown
+		If e.Key = Key.F2 Then
+			MenuRenamePlaylist_Click(sender, Nothing)
 		End If
 	End Sub
 End Class

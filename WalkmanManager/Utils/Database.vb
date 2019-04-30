@@ -870,4 +870,13 @@ Public Class Database
 
 	End Function
 
+	Public Shared Sub RenamePlaylist(name As String, newName As String)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		cmd.BuildQuery("update playlists set name = ? where name = ?", New Object() {newName, name})
+		cmd.ExecuteNonQuery()
+		conn.Close()
+		cmd.Dispose()
+		conn.Dispose()
+	End Sub
 End Class
