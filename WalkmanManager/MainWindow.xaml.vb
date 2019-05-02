@@ -17,6 +17,7 @@ Class MainWindow
 	Dim _syncRemoteDeviceContent As Object
 	Dim _flgSyncStop As Boolean
 	Dim _flgUSBRefreshPause As Boolean = False
+	Dim _encryptKey As String
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -59,16 +60,36 @@ Class MainWindow
 			If _isCloudMusicLoggedIn Then
 				GridCloudMusic.Visibility = Visibility.Visible
 			Else
-				Dim lastPhone As String = ""
+
+				Dim dlgLogin As New DlgCloudMusicLogin()
+				Dim cmPhone = DecryptString(_encryptKey, GetSetting("CloudMusicPhone", ""))
+				Dim cmPassword = DecryptString(_encryptKey, GetSetting("CloudMusicPwd", ""))
+				Dim flgAutoLogin = Boolean.Parse(GetSetting("CloudMusicAutoLogin", "False"))
+
+				dlgLogin.Phone = cmPhone
+				dlgLogin.Password = cmPassword
+				Dim login = True
+				If Not flgAutoLogin Then
+					login = Await DlgWindowRoot.ShowDialog(dlgLogin)
+				End If
+
 				While True
-					Dim dlgLogin As New DlgCloudMusicLogin(lastPhone)
-					Dim login As Boolean = Await DlgWindowRoot.ShowDialog(dlgLogin)
 					If login Then
 						Dim dlgProg = New dlg_progress
 						dlgProg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
 						DlgWindowRoot.ShowDialog(dlgProg)
-						Dim result = Await UiCloudMusicLogin(dlgLogin, dlgProg)
+						Dim result = Await UiCloudMusicLogin(dlgLogin.Phone, dlgLogin.Password, dlgProg)
 						If result = "" Then
+							If dlgLogin.ChkRememberPwd.IsChecked Then
+								SaveSetting("CloudMusicPhone", EncryptString(_encryptKey, dlgLogin.Phone))
+								SaveSetting("CloudMusicPwd", EncryptString(_encryptKey, dlgLogin.Password))
+							End If
+							If dlgLogin.ChkAutoLogin.IsChecked Then
+								SaveSetting("CloudMusicAutoLogin", "True")
+							Else
+								SaveSetting("CloudMusicAutoLogin", "False")
+							End If
+
 							For Each p In _cloudMusic.Playlists
 								ListBoxCloudMusicPlaylists.Items.Add(
 									New ListBoxItem() With {.Content = p("name"), .Padding = New Thickness(20, 10, 0, 10)})
@@ -94,7 +115,6 @@ Class MainWindow
 							End If
 							Exit While
 						Else
-							lastPhone = dlgLogin.TextBoxPhone.Text
 							Dim dlgFail As New DlgMessageDialog("登录失败", result)
 							dlgFail.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
 							_isCloudMusicLoggedIn = False
@@ -113,11 +133,17 @@ Class MainWindow
 		End If
 	End Sub
 
-	Private Async Function UiCloudMusicLogin(dlgLogin As DlgCloudMusicLogin, dlgProg As dlg_progress) As Task(Of String)
+	''' <summary>
+	''' UI login method, return an empty string when success, error message when failed
+	''' </summary>
+	''' <param name="dlgLogin">login dialog reference, for user phone and password</param>
+	''' <param name="dlgProg">progress dialog ref, for changing prompt</param>
+	''' <returns></returns>
+	Private Async Function UiCloudMusicLogin(phone As String, pwd As String, dlgProg As dlg_progress) As Task(Of String)
 		Dim result = Await Task.Run(Function()
 										Try
 											dlgProg.Text = "登录中"
-											Dim loginResult = _cloudMusic.Login(dlgLogin.Phone, dlgLogin.Password)
+											Dim loginResult = _cloudMusic.Login(phone, pwd)
 											If loginResult("success") Then
 												dlgProg.Text = "获取歌单"
 												_cloudMusic.GetPlaylists()
@@ -144,6 +170,7 @@ Class MainWindow
 			My.Computer.FileSystem.CreateDirectory("SongLib")
 			SaveSetting("song_dir", "SongLib")
 		End If
+		_encryptKey = GetSetting("enc_key")
 
 		PageSwitcher(Nothing, Nothing)
 

@@ -8,11 +8,24 @@
 		TextBoxPhone.Text = defaultPhone
 	End Sub
 
-	Public Property Phone As String = ""
-	Public Property Password As String = ""
+	Public Property Phone As String
+		Get
+			Return TextBoxPhone.Text
+		End Get
+		Set
+			TextBoxPhone.Text = Value
+		End Set
+	End Property
+	Public Property Password As String
+		Get
+			Return TextBoxPassword.Password
+		End Get
+		Set
+			TextBoxPassword.Password = Value
+		End Set
+	End Property
 
 	Private Sub TextBoxPhone_TextChanged(sender As Object, e As TextChangedEventArgs) Handles TextBoxPhone.TextChanged
-		Phone = TextBoxPhone.Text
 		If Phone = "" Then
 			ButtonLogin.IsEnabled = False
 		ElseIf Password <> "" Then
@@ -21,7 +34,6 @@
 	End Sub
 
 	Private Sub TextBoxPassword_TextChanged(sender As Object, e As RoutedEventArgs) Handles TextBoxPassword.PasswordChanged
-		Password = TextBoxPassword.Password
 		If Password = "" Then
 			ButtonLogin.IsEnabled = False
 		ElseIf Phone <> "" Then

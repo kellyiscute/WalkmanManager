@@ -10,6 +10,16 @@ Imports WalkmanManager
 		Return arg1 & " sb"
 	End Function
 
+	<TestMethod()> Public Sub EncDecTest()
+		Dim enc = Database.EncryptString("123456", "456789")
+		Console.WriteLine("encrypted: " + enc)
+		Dim dec = Database.DecryptString("123456", enc)
+		Console.WriteLine("decrypt1: " + dec)
+		dec = Database.DecryptString("123", enc)
+		Console.WriteLine("decrypt2: " + dec)
+
+	End Sub
+
 	<TestMethod()> Public Async Function TestMethod1() As Task
 		Trace.WriteLine("Async method start")
 		Dim sb = Await async_demo("Kristen")

@@ -196,6 +196,9 @@
     <Compile Include="Dialogs\DlgYesNoDialog.xaml.vb">
       <DependentUpon>DlgYesNoDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Settings.xaml.vb">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utils\CloudMusic.vb" />
     <Compile Include="Utils\Database.vb" />
     <Compile Include="Utils\db_updater.vb" />
@@ -239,6 +242,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\dlg_progress.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\Settings.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

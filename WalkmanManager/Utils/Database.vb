@@ -72,15 +72,69 @@ Public Class Database
 		trans.Commit()
 		conn.Close()
 		Dim encryptKey As String
-
-		SaveSetting("enc_key", "")
+		Dim p As New Random()
+		For i = 1 To 64
+			encryptKey += Chr(p.Next(33, 126))
+		Next
+		SaveSetting("enc_key", encryptKey)
 	End Sub
 
-	Public Shared Function EncryptString(key As String, data As String)
-		Dim dataByte = Encoding.UTF8.GetBytes(data)
-		Dim keyByte = Encoding.UTF8.GetBytes(key)
+	Public Shared Function EncryptString(key As String, data As String) As String
+		Dim dataByte = Encoding.ASCII.GetBytes(data)
+		Dim keyByte = Encoding.ASCII.GetBytes(key)
+		Dim encrypted(dataByte.Count) As Byte
+		Dim result = ""
 
+		For i = 0 To dataByte.Count - 1
+			encrypted(i) = dataByte(i)
+			For Each k In keyByte
+				encrypted(i) = (encrypted(i) Xor k)
+			Next
+		Next
 
+		'Checking char, use to check if it decrypts correctly
+		encrypted(dataByte.Count) = Encoding.ASCII.GetBytes("P")(0)
+		For Each k In keyByte
+			encrypted(dataByte.Count) = (encrypted(dataByte.Count) Xor k)
+		Next
+
+		For Each b In encrypted
+			result += b.ToString("X02")
+		Next
+
+		Return result
+	End Function
+
+	Public Shared Function DecryptString(key As String, data As String) As String
+		If data = "" Then
+			Return ""
+		End If
+
+		Dim dataByte((data.Length / 2) - 1) As Byte
+		Dim c = 0
+		For i = 0 To data.Length - 1 Step 2
+			dataByte(c) = Convert.ToByte(data.Substring(i, 2), 16)
+			c += 1
+		Next
+		Dim result = ""
+
+		Dim keyByte = Encoding.ASCII.GetBytes(key)
+		Dim decrypted(dataByte.Count - 1) As Byte
+
+		For i = 0 To dataByte.Count - 1
+			decrypted(i) = dataByte(i)
+			For Each k In keyByte
+				decrypted(i) = (decrypted(i) Xor k)
+			Next
+		Next
+
+		result = Encoding.ASCII.GetString(decrypted)
+
+		If result.Last = "P" Then
+			Return result.Substring(0, result.Count - 1)
+		Else
+			Return ""
+		End If
 	End Function
 
 	''' <summary>
@@ -378,7 +432,7 @@ Public Class Database
 	''' <param name="key">key of setting</param>
 	''' <param name="defaultValue">default value to return if not found(default = Nothing)</param>
 	''' <returns>setting value</returns>
-	Public Shared Function GetSetting(key As String, Optional defaultValue As String = Nothing)
+	Public Shared Function GetSetting(key As String, Optional defaultValue As String = Nothing) As String
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("select * from settings where key = ?", New Object() {key})
