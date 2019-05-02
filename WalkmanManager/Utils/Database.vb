@@ -1,5 +1,7 @@
 ﻿Imports System.Collections.ObjectModel
 Imports System.Data.SQLite
+Imports System.Security.Cryptography
+Imports System.Text
 Imports ATL
 
 Public Class Database
@@ -69,12 +71,22 @@ Public Class Database
 		cmd.ExecuteNonQuery()
 		trans.Commit()
 		conn.Close()
+		Dim encryptKey As String
+
+		SaveSetting("enc_key", "")
 	End Sub
+
+	Public Shared Function EncryptString(key As String, data As String)
+		Dim dataByte = Encoding.UTF8.GetBytes(data)
+		Dim keyByte = Encoding.UTF8.GetBytes(key)
+
+
+	End Function
 
 	''' <summary>
 	''' add a song to database
 	''' </summary>
-	''' <param name="title">song title, readed from file</param>
+	''' <param name="title">song title, read from file</param>
 	''' <param name="artists">artists</param>
 	''' <param name="path">file path</param>
 	Public Overloads Shared Sub AddSong(title As String, artists As String, path As String)

@@ -25,6 +25,8 @@
 			         mD:HintAssist.IsFloating="True" mD:HintAssist.Hint="密码" />
 		</Grid>
 		<Grid Height="47" VerticalAlignment="Bottom">
+			<CheckBox x:Name="ChkRememberPwd" HorizontalAlignment="Left" Width="81" Height="47" VerticalAlignment="Top" Margin="5,0,0,0">记住密码</CheckBox>
+			<CheckBox x:Name="ChkAutoLogin" HorizontalAlignment="Left" Width="76" Margin="86,0,0,0">自动登录</CheckBox>
 			<Button IsCancel="True" VerticalAlignment="Top" HorizontalAlignment="Right" Style="{DynamicResource MaterialDesignFlatButton}" Foreground="#c62f2f"
 			        Width="70" Margin="0,5,15,0"
 			        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
