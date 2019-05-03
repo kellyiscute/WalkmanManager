@@ -46,4 +46,16 @@
 			e.Handled = True
 		End If
 	End Sub
+
+	Private Sub ChkAutoLogin_Checked(sender As Object, e As RoutedEventArgs) Handles ChkAutoLogin.Checked
+		If ChkAutoLogin.IsChecked Then
+			ChkRememberPwd.IsChecked = True
+		End If
+	End Sub
+
+	Private Sub ChkRememberPwd_Click(sender As Object, e As RoutedEventArgs) Handles ChkRememberPwd.Click
+		If Not ChkRememberPwd.IsChecked Then
+			ChkAutoLogin.IsChecked = False
+		End If
+	End Sub
 End Class

@@ -144,7 +144,7 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" d:IsHidden="True">
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0">
 					<!-- Visibility="Hidden"-->
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>

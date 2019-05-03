@@ -464,6 +464,8 @@ Public Class Database
 			Dim conn = Connect()
 			Dim cmd As New SQLiteCommand(conn)
 			cmd.BuildQuery("update Settings set value = ? where key = ?", New Object() {value, key})
+			cmd.ExecuteNonQuery()
+			conn.Close()
 		End If
 	End Sub
 
@@ -944,5 +946,23 @@ Public Class Database
 		conn.Close()
 		cmd.Dispose()
 		conn.Dispose()
+	End Sub
+
+	Public Shared Sub InitPlaylists()
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		cmd.CommandText = "DELETE FROM playlists"
+		cmd.ExecuteNonQuery()
+		cmd.CommandText = "DELETE FROM playlist_detail"
+		cmd.ExecuteNonQuery()
+		conn.Close()
+	End Sub
+
+	Public Shared Sub InitSongLib()
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		cmd.CommandText = "DELETE FROM songs"
+		cmd.ExecuteNonQuery()
+		conn.Close()
 	End Sub
 End Class

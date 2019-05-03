@@ -13,7 +13,9 @@
 	
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="F:\Megasync\WalkmanManager\packages\z440.atl.core.2.4.1\lib\net30\ATL.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5.1\System.Runtime.Serialization.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:Boolean x:Key="/Default/Environment/Hierarchy/EntityFrameworkOptions/IsAlreadyNotifiedAboutEntityFramework/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=C65318E83F72A444B7E9CD6C3C6925F3/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=C65318E83F72A444B7E9CD6C3C6925F3/AbsolutePath/@EntryValue">D:\Program Files\JetBrains\apps\Rider\ch-0\183.4139.314\plugins\rider-unity\EditorPlugin\Unity.DotSettings</s:String>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileC65318E83F72A444B7E9CD6C3C6925F3/@KeyIndexDefined">True</s:Boolean>

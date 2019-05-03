@@ -69,11 +69,12 @@ Class MainWindow
 				dlgLogin.Phone = cmPhone
 				dlgLogin.Password = cmPassword
 				Dim login = True
-				If Not flgAutoLogin Then
-					login = Await DlgWindowRoot.ShowDialog(dlgLogin)
-				End If
 
 				While True
+					If Not flgAutoLogin Or cmPhone = "" Or cmPassword = "" Then
+						login = Await DlgWindowRoot.ShowDialog(dlgLogin)
+					End If
+
 					If login Then
 						Dim dlgProg = New dlg_progress
 						dlgProg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
@@ -120,6 +121,7 @@ Class MainWindow
 							_isCloudMusicLoggedIn = False
 							DlgWindowRoot.IsOpen = False
 							Await DlgWindowRoot.ShowDialog(dlgFail)
+							flgAutoLogin = False
 						End If
 					Else
 						TabCloudMusic.IsSelected = False
@@ -461,6 +463,7 @@ Class MainWindow
 	End Sub
 
 	Private Sub ButtonCloudMusicLogout_Click(sender As Object, e As RoutedEventArgs) Handles ButtonCloudMusicLogout.Click
+		SaveSetting("CloudMusicAutoLogin", "False")
 		_cloudMusic = Nothing
 		_cloudMusic = New CloudMusic
 		_isCloudMusicLoggedIn = False
@@ -786,6 +789,11 @@ Class MainWindow
 						   Next
 					   End Sub)
 
+		' Write playlist files
+		Await Task.Run(Sub()
+
+					   End Sub)
+
 Complete:
 		ProgressBarSyncSub.Value = 0
 		ProgressBarSyncTotal.Value = 0
@@ -879,6 +887,16 @@ Complete:
 	Private Sub ListBoxPlaylist_KeyDown(sender As Object, e As KeyEventArgs) Handles ListBoxPlaylist.KeyDown
 		If e.Key = Key.F2 Then
 			MenuRenamePlaylist_Click(sender, Nothing)
+		End If
+	End Sub
+
+	Private Async Sub BtnSettings_Click(sender As Object, e As RoutedEventArgs) Handles BtnSettings.Click
+		Dim dlg = New DlgSettings
+		dlg.Init()
+		Await DlgWindowRoot.ShowDialog(dlg)
+		If dlg._flgForceRestart Then
+			Process.Start(Application.ResourceAssembly.Location)
+			Environment.Exit(0)
 		End If
 	End Sub
 End Class
