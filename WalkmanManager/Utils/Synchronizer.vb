@@ -65,7 +65,7 @@ Public Class Synchronizer
 
 		Dim sourceFile = New BinaryReader(New FileStream(source, FileMode.Open))
 		_totalLength = sourceFile.BaseStream.Length
-		_chunkSize = 512 * 1024 'Initial Chunk Size = .5MB
+		_chunkSize = 1024 * 1024 'Initial Chunk Size = 1MB
 		Dim destinationFile = New BinaryWriter(New FileStream(destination, FileMode.OpenOrCreate))
 		'Prepare variables
 		Dim rTime As Long

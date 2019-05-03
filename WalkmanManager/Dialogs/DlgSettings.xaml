@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:WalkmanManager"
              xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" Height="310" Width="485">
+	<mD:DialogHost x:Name="Dialog">
 	<Grid>
 		<mD:ColorZone Height="35" Mode="PrimaryMid">
 			<Grid>
@@ -29,4 +30,5 @@
 			</Grid>
 		</GroupBox>
 	</Grid>
+	</mD:DialogHost>
 </UserControl>

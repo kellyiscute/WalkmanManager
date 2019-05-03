@@ -965,4 +965,19 @@ Public Class Database
 		cmd.ExecuteNonQuery()
 		conn.Close()
 	End Sub
+
+	Public Shared Sub ClearDatabase()
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		cmd.CommandText = "DROP TABLE playlists"
+		cmd.ExecuteNonQuery()
+		cmd.CommandText = "DROP TABLE playlist_detail"
+		cmd.ExecuteNonQuery()
+		cmd.CommandText = "DROP TABLE songs"
+		cmd.ExecuteNonQuery()
+		cmd.CommandText = "DROP TABLE settings"
+		cmd.ExecuteNonQuery()
+		conn.Close()
+		CreateDatabase()
+	End Sub
 End Class

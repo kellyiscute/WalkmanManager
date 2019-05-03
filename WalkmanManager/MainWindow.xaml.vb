@@ -647,10 +647,15 @@ Class MainWindow
 		Dim progressUpdateThread As Thread
 		Dim flgProgressUpdateThreadStop = False
 		Dim flgProgressUpdateThreadPause = False
+		Dim flgHashCheck = CheckBoxSyncOptionHashCheck.IsChecked
 
 		ProgressBarSyncSub.Maximum = 2
 		ProgressBarSyncSub.IsIndeterminate = False
 		ProgressBarSyncSub.Value = 0
+
+		If IsNothing(lstSongs) Then
+			GoTo Complete
+		End If
 
 		progressUpdateThread = New Thread(Sub()
 											  Do
@@ -687,7 +692,7 @@ Class MainWindow
 		AddSyncLog(LogType.Information, "发现需要删除的项目：" & lstDelete.Count, False)
 		AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
 		Dim lstChanged = Await Task.Run(Function()
-											Return SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, True, progressSubscriber, _flgSyncStop)
+											Return SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, flgHashCheck, progressSubscriber, _flgSyncStop)
 										End Function)
 		If _flgSyncStop Then
 			GoTo Complete
@@ -698,6 +703,7 @@ Class MainWindow
 		AddSyncLog(LogType.Information, "正在计算所需空间...", False)
 		ProgressBarSyncSub.Maximum = lstChanged.Count + lstDelete.Count
 
+		ProgressBarSyncSub.IsIndeterminate = False
 		flgProgressUpdateThreadStop = True
 		Await Task.Run(Sub()
 						   For Each itm In lstChanged
@@ -732,7 +738,9 @@ Class MainWindow
 						   Next
 					   End Sub)
 
-		If spaceNeeded > My.Computer.FileSystem.GetDriveInfo(drivePath).TotalFreeSpace And Not CheckBoxSyncOptionNoSpaceCheck.IsChecked Then
+		If _
+			spaceNeeded > My.Computer.FileSystem.GetDriveInfo(drivePath).TotalFreeSpace And
+			Not CheckBoxSyncOptionNoSpaceCheck.IsChecked Then
 			Dim errorDlg As New DlgMessageDialog("同步失败", "磁盘空间不足")
 			Await DialogHost.Show(errorDlg, "window-root")
 			ProgressBarSyncTotal.Value = 0
@@ -791,16 +799,33 @@ Class MainWindow
 
 		' Write playlist files
 		Await Task.Run(Sub()
-
+						   Dim lstPlaylists = GetPlaylists()
+						   For Each p In lstPlaylists
+							   Try
+								   AddSyncLog(LogType.Information, "写入：" & wmManagedPath & "\" & p & ".m3u")
+								   Dim playlistFile = My.Computer.FileSystem.OpenTextFileWriter(wmManagedPath & "\" & p & ".m3u", False, Text.Encoding.UTF8)
+								   For Each s In GetSongsFromPlaylist(p)
+									   Dim sInfo = GetSongById(s)
+									   playlistFile.WriteLine(My.Computer.FileSystem.GetFileInfo(sInfo.Path).Name)
+									   playlistFile.Flush()
+								   Next
+								   playlistFile.Close()
+							   Catch ex As Exception
+								   AddSyncLog(LogType.Err, ex.Message)
+							   End Try
+						   Next
 					   End Sub)
 
 Complete:
 		ProgressBarSyncSub.Value = 0
+		ProgressBarSyncSub.IsIndeterminate = False
 		ProgressBarSyncTotal.Value = 0
 		ButtonRemoteSync.Content = _syncRemoteDeviceContent
 		Dim msgDlg As New DlgMessageDialog("", "同步完成")
-		If progressUpdateThread.IsAlive Then
-			progressUpdateThread.Abort()
+		If Not IsNothing(progressUpdateThread) Then
+			If progressUpdateThread.IsAlive Then
+				progressUpdateThread.Abort()
+			End If
 		End If
 		Await DlgWindowRoot.ShowDialog(msgDlg)
 		ButtonRemoteSync.IsEnabled = True
@@ -856,8 +881,8 @@ Complete:
 			If ListBoxPlaylist.SelectedItem.Content.GetType = GetType(String) Then
 				Dim textBoxRenamePlaylist = New TextBox _
 						With {.Tag = New Object() {ListBoxPlaylist.SelectedItem, ListBoxPlaylist.SelectedItem.Content},
-												.Width = ListBoxPlaylist.Width - 20,
-												.Text = ListBoxPlaylist.SelectedItem.Content}
+						.Width = ListBoxPlaylist.Width - 20,
+						.Text = ListBoxPlaylist.SelectedItem.Content}
 				AddHandler textBoxRenamePlaylist.KeyDown, AddressOf TextBoxRenamePlaylist_KeyDown
 				ListBoxPlaylist.SelectedItem.Content = textBoxRenamePlaylist
 				textBoxRenamePlaylist.Focus()
@@ -881,7 +906,6 @@ Complete:
 				sender = Nothing
 			End If
 		End If
-
 	End Sub
 
 	Private Sub ListBoxPlaylist_KeyDown(sender As Object, e As KeyEventArgs) Handles ListBoxPlaylist.KeyDown
@@ -893,10 +917,13 @@ Complete:
 	Private Async Sub BtnSettings_Click(sender As Object, e As RoutedEventArgs) Handles BtnSettings.Click
 		Dim dlg = New DlgSettings
 		dlg.Init()
-		Await DlgWindowRoot.ShowDialog(dlg)
-		If dlg._flgForceRestart Then
-			Process.Start(Application.ResourceAssembly.Location)
-			Environment.Exit(0)
-		End If
+		Try
+			Await DlgWindowRoot.ShowDialog(dlg)
+			If dlg.FlgForceRestart Then
+				Process.Start(Application.ResourceAssembly.Location)
+				Environment.Exit(0)
+			End If
+		Catch
+		End Try
 	End Sub
 End Class
