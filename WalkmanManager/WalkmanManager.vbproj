@@ -210,6 +210,7 @@
     <Compile Include="SongItm.xaml.vb">
       <DependentUpon>SongItm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils\MoreSound.vb" />
     <Compile Include="Utils\Searching.vb" />
     <Compile Include="Utils\ExtensionMethods.vb" />
     <Compile Include="Utils\SyncAnalyzer.vb" />
