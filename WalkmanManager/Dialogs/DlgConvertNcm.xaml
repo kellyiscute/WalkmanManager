@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="DlgConvertNcm"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:WalkmanManager"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" Width="800">
+    <Grid>
+		<mD:ColorZone Height="40" Mode="PrimaryMid">
+			<Grid>
+				<Label HorizontalAlignment="Left" VerticalContentAlignment="Center" Foreground="White">转换网易云加密音乐</Label>
+				<Button HorizontalAlignment="Right" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0">
+					<mD:PackIcon Kind="Close"/>
+				</Button>
+				<Button HorizontalAlignment="Right" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,48,0">
+					<mD:PackIcon Kind="Minus"/>
+				</Button>
+			</Grid>
+		</mD:ColorZone>
+		<Grid Margin="0,40,0,0">
+
+		</Grid>
+    </Grid>
+</UserControl>

@@ -36,7 +36,12 @@ Public Class MoreSound
 	Public Function GetSong(method As SearchMethod, mid As String) As Dictionary(Of String, Object)
 		Dim webcli = InitWebClient()
 		webcli.QueryString = New Specialized.NameValueCollection From {{"get_song", method.GetName(GetType(SearchMethod), method)}}
+		Dim responseBytes = webcli.UploadValues(ApiUrl, New Specialized.NameValueCollection From {{"mid", mid}})
+		Dim responseString = Encoding.UTF8.GetString(responseBytes)
+		Dim deserializedResponse = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(responseString)
 
+		webcli.Dispose()
+		Return deserializedResponse
 	End Function
 
 End Class

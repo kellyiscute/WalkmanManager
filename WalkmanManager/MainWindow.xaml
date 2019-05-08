@@ -33,6 +33,12 @@
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,100,0">
 					<mD:PackIcon Kind="Settings" />
 				</Button>
+				<Button x:Name="BtnConvertNcm" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+				        BorderThickness="0"
+				        WindowChrome.IsHitTestVisibleInChrome="True"
+				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,150,0">
+					<mD:PackIcon Kind="Cached" />
+				</Button>
 			</Grid>
 		</mD:ColorZone>
 		<mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,35,0,0">
