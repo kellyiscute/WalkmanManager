@@ -34,6 +34,18 @@ Public Module ExtensionMethods
 		Return result
 	End Function
 
+	<System.Runtime.CompilerServices.Extension>
+	Public Function NameWithoutExtention(file As IO.FileInfo) As String
+		Dim result = file.Name
+		Dim sp = result.Split(".")
+		result = ""
+		For i = 0 To sp.Count-2
+			result += sp(i) + "."
+		Next
+		result = result.Substring(0,result.Length-2)
+		Return result
+	End Function
+
 	''' <summary>
 	''' this method is to create a python-ish command builder, which is easier to use
 	''' </summary>

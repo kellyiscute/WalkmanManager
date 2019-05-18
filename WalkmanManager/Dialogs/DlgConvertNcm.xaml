@@ -6,12 +6,12 @@
              xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:WalkmanManager"
              mc:Ignorable="d" 
-             d:DesignHeight="450" Width="800">
-    <Grid>
+             d:DesignHeight="450" Width="800" Background="White">
+	<Grid>
 		<mD:ColorZone Height="40" Mode="PrimaryMid">
 			<Grid>
 				<Label HorizontalAlignment="Left" VerticalContentAlignment="Center" Foreground="White">转换网易云加密音乐</Label>
-				<Button HorizontalAlignment="Right" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0">
+				<Button x:Name="ButtonClose" HorizontalAlignment="Right" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0">
 					<mD:PackIcon Kind="Close"/>
 				</Button>
 				<Button HorizontalAlignment="Right" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,48,0">
@@ -20,7 +20,20 @@
 			</Grid>
 		</mD:ColorZone>
 		<Grid Margin="0,40,0,0">
+			<mD:ColorZone Height="50" Background="AntiqueWhite" BorderThickness="0,0,0,1" BorderBrush="BurlyWood" mD:ShadowAssist.ShadowDepth="Depth1">
+				<Grid Margin="15,0,0,0">
+					<ProgressBar x:Name="ProgressBarWorking" Style="{DynamicResource MaterialDesignCircularProgressBar}" IsIndeterminate="True" HorizontalAlignment="Left"/>
+					<mD:PackIcon Visibility="Hidden" x:Name="IconCheck" Kind="CheckCircle" Width="25" Height="25" Margin="-1,11,0,0"></mD:PackIcon>
+					<Label Margin="25,0,0,0" VerticalContentAlignment="Center">正在查找加密文件</Label>
+					<Button IsEnabled="False" Style="{DynamicResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Margin="0,8,10,9" Width="90">转换</Button>
+				</Grid>
+			</mD:ColorZone>
 
+			<Grid Margin="0,55,0,0">
+				<ScrollViewer>
+					<StackPanel x:Name="StackPanelFiles"/>
+				</ScrollViewer>
+			</Grid>
 		</Grid>
-    </Grid>
+	</Grid>
 </UserControl>
