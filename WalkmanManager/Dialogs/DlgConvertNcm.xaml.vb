@@ -56,6 +56,7 @@
 		IconCheck.Visibility = Visibility.Hidden
 		For Each itm As NcmItem In StackPanelFiles.Children
 			Await itm.Dump(SongLibPath)
+			itm.Dispose()
 			My.Computer.FileSystem.DeleteFile(itm._filePath)
 		Next
 	End Sub
