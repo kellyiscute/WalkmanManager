@@ -42,7 +42,7 @@
 			</Grid>
 		</mD:ColorZone>
 		<mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,35,0,0">
-			<Grid>
+			<Grid x:Name="GridRoot">
 				<mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50"
 				              Background="WhiteSmoke">
 					<Grid>
@@ -69,7 +69,7 @@
 						</ListBox>
 					</Grid>
 				</mD:ColorZone>
-				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible" d:IsHidden="True">
+				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible">
 					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
 						<Grid>
 							<Grid x:Name="LstLocalSidebar" Width="220" HorizontalAlignment="Left">
@@ -150,8 +150,8 @@
 						</Grid>
 					</mD:DialogHost>
 				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" d:IsHidden="True">
-					<!-- Visibility="Hidden"-->
+				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" d:IsHidden="True" Visibility="Hidden">
+					
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
 							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70"
@@ -233,7 +233,7 @@
 					</mD:DialogHost>
 				</Grid>
 
-				<Grid x:Name="GridRemote" Margin="0,55,0,0" d:IsHidden="True">
+				<Grid x:Name="GridRemote" Visibility="Hidden" Margin="0,55,0,0" d:IsHidden="True">
 					<Grid Margin="0,0,0,95">
 					</Grid>
 					<mD:ColorZone VerticalAlignment="Top" Margin="10,10,10,0" Height="70" CornerRadius="10"

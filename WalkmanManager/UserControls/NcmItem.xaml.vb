@@ -1,7 +1,8 @@
-﻿Imports libNcmDump
+﻿Imports System.ComponentModel
+Imports libNcmDump
 
 Public Class NcmItem
-	Dim _filePath = ""
+	Public _filePath = ""
 	Dim _crypto As libNcmDump.NeteaseCrypto
 
 	Public enum Status
@@ -16,7 +17,7 @@ Public Class NcmItem
 		InitializeComponent()
 
 		' Add any initialization after the InitializeComponent() call.
-		If Not My.Computer.FileSystem.DirectoryExists(filePath) Then
+		If Not My.Computer.FileSystem.FileExists(filePath) Then
 			Throw New IO.FileNotFoundException(filePath & " Not found")
 		End If
 		_filePath = filePath
@@ -25,7 +26,7 @@ Public Class NcmItem
 		_crypto = New NeteaseCrypto(New IO.FileStream(filePath, IO.FileMode.Open))
 	End Sub
 
-	Public sub SetStatus(s As Status)
+	Public Sub SetStatus(s As Status)
 		Select Case s
 			Case Status.wait
 				IconStatus.Kind = MaterialDesignThemes.Wpf.PackIconKind.Clock
@@ -34,10 +35,23 @@ Public Class NcmItem
 			Case Status.done
 				IconStatus.Kind = MaterialDesignThemes.Wpf.PackIconKind.Check
 		End Select
-	End sub
-
-	Public Sub Dump()
-		_crypto.FileName = My.Computer.FileSystem.GetFileInfo(_filePath).NameWithoutExtention()
-		_crypto.Dump()
 	End Sub
+
+	Public Async Function Dump(dir As String) As Task
+		SetStatus(Status.processing)
+		Await Task.Run(Sub()
+						   _crypto.FileName = dir & "\" & My.Computer.FileSystem.GetFileInfo(_filePath).NameWithoutExtention()
+						   Try
+							   _crypto.Dump()
+						   Catch ex As Exception
+
+						   End Try
+					   End Sub)
+		SetStatus(Status.done)
+	End Function
+
+	Public sub Dispose()
+		_crypto.CloseFile
+		_crypto = nothing
+	End sub
 End Class

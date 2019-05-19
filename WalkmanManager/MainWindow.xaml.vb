@@ -18,6 +18,7 @@ Class MainWindow
 	Dim _flgSyncStop As Boolean
 	Dim _flgUSBRefreshPause As Boolean = False
 	Dim _encryptKey As String
+	Dim _toolWindowConvertNcm As DlgConvertNcm
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -835,6 +836,9 @@ Complete:
 		Dispatcher.Invoke(Sub()
 							  ProgressBarSyncSub.Maximum = sender.TotalLength
 							  ProgressBarSyncSub.Value = sender.CopiedLength
+							  TextBoxTotal.Text = sender.TotalLength
+							  TextBoxComplete.Text = sender.CopiedLength
+							  TextBoxBlock.Text = sender.ChunkSize
 						  End Sub)
 	End Sub
 
@@ -925,5 +929,30 @@ Complete:
 			End If
 		Catch
 		End Try
+	End Sub
+
+	Private Sub BtnConvertNcm_Click(sender As Object, e As RoutedEventArgs) Handles BtnConvertNcm.Click
+		If IsNothing(_toolWindowConvertNcm) Then
+			_toolWindowConvertNcm = New DlgConvertNcm(GetSetting("song_dir"))
+			_toolWindowConvertNcm.HorizontalAlignment = HorizontalAlignment.Center
+			_toolWindowConvertNcm.VerticalAlignment = VerticalAlignment.Center
+			AddHandler _toolWindowConvertNcm.Close, AddressOf dlgConvertNcm_Close
+			AddHandler _toolWindowConvertNcm.Minimize, AddressOf dlgConvertNcm_Minimize
+
+			GridRoot.Children.Add(_toolWindowConvertNcm)
+			_toolWindowConvertNcm.Init()
+		Else
+			_toolWindowConvertNcm.Visibility = Visibility.Visible
+		End If
+	End Sub
+
+	Private Sub dlgConvertNcm_Minimize()
+		_toolWindowConvertNcm.Visibility = Visibility.Collapsed
+	End Sub
+
+	Private Sub dlgConvertNcm_Close()
+		GridRoot.Children.Remove(_toolWindowConvertNcm)
+		_toolWindowConvertNcm.dispose
+		_toolWindowConvertNcm = Nothing
 	End Sub
 End Class

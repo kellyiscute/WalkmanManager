@@ -12,7 +12,7 @@
 			<Label HorizontalAlignment="Left" VerticalContentAlignment="Center">
 				<mD:PackIcon x:Name="IconStatus" Kind="clock"/>
 			</Label>
-			<Label x:Name="LabelFilename" HorizontalAlignment="Left" Margin="26,0,0,0"/>
+			<Label x:Name="LabelFilename" HorizontalAlignment="Left" VerticalContentAlignment="Center" Margin="26,0,0,0"/>
 		</Grid>
     </mD:ColorZone>
 </UserControl>

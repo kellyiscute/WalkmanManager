@@ -22,6 +22,7 @@
 		End Get
 		Set
 			TextBoxPassword.Password = Value
+			ChkRememberPwd.IsChecked = True
 		End Set
 	End Property
 
