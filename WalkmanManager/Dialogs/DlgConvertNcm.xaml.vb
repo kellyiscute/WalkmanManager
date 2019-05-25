@@ -57,7 +57,10 @@
 		For Each itm As NcmItem In StackPanelFiles.Children
 			Await itm.Dump(SongLibPath)
 			itm.Dispose()
-			My.Computer.FileSystem.DeleteFile(itm._filePath)
+			Try
+				My.Computer.FileSystem.DeleteFile(itm._filePath)
+			Catch ex As Exception
+			End Try
 		Next
 	End Sub
 End Class
