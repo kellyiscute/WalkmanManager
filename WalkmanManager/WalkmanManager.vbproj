@@ -227,9 +227,6 @@
       <DependentUpon>dlg_progress.xaml</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
-    <Compile Include="SongItm.xaml.vb">
-      <DependentUpon>SongItm.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Utils\MoreSound.vb" />
     <Compile Include="Utils\Searching.vb" />
     <Compile Include="Utils\ExtensionMethods.vb" />
@@ -291,10 +288,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SongItm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UserControls\NcmItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

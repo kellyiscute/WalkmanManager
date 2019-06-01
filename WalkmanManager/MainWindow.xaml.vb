@@ -1037,10 +1037,9 @@ Complete:
 	Private Sub DatSongList_DragOver(sender As Object, e As DragEventArgs) Handles DatSongList.DragOver
 		If e.Data.GetFormats.Contains("FileNameW") Or e.Data.GetFormats.Contains("GongSolutions.Wpf.DragDrop") Then
 			e.Effects = DragDropEffects.All
-			e.Handled = True
 		Else
 			e.Effects = DragDropEffects.None
-			e.Handled = True
 		End If
+		e.Handled = True
 	End Sub
 End Class
