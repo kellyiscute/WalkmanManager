@@ -804,7 +804,8 @@ Class MainWindow
 						   For Each p In lstPlaylists
 							   Try
 								   AddSyncLog(LogType.Information, "写入：" & wmManagedPath & "\" & p & ".m3u")
-								   Dim playlistFile = My.Computer.FileSystem.OpenTextFileWriter(wmManagedPath & "\" & p & ".m3u", False, Text.Encoding.UTF8)
+								   Dim playlistFile = My.Computer.FileSystem.OpenTextFileWriter(wmManagedPath & "\" & p & ".m3u", False,
+																								Text.Encoding.UTF8)
 								   For Each s In GetSongsFromPlaylist(p)
 									   Dim sInfo = GetSongById(s)
 									   playlistFile.WriteLine(My.Computer.FileSystem.GetFileInfo(sInfo.Path).Name)
@@ -952,13 +953,14 @@ Complete:
 
 	Private Sub dlgConvertNcm_Close()
 		GridRoot.Children.Remove(_toolWindowConvertNcm)
-		_toolWindowConvertNcm.dispose
+		_toolWindowConvertNcm.Dispose()
 		_toolWindowConvertNcm = Nothing
 	End Sub
 
 	Private Async Sub MenuImportPlaylist_Click(sender As Object, e As RoutedEventArgs) Handles MenuImportPlaylist.Click
+		'TODO: Check for same song
 		Dim dlgOpen As New System.Windows.Forms.OpenFileDialog
-		dlgOpen.Filter = "m3u播放列表 (*.m3u)|*.m3u"
+		dlgOpen.Filter = "兼容的播放列表 |*.m3u; *.m3u8"
 		dlgOpen.Multiselect = False
 		Dim r = dlgOpen.ShowDialog()
 		If r = Forms.DialogResult.OK And My.Computer.FileSystem.FileExists(dlgOpen.FileName) Then
@@ -974,18 +976,71 @@ Complete:
 			'Check path
 			For i = 0 To files.Count - 1
 				files(i) = IIf(My.Computer.FileSystem.FileExists(files(i)), files(i),
-							   My.Computer.FileSystem.CombinePath(My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).DirectoryName, files(i)))
+							   My.Computer.FileSystem.CombinePath(My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).DirectoryName,
+																  files(i)))
 				If Not My.Computer.FileSystem.FileExists(files(i)) Then
 					files(i) = ""
 				End If
 			Next
 
 			'Copy to library & add to database
+			Dim libDir = GetSetting("song_dir")
+			Dim localDir As String
 			Dim dlgWait As New dlg_progress()
 			DlgWindowRoot.ShowDialog(dlgWait)
-			For i = 0 To files.Count - 1
-				My.Computer.FileSystem.CopyFile(files(i), "", True)
-			Next
+			dlgWait.Text = "0/" & files.Count
+			Await Task.Run(Sub()
+							   For i = 0 To files.Count - 1
+								   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(files(i)).Name)
+								   My.Computer.FileSystem.CopyFile(files(i), localDir, True)
+								   Dim audioInfo As New Track(localDir)
+								   AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+								   audioInfo = Nothing
+								   dlgWait.Text = (i + 1) & "/" & files.Count
+							   Next
+							   dlgWait.Text = "更新列表..."
+							   _lstSongs = GetSongs()
+							   DatSongList.ItemsSource = _lstSongs
+						   End Sub)
+			DlgWindowRoot.IsOpen = False
+		End If
+	End Sub
+
+	Private Async Sub DatSongList_Drop(sender As Object, e As DragEventArgs) Handles DatSongList.Drop
+		If e.Data.GetFormats.Contains("FileNameW") Then
+			'TODO: Check for same song and ask if to continue
+			Dim filename() As String = e.Data.GetData("FileNameW")
+			Dim dlg As New dlgDragImport()
+			DlgWindowRoot.ShowDialog(dlg)
+			dlg.Max = filename.Count
+			Await Task.Run(Sub()
+							   Dim libDir = GetSetting("song_dir")
+							   Dim localDir As String
+
+							   For i = 0 To filename.Count - 1
+								   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(filename(i)).Name)
+								   My.Computer.FileSystem.CopyFile(filename(i), localDir, True)
+								   Dim audioInfo As New Track(localDir)
+								   AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+								   audioInfo = Nothing
+								   Dispatcher.Invoke(Sub() dlg.Progress += 1)
+							   Next
+
+							   Dispatcher.Invoke(Sub() dlg.ProgressBar.IsIndeterminate = True)
+							   _lstSongs = GetSongs()
+
+						   End Sub)
+			DlgWindowRoot.IsOpen = False
+		End If
+	End Sub
+
+	Private Sub DatSongList_DragOver(sender As Object, e As DragEventArgs) Handles DatSongList.DragOver
+		If e.Data.GetFormats.Contains("FileNameW") Or e.Data.GetFormats.Contains("GongSolutions.Wpf.DragDrop") Then
+			e.Effects = DragDropEffects.All
+			e.Handled = True
+		Else
+			e.Effects = DragDropEffects.None
+			e.Handled = True
 		End If
 	End Sub
 End Class

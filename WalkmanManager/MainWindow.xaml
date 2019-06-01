@@ -100,7 +100,7 @@
 									</ListBoxItem>
 								</ListBox>
 							</Grid>
-							<Grid x:Name="GridMusic" Margin="220,0,0,0">
+							<Grid x:Name="GridMusic" Margin="220,0,0,0" Background="#00000000">
 								<mD:ColorZone Height="45" Background="#FFF3F3F3" mD:ShadowAssist.ShadowDepth="Depth1">
 									<Grid>
 										<mD:ColorZone x:Name="PanelSearchLocalMusic" Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35"

@@ -193,6 +193,9 @@
     <Compile Include="Dialogs\DlgConvertNcm.xaml.vb">
       <DependentUpon>DlgConvertNcm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\dlgDragImport.xaml.vb">
+      <DependentUpon>dlgDragImport.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\dlgPlaylistSyncResult.xaml.vb">
       <DependentUpon>dlgPlaylistSyncResult.xaml</DependentUpon>
     </Compile>
@@ -237,6 +240,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\DlgConvertNcm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\dlgDragImport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -146,7 +146,7 @@ Public Class Database
 	Public Overloads Shared Sub AddSong(title As String, artists As String, path As String)
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
-		cmd.BuildQuery("insert into songs (title, artists, path) calues (?, ?, ?)",
+		cmd.BuildQuery("insert into songs (title, artists, path) values (?, ?, ?)",
 					   New Object() {title, artists, path})
 		cmd.ExecuteNonQuery()
 		conn.Close()

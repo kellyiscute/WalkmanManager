@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="dlgDragImport"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:WalkmanManager"
+             mc:Ignorable="d" Height="211.481" Width="485.193" Background="White">
+    <Grid>
+		<mD:ColorZone Mode="PrimaryMid" Height="35">
+			<Label Foreground="White" VerticalContentAlignment="Center" Margin="10,0,0,0">导入到曲库</Label>
+		</mD:ColorZone>
+		<Grid Margin="0,35,0,0">
+			<TextBlock x:Name="TextBlockPrompt" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="23,38,0,0">正在导入(0/0)</TextBlock>
+			<ProgressBar x:Name="ProgressBar" Margin="32,82,29,0" VerticalAlignment="Top" Height="8"></ProgressBar>
+		</Grid>
+    </Grid>
+</UserControl>
