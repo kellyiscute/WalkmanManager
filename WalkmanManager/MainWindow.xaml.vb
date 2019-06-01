@@ -955,4 +955,37 @@ Complete:
 		_toolWindowConvertNcm.dispose
 		_toolWindowConvertNcm = Nothing
 	End Sub
+
+	Private Async Sub MenuImportPlaylist_Click(sender As Object, e As RoutedEventArgs) Handles MenuImportPlaylist.Click
+		Dim dlgOpen As New System.Windows.Forms.OpenFileDialog
+		dlgOpen.Filter = "m3u播放列表 (*.m3u)|*.m3u"
+		dlgOpen.Multiselect = False
+		Dim r = dlgOpen.ShowDialog()
+		If r = Forms.DialogResult.OK And My.Computer.FileSystem.FileExists(dlgOpen.FileName) Then
+			Dim files As New List(Of String)
+			Dim reader = My.Computer.FileSystem.OpenTextFileReader(dlgOpen.FileName, Text.Encoding.UTF8)
+			Do Until reader.EndOfStream
+				Dim t = reader.ReadLine
+				If Not t.StartsWith("#") Then
+					files.Add(t)
+				End If
+			Loop
+
+			'Check path
+			For i = 0 To files.Count - 1
+				files(i) = IIf(My.Computer.FileSystem.FileExists(files(i)), files(i),
+							   My.Computer.FileSystem.CombinePath(My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).DirectoryName, files(i)))
+				If Not My.Computer.FileSystem.FileExists(files(i)) Then
+					files(i) = ""
+				End If
+			Next
+
+			'Copy to library & add to database
+			Dim dlgWait As New dlg_progress()
+			DlgWindowRoot.ShowDialog(dlgWait)
+			For i = 0 To files.Count - 1
+				My.Computer.FileSystem.CopyFile(files(i), "", True)
+			Next
+		End If
+	End Sub
 End Class

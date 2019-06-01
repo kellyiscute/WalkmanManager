@@ -84,8 +84,10 @@
 								         PreviewMouseRightButtonDown="BlockRightClickSelection" Width="220" Margin="0,107,0,0">
 									<ListBox.ContextMenu>
 										<ContextMenu>
-											<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150" Height="50" />
-											<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="150" Height="50" />
+											<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="180" Height="50" />
+											<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="180" Height="50" />
+											<Separator/>
+											<MenuItem x:Name="MenuImportPlaylist" Header="导入m3u播放列表" Width="180" Height="50" />
 										</ContextMenu>
 									</ListBox.ContextMenu>
 									<ListBoxItem Padding="15,7,0,7" Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
