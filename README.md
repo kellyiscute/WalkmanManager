@@ -9,12 +9,14 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 **THE BETA RELEASE IS HERE!!!**  
 Download it [here](https://github.com/guo40020/WalkmanManager/releases)
 
-## Authors
+## TODO
+* [x] Drag to import
+* [ ] Match Cover and Lyrics for local songs
+* [ ] Tries to Download CloudMusic Playlist
+* [ ] Demos in README
 
-* [**Kelly**](https://github.com/guo40020) - *Initial work*
-* [**Banyc**](https://github.com/Banyc) - *Initial work* for files in ".\WalkmanManager\music_files_management\" and for this "README.md"
-
-See also [contributors](https://github.com/guo40020/WalkmanManager/graphs/contributors)
+## Demos  
+`It's in TODO (:P)`
 
 ## License
 
