@@ -7,28 +7,28 @@
              xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" Height="310" Width="485">
 	<mD:DialogHost x:Name="Dialog">
-	<Grid>
-		<mD:ColorZone Height="35" Mode="PrimaryMid">
-			<Grid>
-				<Label HorizontalAlignment="Left" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,0,0">设置</Label>
-				<Button HorizontalAlignment="Right" mD:ShadowAssist.ShadowDepth="Depth0" Height="Auto" Command="{x:Static mD:DialogHost.CloseDialogCommand}">
-					<mD:PackIcon Kind="Close"/>
-				</Button>
-			</Grid>
-		</mD:ColorZone>
-		<Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,54,0,0">库位置：</Label>
-		<TextBox x:Name="TextBoxSongDir" VerticalAlignment="Top" Margin="73,54,52,0" IsReadOnly="True" mD:TextFieldAssist.DecorationVisibility="Collapsed" BorderThickness="0,0,0,1"/>
-		<Button x:Name="ButtonOpen" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,47,10,0" Width="37" Style="{DynamicResource MaterialDesignToolButton}" mD:RippleAssist.RippleSizeMultiplier="1" mD:RippleAssist.IsCentered="True">
-			<mD:PackIcon Kind="FolderOpen"/>
-		</Button>
+		<Grid>
+			<mD:ColorZone Height="35" Mode="PrimaryMid">
+				<Grid>
+					<Label HorizontalAlignment="Left" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,0,0">设置</Label>
+					<Button HorizontalAlignment="Right" mD:ShadowAssist.ShadowDepth="Depth0" Height="Auto" Command="{x:Static mD:DialogHost.CloseDialogCommand}">
+						<mD:PackIcon Kind="Close"/>
+					</Button>
+				</Grid>
+			</mD:ColorZone>
+			<Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,54,0,0">库位置：</Label>
+			<TextBox x:Name="TextBoxSongDir" VerticalAlignment="Top" Margin="73,54,52,0" IsReadOnly="True" mD:TextFieldAssist.DecorationVisibility="Collapsed" BorderThickness="0,0,0,1"/>
+			<Button x:Name="ButtonOpen" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,47,10,0" Width="37" Style="{DynamicResource MaterialDesignToolButton}" mD:RippleAssist.RippleSizeMultiplier="1" mD:RippleAssist.IsCentered="True">
+				<mD:PackIcon Kind="FolderOpen"/>
+			</Button>
 
-		<GroupBox Margin="10,93,10,0" Height="87" VerticalAlignment="Top" Header="数据库维护" BorderThickness="0" mD:ShadowAssist.ShadowDepth="Depth2">
-			<Grid>
-				<Button x:Name="ButtonClearSongs" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,0,0,0">删除曲库记录</Button>
-				<Button x:Name="ButtonClearPlaylist" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="173,0,0,0">清除播放列表</Button>
-				<Button x:Name="ButtonRebuildDb" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="322,0,0,0">重建数据库</Button>
-			</Grid>
-		</GroupBox>
-	</Grid>
+			<GroupBox Margin="10,118,10,0" Height="157" VerticalAlignment="Top" Header="数据库维护" BorderThickness="0" mD:ShadowAssist.ShadowDepth="Depth2">
+				<Grid>
+					<Button x:Name="ButtonClearSongs" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,0,0,0" Width="407" Style="{DynamicResource MaterialDesignFlatButton}">删除曲库记录</Button>
+					<Button x:Name="ButtonClearPlaylist" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,37,0,0" Width="407" Style="{DynamicResource MaterialDesignFlatButton}">清除播放列表</Button>
+					<Button x:Name="ButtonRebuildDb" VerticalAlignment="Top" Margin="20,74,20,0" Style="{DynamicResource MaterialDesignFlatButton}">重建数据库</Button>
+				</Grid>
+			</GroupBox>
+		</Grid>
 	</mD:DialogHost>
 </UserControl>

@@ -958,13 +958,16 @@ Complete:
 	End Sub
 
 	Private Async Sub MenuImportPlaylist_Click(sender As Object, e As RoutedEventArgs) Handles MenuImportPlaylist.Click
-		'TODO: Check for same song
 		Dim dlgOpen As New System.Windows.Forms.OpenFileDialog
 		dlgOpen.Filter = "兼容的播放列表 |*.m3u; *.m3u8"
 		dlgOpen.Multiselect = False
 		Dim r = dlgOpen.ShowDialog()
 		If r = Forms.DialogResult.OK And My.Computer.FileSystem.FileExists(dlgOpen.FileName) Then
 			Dim files As New List(Of String)
+			Dim playlistName As String
+			playlistName = My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).Name
+			playlistName = playlistName.Replace("." & My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).Extension, "")
+
 			Dim reader = My.Computer.FileSystem.OpenTextFileReader(dlgOpen.FileName, Text.Encoding.UTF8)
 			Do Until reader.EndOfStream
 				Dim t = reader.ReadLine
@@ -990,13 +993,30 @@ Complete:
 			DlgWindowRoot.ShowDialog(dlgWait)
 			dlgWait.Text = "0/" & files.Count
 			Await Task.Run(Sub()
+							   'Add playlist, if there is one with the same name, merge
+							   If Not CheckPlaylistNameAvailability(playlistName) Then
+								   'Create
+								   AddPlaylist(playlistName)
+							   End If
+							   Dim playlistId = GetPlaylistIdByName(playlistName)
+
 							   For i = 0 To files.Count - 1
-								   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(files(i)).Name)
-								   My.Computer.FileSystem.CopyFile(files(i), localDir, True)
-								   Dim audioInfo As New Track(localDir)
-								   AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+								   Dim audioInfo As New Track(files(i))
+								   Dim songId As Integer
+								   If SongExists(audioInfo.Title, audioInfo.Artist) <> "" Then
+									   'if there is same song, dont copy
+									   songId = FindSong(audioInfo.Title, audioInfo.Artist)(0) 'only take the first one
+								   Else
+									   'copy and add to db
+									   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(files(i)).Name)
+									   My.Computer.FileSystem.CopyFile(files(i), localDir, True)
+									   songId = AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+									   dlgWait.Text = (i + 1) & "/" & files.Count
+								   End If
+								   'add to playlist
+								   AddSongToPlaylist(playlistId, songId)
+
 								   audioInfo = Nothing
-								   dlgWait.Text = (i + 1) & "/" & files.Count
 							   Next
 							   dlgWait.Text = "更新列表..."
 							   _lstSongs = GetSongs()
@@ -1008,7 +1028,6 @@ Complete:
 
 	Private Async Sub DatSongList_Drop(sender As Object, e As DragEventArgs) Handles DatSongList.Drop
 		If e.Data.GetFormats.Contains("FileNameW") Then
-			'TODO: Check for same song and ask if to continue
 			Dim filename() As String = e.Data.GetData("FileNameW")
 			Dim dlg As New dlgDragImport()
 			DlgWindowRoot.ShowDialog(dlg)
@@ -1019,11 +1038,13 @@ Complete:
 
 							   For i = 0 To filename.Count - 1
 								   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(filename(i)).Name)
-								   My.Computer.FileSystem.CopyFile(filename(i), localDir, True)
 								   Dim audioInfo As New Track(localDir)
-								   AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+								   If SongExists(audioInfo.Title, audioInfo.Artist) = "" Then
+									   My.Computer.FileSystem.CopyFile(filename(i), localDir, True)
+									   AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+									   Dispatcher.Invoke(Sub() dlg.Progress += 1)
+								   End If
 								   audioInfo = Nothing
-								   Dispatcher.Invoke(Sub() dlg.Progress += 1)
 							   Next
 
 							   Dispatcher.Invoke(Sub() dlg.ProgressBar.IsIndeterminate = True)
