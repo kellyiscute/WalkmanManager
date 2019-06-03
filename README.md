@@ -6,8 +6,8 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
 ## Current Progress
-**THE BETA RELEASE IS HERE!!!**  
-Download it [here](https://github.com/guo40020/WalkmanManager/releases)
+**THE BETA RELEASE IS HERE!!!**
+### [Download](https://github.com/guo40020/WalkmanManager/releases)
 
 ## TODO
 * [x] Drag to import
