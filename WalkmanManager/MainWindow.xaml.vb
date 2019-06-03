@@ -1037,6 +1037,10 @@ Complete:
 							   Dim localDir As String
 
 							   For i = 0 To filename.Count - 1
+								   'Check extension
+								   If Not DbUpdater.CheckExtention(filename(i)) Then
+									   Continue For
+								   End If
 								   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(filename(i)).Name)
 								   Dim audioInfo As New Track(localDir)
 								   If SongExists(audioInfo.Title, audioInfo.Artist) = "" Then
