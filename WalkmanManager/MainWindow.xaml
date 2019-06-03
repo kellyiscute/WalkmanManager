@@ -84,8 +84,10 @@
 								         PreviewMouseRightButtonDown="BlockRightClickSelection" Width="220" Margin="0,107,0,0">
 									<ListBox.ContextMenu>
 										<ContextMenu>
-											<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="150" Height="50" />
-											<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="150" Height="50" />
+											<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="180" Height="50" />
+											<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="180" Height="50" />
+											<Separator/>
+											<MenuItem x:Name="MenuImportPlaylist" Header="导入m3u播放列表" Width="180" Height="50" />
 										</ContextMenu>
 									</ListBox.ContextMenu>
 									<ListBoxItem Padding="15,7,0,7" Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
@@ -98,7 +100,7 @@
 									</ListBoxItem>
 								</ListBox>
 							</Grid>
-							<Grid x:Name="GridMusic" Margin="220,0,0,0">
+							<Grid x:Name="GridMusic" Margin="220,0,0,0" Background="#00000000">
 								<mD:ColorZone Height="45" Background="#FFF3F3F3" mD:ShadowAssist.ShadowDepth="Depth1">
 									<Grid>
 										<mD:ColorZone x:Name="PanelSearchLocalMusic" Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35"

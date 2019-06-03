@@ -193,6 +193,9 @@
     <Compile Include="Dialogs\DlgConvertNcm.xaml.vb">
       <DependentUpon>DlgConvertNcm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\dlgDragImport.xaml.vb">
+      <DependentUpon>dlgDragImport.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\dlgPlaylistSyncResult.xaml.vb">
       <DependentUpon>dlgPlaylistSyncResult.xaml</DependentUpon>
     </Compile>
@@ -224,9 +227,6 @@
       <DependentUpon>dlg_progress.xaml</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
-    <Compile Include="SongItm.xaml.vb">
-      <DependentUpon>SongItm.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Utils\MoreSound.vb" />
     <Compile Include="Utils\Searching.vb" />
     <Compile Include="Utils\ExtensionMethods.vb" />
@@ -237,6 +237,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\DlgConvertNcm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\dlgDragImport.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -284,10 +288,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="SongItm.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UserControls\NcmItem.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

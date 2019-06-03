@@ -143,14 +143,16 @@ Public Class Database
 	''' <param name="title">song title, read from file</param>
 	''' <param name="artists">artists</param>
 	''' <param name="path">file path</param>
-	Public Overloads Shared Sub AddSong(title As String, artists As String, path As String)
+	Public Overloads Shared Function AddSong(title As String, artists As String, path As String) As Integer
 		Dim conn = Connect()
 		Dim cmd = New SQLiteCommand(conn)
-		cmd.BuildQuery("insert into songs (title, artists, path) calues (?, ?, ?)",
+		cmd.BuildQuery("insert into songs (title, artists, path) values (?, ?, ?)",
 					   New Object() {title, artists, path})
 		cmd.ExecuteNonQuery()
+		Dim id = GetSongId(path, cmd)
 		conn.Close()
-	End Sub
+		Return id
+	End Function
 
 	''' <summary>
 	''' this is a overload of add_song method, which allows you to pass a SQLiteConnection Object instead of creating a new one
@@ -160,12 +162,14 @@ Public Class Database
 	''' <param name="artists">artists</param>
 	''' <param name="path">file path</param>
 	''' <param name="conn">SQLiteConnection Object</param>
-	Public Overloads Shared Sub AddSong(title As String, artists As String, path As String, conn As SQLiteConnection)
+	Public Overloads Shared Function AddSong(title As String, artists As String, path As String, conn As SQLiteConnection) As Integer
 		Dim cmd = New SQLiteCommand(conn)
 		cmd.BuildQuery("insert into songs (title, artists, path) calues (?, ?, ?)",
 					   New Object() {title, artists, path})
 		cmd.ExecuteNonQuery()
-	End Sub
+		Dim id = GetSongId(path, cmd)
+		Return id
+	End Function
 
 	''' <summary>
 	''' this is a overload of add_song method, which allows you to pass a SQLiteCommand Object instead of creating a new connection and a new command object
@@ -174,11 +178,13 @@ Public Class Database
 	''' <param name="artists">artists</param>
 	''' <param name="path">file path</param>
 	''' <param name="cmd">SQLiteCommand Object</param>
-	Public Overloads Shared Sub AddSong(title As String, artists As String, path As String, cmd As SQLiteCommand)
+	Public Overloads Shared Function AddSong(title As String, artists As String, path As String, cmd As SQLiteCommand) As Integer
 		cmd.BuildQuery("insert into songs (title, artists, path) values (?, ?, ?)",
 					   New Object() {title, artists, path})
 		cmd.ExecuteNonQuery()
-	End Sub
+		Dim id = GetSongId(path, cmd)
+		Return id
+	End Function
 
 	''' <summary>
 	''' create a new playlist in the database
@@ -936,6 +942,22 @@ Public Class Database
 			Return ""
 		End If
 
+	End Function
+
+	Public Overloads Shared Function FindSong(title As String, artists As String) As List(Of Integer)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		cmd.BuildQuery("select id from songs where title = ? and artists = ?", New Object() {title, artists})
+		Dim r = cmd.ExecuteReader()
+		Dim result As New List(Of Integer)
+		If r.HasRows Then
+			While r.Read
+				result.Add(r(0))
+			End While
+		End If
+		r.Close()
+		conn.Close()
+		Return result
 	End Function
 
 	Public Shared Sub RenamePlaylist(name As String, newName As String)

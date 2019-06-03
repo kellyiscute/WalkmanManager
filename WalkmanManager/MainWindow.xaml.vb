@@ -804,7 +804,8 @@ Class MainWindow
 						   For Each p In lstPlaylists
 							   Try
 								   AddSyncLog(LogType.Information, "写入：" & wmManagedPath & "\" & p & ".m3u")
-								   Dim playlistFile = My.Computer.FileSystem.OpenTextFileWriter(wmManagedPath & "\" & p & ".m3u", False, Text.Encoding.UTF8)
+								   Dim playlistFile = My.Computer.FileSystem.OpenTextFileWriter(wmManagedPath & "\" & p & ".m3u", False,
+																								Text.Encoding.UTF8)
 								   For Each s In GetSongsFromPlaylist(p)
 									   Dim sInfo = GetSongById(s)
 									   playlistFile.WriteLine(My.Computer.FileSystem.GetFileInfo(sInfo.Path).Name)
@@ -952,7 +953,118 @@ Complete:
 
 	Private Sub dlgConvertNcm_Close()
 		GridRoot.Children.Remove(_toolWindowConvertNcm)
-		_toolWindowConvertNcm.dispose
+		_toolWindowConvertNcm.Dispose()
 		_toolWindowConvertNcm = Nothing
+	End Sub
+
+	Private Async Sub MenuImportPlaylist_Click(sender As Object, e As RoutedEventArgs) Handles MenuImportPlaylist.Click
+		Dim dlgOpen As New System.Windows.Forms.OpenFileDialog
+		dlgOpen.Filter = "兼容的播放列表 |*.m3u; *.m3u8"
+		dlgOpen.Multiselect = False
+		Dim r = dlgOpen.ShowDialog()
+		If r = Forms.DialogResult.OK And My.Computer.FileSystem.FileExists(dlgOpen.FileName) Then
+			Dim files As New List(Of String)
+			Dim playlistName As String
+			playlistName = My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).Name
+			playlistName = playlistName.Replace("." & My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).Extension, "")
+
+			Dim reader = My.Computer.FileSystem.OpenTextFileReader(dlgOpen.FileName, Text.Encoding.UTF8)
+			Do Until reader.EndOfStream
+				Dim t = reader.ReadLine
+				If Not t.StartsWith("#") Then
+					files.Add(t)
+				End If
+			Loop
+
+			'Check path
+			For i = 0 To files.Count - 1
+				files(i) = IIf(My.Computer.FileSystem.FileExists(files(i)), files(i),
+							   My.Computer.FileSystem.CombinePath(My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).DirectoryName,
+																  files(i)))
+				If Not My.Computer.FileSystem.FileExists(files(i)) Then
+					files(i) = ""
+				End If
+			Next
+
+			'Copy to library & add to database
+			Dim libDir = GetSetting("song_dir")
+			Dim localDir As String
+			Dim dlgWait As New dlg_progress()
+			DlgWindowRoot.ShowDialog(dlgWait)
+			dlgWait.Text = "0/" & files.Count
+			Await Task.Run(Sub()
+							   'Add playlist, if there is one with the same name, merge
+							   If Not CheckPlaylistNameAvailability(playlistName) Then
+								   'Create
+								   AddPlaylist(playlistName)
+							   End If
+							   Dim playlistId = GetPlaylistIdByName(playlistName)
+
+							   For i = 0 To files.Count - 1
+								   Dim audioInfo As New Track(files(i))
+								   Dim songId As Integer
+								   If SongExists(audioInfo.Title, audioInfo.Artist) <> "" Then
+									   'if there is same song, dont copy
+									   songId = FindSong(audioInfo.Title, audioInfo.Artist)(0) 'only take the first one
+								   Else
+									   'copy and add to db
+									   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(files(i)).Name)
+									   My.Computer.FileSystem.CopyFile(files(i), localDir, True)
+									   songId = AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+									   dlgWait.Text = (i + 1) & "/" & files.Count
+								   End If
+								   'add to playlist
+								   AddSongToPlaylist(playlistId, songId)
+
+								   audioInfo = Nothing
+							   Next
+							   dlgWait.Text = "更新列表..."
+							   _lstSongs = GetSongs()
+							   DatSongList.ItemsSource = _lstSongs
+						   End Sub)
+			DlgWindowRoot.IsOpen = False
+		End If
+	End Sub
+
+	Private Async Sub DatSongList_Drop(sender As Object, e As DragEventArgs) Handles DatSongList.Drop
+		If e.Data.GetFormats.Contains("FileNameW") Then
+			Dim filename() As String = e.Data.GetData("FileNameW")
+			Dim dlg As New dlgDragImport()
+			DlgWindowRoot.ShowDialog(dlg)
+			dlg.Max = filename.Count
+			Await Task.Run(Sub()
+							   Dim libDir = GetSetting("song_dir")
+							   Dim localDir As String
+
+							   For i = 0 To filename.Count - 1
+								   'Check extension
+								   If Not DbUpdater.CheckExtention(filename(i)) Then
+									   Continue For
+								   End If
+								   localDir = My.Computer.FileSystem.CombinePath(libDir, My.Computer.FileSystem.GetFileInfo(filename(i)).Name)
+								   Dim audioInfo As New Track(localDir)
+								   If SongExists(audioInfo.Title, audioInfo.Artist) = "" Then
+									   My.Computer.FileSystem.CopyFile(filename(i), localDir, True)
+									   AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+									   Dispatcher.Invoke(Sub() dlg.Progress += 1)
+								   End If
+								   audioInfo = Nothing
+							   Next
+
+							   Dispatcher.Invoke(Sub() dlg.ProgressBar.IsIndeterminate = True)
+							   _lstSongs = GetSongs()
+
+						   End Sub)
+			DlgWindowRoot.IsOpen = False
+		End If
+	End Sub
+
+	Private Sub DatSongList_DragOver(sender As Object, e As DragEventArgs) Handles DatSongList.DragOver
+		If e.Data.GetFormats.Contains("FileNameW") Or e.Data.GetFormats.Contains("GongSolutions.Wpf.DragDrop") Then
+			e.Effects = DragDropEffects.All
+		Else
+			e.Effects = DragDropEffects.None
+		End If
+		e.Handled = True
 	End Sub
 End Class
