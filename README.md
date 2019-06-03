@@ -13,10 +13,21 @@ Download it [here](https://github.com/guo40020/WalkmanManager/releases)
 * [x] Drag to import
 * [ ] Match Cover and Lyrics for local songs
 * [ ] Tries to Download CloudMusic Playlist
-* [ ] Demos in README
+* [x] Demos in README
 
 ## Demos  
-`It's in TODO (:P)`
+### To see and change(I forgot to make gif) song details
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/MusicDetail.gif?raw=true)
+### Drag Files to Import to Library
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/DragImport.gif?raw=true)
+### Create Playlists and Put songs in
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/Playlists.gif?raw=true)
+### Playlists Operations
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/Playlists2.gif?raw=true)
+### Search Local Library
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/SearchLocal.gif?raw=true)
+### Convert Ncm Files
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/ConvertNcm.gif?raw=true)
 
 ## License
 
