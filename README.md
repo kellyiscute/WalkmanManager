@@ -11,6 +11,8 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 
 ## TODO
 * [x] Drag to import
+* [ ] Personal Cloud Sync
+* [ ] Fix issue #7
 * [ ] Match Cover and Lyrics for local songs
 * [ ] Tries to Download CloudMusic Playlist
 * [x] Demos in README
