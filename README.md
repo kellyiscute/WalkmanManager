@@ -1,4 +1,4 @@
-﻿﻿﻿﻿# WalkmanManager
+# WalkmanManager
 A easy-to-use app to replace Sony MediaCenter with more features and better design  
  **Project Launched: _3rd Jul, 2018_**  
  **Beta Released: _3rd May, 2019_**
@@ -6,15 +6,30 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
 ## Current Progress
-**THE BETA RELEASE IS HERE!!!**  
-Download it [here](https://github.com/guo40020/WalkmanManager/releases)
+**THE BETA RELEASE IS HERE!!!**
+### [Download](https://github.com/guo40020/WalkmanManager/releases)
 
-## Authors
+## TODO
+* [x] Drag to import
+* [ ] Personal Cloud Sync
+* [ ] Fix issue #7
+* [ ] Match Cover and Lyrics for local songs
+* [ ] Tries to Download CloudMusic Playlist
+* [x] Demos in README
 
-* [**Kelly**](https://github.com/guo40020) - *Initial work*
-* [**Banyc**](https://github.com/Banyc) - *Initial work* for files in ".\WalkmanManager\music_files_management\" and for this "README.md"
-
-See also [contributors](https://github.com/guo40020/WalkmanManager/graphs/contributors)
+## Demos  
+### To see and change(I forgot to make gif) song details
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/MusicDetail.gif?raw=true)
+### Drag Files to Import to Library
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/DragImport.gif?raw=true)
+### Create Playlists and Put songs in
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/Playlists.gif?raw=true)
+### Playlists Operations
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/Playlists2.gif?raw=true)
+### Search Local Library
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/SearchLocal.gif?raw=true)
+### Convert Ncm Files
+![](https://github.com/guo40020/WalkmanManager/blob/master/Demos/ConvertNcm.gif?raw=true)
 
 ## License
 
