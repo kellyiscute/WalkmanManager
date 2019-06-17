@@ -40,6 +40,7 @@
     <DocumentationFile>WalkmanManager.xml</DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42025,42029,42031,42032,42036</NoWarn>
     <WarningLevel>1</WarningLevel>
+    <CodeAnalysisRuleSet>BasicCorrectnessRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -124,6 +125,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ATL, Version=2.9.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -227,11 +231,13 @@
       <DependentUpon>dlg_progress.xaml</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="Utils\DriveInfoMem.vb" />
     <Compile Include="Utils\MoreSound.vb" />
     <Compile Include="Utils\Searching.vb" />
     <Compile Include="Utils\ExtensionMethods.vb" />
     <Compile Include="Utils\SyncAnalyzer.vb" />
     <Compile Include="Utils\Synchronizer.vb" />
+    <Compile Include="Utils\USBWatcher.vb" />
     <Page Include="Dialogs\DlgCloudMusicLogin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -335,6 +341,7 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
     </EmbeddedResource>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
@@ -353,6 +360,13 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Res\user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\MaterialDesignInXAMLToolkit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\NewtonsoftJson.png" />
+    <Resource Include="Res\Sqlite.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.110.0\build\net451\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.110.0\build\net451\System.Data.SQLite.Core.targets')" />

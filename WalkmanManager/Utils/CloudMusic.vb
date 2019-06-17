@@ -66,8 +66,8 @@ Public Class CloudMusic
 
 	Private Function InitCookies()
 		Dim cookie = New List(Of Cookie)
-		'cookie.Add(New Cookie With {.Name = "os", .Value = "pc", .Domain = "music.163.com"})
-		'cookie.Add(New Cookie With {.Name = "osver", .Value = "Ubuntu 18.04", .Domain = "music.163.com"})
+		cookie.Add(New Cookie With {.Name = "os", .Value = "pc", .Domain = "music.163.com"})
+		cookie.Add(New Cookie With {.Name = "osver", .Value = "Ubuntu 18.04", .Domain = "music.163.com"})
 		cookie.Add(New Cookie With {.Name = "appver", .Value = "2.0.3.131777", .Domain = "music.163.com"})
 		cookie.Add(New Cookie With {.Name = "channel", .Value = "netease", .Domain = "music.163.com"})
 		Return cookie

@@ -1,10 +1,11 @@
 ﻿Imports System.Collections.ObjectModel
+Imports System.IO
 Imports System.Threading
 Imports System.Windows.Shell
-Imports MaterialDesignThemes.Wpf
-Imports WalkmanManager.Database
 Imports ATL
 Imports GongSolutions.Wpf.DragDrop
+Imports MaterialDesignThemes.Wpf
+Imports WalkmanManager.Database
 
 Class MainWindow
 	ReadOnly NETEASE_RED = Media.Color.FromRgb(198, 47, 47)
@@ -19,6 +20,8 @@ Class MainWindow
 	Dim _flgUSBRefreshPause As Boolean = False
 	Dim _encryptKey As String
 	Dim _toolWindowConvertNcm As DlgConvertNcm
+	Dim _usbWatcher As UsbWatcher
+	Dim _sbMessageQueue As New SnackbarMessageQueue
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -139,7 +142,6 @@ Class MainWindow
 	''' <summary>
 	''' UI login method, return an empty string when success, error message when failed
 	''' </summary>
-	''' <param name="dlgLogin">login dialog reference, for user phone and password</param>
 	''' <param name="dlgProg">progress dialog ref, for changing prompt</param>
 	''' <returns></returns>
 	Private Async Function UiCloudMusicLogin(phone As String, pwd As String, dlgProg As dlg_progress) As Task(Of String)
@@ -204,16 +206,79 @@ Class MainWindow
 			Await DialogHost.Show(dlgSyncResult, "window-root")
 		End If
 		_syncRemoteDeviceContent = ButtonRemoteSync.Content
-		Dim t As New Thread(Sub()
-								Do
-									If Not _flgUSBRefreshPause Then
-										ButtonRefreshDeviceList_Click(Nothing, Nothing)
-										Thread.Sleep(1000)
-									End If
-								Loop
-							End Sub)
-		t.IsBackground = True
-		t.Start()
+		'Init USB Watcher
+		_usbWatcher = New UsbWatcher
+		AddHandler _usbWatcher.Unplugged, AddressOf Device_Unplugged
+		AddHandler _usbWatcher.PluggedIn, AddressOf Device_PluggedIn
+		_usbWatcher.Start()
+		'Init Device List
+		ButtonRefreshDeviceList_Click(Nothing, Nothing)
+		'Monitor File changes
+		Dim w As New FileSystemWatcher(GetSetting("song_dir"))
+		AddHandler w.Created, AddressOf File_Created
+		AddHandler w.Deleted, AddressOf File_Deleted
+		w.EnableRaisingEvents = True
+		'Set Message Queue
+		SnackbarInfoMessage.MessageQueue = _sbMessageQueue
+	End Sub
+
+	Private Sub File_Created(sender As Object, e As FileSystemEventArgs)
+		If DbUpdater.CheckExtention(e.FullPath) Then
+			'if is audio, add to db
+			Dim t As New Track(e.FullPath)
+			Dim id = AddSong(t.Title, t.Artist, e.FullPath)
+			'add to list
+			Dispatcher.Invoke(Sub() _lstSongs.Add(New SongInfo With {.Title = t.Title, .Artists = t.Artist, .Path = e.FullPath, .Id = id}))
+			t = Nothing
+			_sbMessageQueue.Enqueue($"新文件：{e.FullPath}")
+		End If
+	End Sub
+
+	Private Sub File_Deleted(sender As Object, e As FileSystemEventArgs)
+		If DbUpdater.CheckExtention(e.FullPath) Then
+			'if is audio, check if in db
+			Dim id = GetSongId(e.FullPath)
+			If Not IsNothing(id) Then
+				'remove from db
+				RemoveSongFromLib(id)
+				'remove from list
+				Dispatcher.Invoke(Sub() _lstSongs.Remove((From itm In _lstSongs Where itm.Path = e.FullPath Select itm)(0)))
+			End If
+			_sbMessageQueue.Enqueue($"文件删除：{e.FullPath}")
+		End If
+	End Sub
+
+	Private Sub Device_Unplugged(sender As Object, d As DriveInfoMem)
+		Dim selDevName, selDevLabel As String
+		selDevName = Dispatcher.Invoke(Of String)(Function()
+													  Return Mid(ComboBoxDevices.SelectedValue, 1, 3)
+												  End Function)
+		selDevLabel = Dispatcher.Invoke(Of String)(Function()
+													   Return ComboBoxDevices.SelectedValue.Substring(5, ComboBoxDevices.SelectedValue.length - 6)
+												   End Function)
+
+		For Each itm In ComboBoxDevices.Items
+			If itm = $"{d.Name} ({d.VolumeLabel})" Then
+				Dispatcher.Invoke(Sub() ComboBoxDevices.Items.Remove(itm))
+				Exit For
+			End If
+		Next
+		If selDevLabel = d.VolumeLabel And selDevName = d.Name Then
+			Dispatcher.Invoke(Sub()
+								  If ComboBoxDevices.Items.Count > 0 Then
+									  ComboBoxDevices.SelectedIndex = 0
+								  Else
+									  ComboBoxDevices.SelectedIndex = -1
+								  End If
+							  End Sub)
+		End If
+
+		_sbMessageQueue.Enqueue($"设备拔出：{d.Name} ({d.VolumeLabel})")
+	End Sub
+
+	Private Sub Device_PluggedIn(sender As Object, d As DriveInfoMem)
+		Dispatcher.Invoke(Sub() ComboBoxDevices.Items.Add($"{d.Name} ({d.VolumeLabel})"))
+		_sbMessageQueue.Enqueue($"设备插入：{d.Name} ({d.VolumeLabel})")
 	End Sub
 
 	Private Async Sub RefreshPlaylists()
@@ -221,7 +286,6 @@ Class MainWindow
 											 Dim r = GetPlaylists()
 											 Return r
 										 End Function)
-		Dim addNew = ListBoxPlaylist.Items(ListBoxPlaylist.Items.Count - 1)
 		ListBoxPlaylist.Items.Clear()
 
 		For Each itm In lstPlaylist
@@ -229,7 +293,6 @@ Class MainWindow
 			AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
 			ListBoxPlaylist.Items.Add(lbitm)
 		Next
-		ListBoxPlaylist.Items.Add(addNew)
 	End Sub
 
 	Private Sub MainWindow_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
@@ -306,49 +369,40 @@ Class MainWindow
 	End Sub
 
 	'Playlist Selected
-	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs)
+	Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs) Handles ListBoxPlaylist.SelectionChanged
 		If sender.SelectedIndex <> -1 And Not _isRightClickSelect Then
-			If sender.SelectedItem.Tag = "NewPlaylist" Then
-				'if is button "NewPlaylist"
-				Dim dlg As New DlgNewPlaylist
-				Dim result = Await DlgWindowRoot.ShowDialog(dlg)
-				If result Then
-					AddPlaylist(dlg.PlaylistName)
-					Dim lbitm = New ListBoxItem() With {.Content = dlg.PlaylistName, .AllowDrop = True}
-					AddHandler lbitm.Drop, AddressOf ListBoxItem_Drop
-					ListBoxPlaylist.Items.Insert(ListBoxPlaylist.Items.Count - 1, lbitm)
-				End If
-				sender.SelectedIndex = -1
-			Else
-				'if not editing
-				If ListBoxPlaylist.SelectedItem.Content.GetType = GetType(String) Then
-					ButtonMusic.IsSelected = False
-					DatSongList.CanUserSortColumns = False
-					ButtonSaveSorting.Visibility = Visibility.Visible
-					PanelSearchLocalMusic.Visibility = Visibility.Collapsed
-					Dim dlg As New dlg_progress
-					DatSongList.ItemsSource = Nothing
-					DialogHost.Show(dlg, "window-root")
-					Dim playlistName = sender.SelectedItem.Content
-					Dim lstSongs = Await Task.Run(Function()
-													  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
-													  Dim conn = Connect()
-													  Dim trans = conn.BeginTransaction()
-													  Dim cmd = conn.CreateCommand()
-													  cmd.Transaction = trans
-													  Dim songs As New ObservableCollection(Of SongInfo)
-													  For Each itm In songIds
-														  songs.Add(GetSongById(itm, cmd))
-													  Next
-													  trans.Commit()
-													  conn.Close()
-													  Return songs
-												  End Function)
-					DatSongList.ItemsSource = lstSongs
-					DlgWindowRoot.IsOpen = False
-					ListBoxPlaylist.Focus()
-				End If
+
+			'if not editing
+			If ListBoxPlaylist.SelectedItem.Content.GetType = GetType(String) Then
+				ButtonMusic.IsSelected = False
+				DatSongList.CanUserSortColumns = False
+				ButtonSaveSorting.Visibility = Visibility.Visible
+				PanelSearchLocalMusic.Visibility = Visibility.Collapsed
+				Dim dlg As New dlg_progress
+				DatSongList.ItemsSource = Nothing
+				DialogHost.Show(dlg, "window-root")
+				Dim playlistName = sender.SelectedItem.Content
+				Dim lstSongs = Await Task.Run(Function()
+												  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
+												  Dim conn = Connect()
+												  Dim trans = conn.BeginTransaction()
+												  Dim cmd = conn.CreateCommand()
+												  cmd.Transaction = trans
+												  Dim songs As New ObservableCollection(Of SongInfo)
+												  For Each itm In songIds
+													  songs.Add(GetSongById(itm, cmd))
+												  Next
+												  trans.Commit()
+												  conn.Close()
+												  Return songs
+											  End Function)
+				DatSongList.ItemsSource = lstSongs
+				DlgWindowRoot.IsOpen = False
+				ListBoxPlaylist.Focus()
+
 			End If
+		Else
+			DatSongList.CanUserSortColumns = True
 		End If
 		_isRightClickSelect = False
 	End Sub
@@ -367,14 +421,14 @@ Class MainWindow
 		ButtonSaveSorting.Visibility = Visibility.Collapsed
 	End Sub
 
-	'Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected
-	'	On Error Resume Next
-	'	ListBoxPlaylist.SelectedIndex = -1
-	'	DatSongList.CanUserSortColumns = True
-	'End Sub
+	Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected
+		On Error Resume Next
+		ListBoxPlaylist.SelectedIndex = -1
+		DatSongList.CanUserSortColumns = True
+	End Sub
 
 	Private Async Sub DeletePlaylist_Click(sender As Object, e As EventArgs) Handles MenuDeletePlaylist.Click
-		If ListBoxPlaylist.SelectedIndex <> -1 And ListBoxPlaylist.SelectedIndex <> ListBoxPlaylist.Items.Count - 1 Then
+		If ListBoxPlaylist.SelectedIndex <> -1 Then 'And ListBoxPlaylist.SelectedIndex <> ListBoxPlaylist.Items.Count - 1
 			Dim dlg As New DlgYesNoDialog("删除播放列表", "要删除播放列表 """ & ListBoxPlaylist.SelectedItem.Content & """ 吗")
 			Dim r = Await DlgWindowRoot.ShowDialog(dlg)
 			If r = True Then
@@ -405,6 +459,7 @@ Class MainWindow
 				For Each o As Object In removeList
 					Dim source = CType(DatSongList.ItemsSource, ObservableCollection(Of SongInfo))
 					source.Remove(o)
+					_lstSongs.Remove(o)
 				Next
 			End If
 		Else
@@ -427,6 +482,7 @@ Class MainWindow
 				For Each o As Object In removeList
 					Dim source = CType(DatSongList.ItemsSource, ObservableCollection(Of SongInfo))
 					source.Remove(o)
+					_lstSongs.Remove(o)
 				Next
 			End If
 		End If
@@ -966,7 +1022,7 @@ Complete:
 			Dim files As New List(Of String)
 			Dim playlistName As String
 			playlistName = My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).Name
-			playlistName = playlistName.Replace("." & My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).Extension, "")
+			playlistName = playlistName.Replace(My.Computer.FileSystem.GetFileInfo(dlgOpen.FileName).Extension, "")
 
 			Dim reader = My.Computer.FileSystem.OpenTextFileReader(dlgOpen.FileName, Text.Encoding.UTF8)
 			Do Until reader.EndOfStream
@@ -994,7 +1050,7 @@ Complete:
 			dlgWait.Text = "0/" & files.Count
 			Await Task.Run(Sub()
 							   'Add playlist, if there is one with the same name, merge
-							   If Not CheckPlaylistNameAvailability(playlistName) Then
+							   If CheckPlaylistNameAvailability(playlistName) Then
 								   'Create
 								   AddPlaylist(playlistName)
 							   End If
@@ -1020,7 +1076,8 @@ Complete:
 							   Next
 							   dlgWait.Text = "更新列表..."
 							   _lstSongs = GetSongs()
-							   DatSongList.ItemsSource = _lstSongs
+							   'DatSongList.ItemsSource = _lstSongs
+							   Dispatcher.Invoke(Sub() RefreshPlaylists())
 						   End Sub)
 			DlgWindowRoot.IsOpen = False
 		End If
@@ -1053,7 +1110,6 @@ Complete:
 
 							   Dispatcher.Invoke(Sub() dlg.ProgressBar.IsIndeterminate = True)
 							   _lstSongs = GetSongs()
-
 						   End Sub)
 			DlgWindowRoot.IsOpen = False
 		End If
@@ -1066,5 +1122,16 @@ Complete:
 			e.Effects = DragDropEffects.None
 		End If
 		e.Handled = True
+	End Sub
+
+	Private Async Sub ButtonAddPlaylist_Click(sender As Object, e As RoutedEventArgs) Handles ButtonAddPlaylist.Click
+		Dim dlg As New DlgNewPlaylist
+		Dim result = Await DlgWindowRoot.ShowDialog(dlg)
+		If result Then
+			AddPlaylist(dlg.PlaylistName)
+			RefreshPlaylists()
+		End If
+		ButtonMusic.IsSelected = True
+		ListBoxPlaylist.SelectedIndex = -1
 	End Sub
 End Class

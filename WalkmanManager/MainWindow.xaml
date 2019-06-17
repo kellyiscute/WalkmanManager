@@ -78,9 +78,16 @@
 										<Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center" Content="音乐" />
 									</ListBoxItem>
 								</ListBox>
-								<Label Padding="20,10,5,5" Content="本地播放列表" Margin="0,67,0,0" BorderThickness="0,1,0,1" BorderBrush="LightGray"
-								       Height="35" VerticalAlignment="Top" />
-								<ListBox x:Name="ListBoxPlaylist" SelectionChanged="ListItem_SelectionChange"
+								<Border Padding="20,10,5,5" Margin="0,67,0,0" BorderThickness="0,1,0,1" BorderBrush="LightGray"
+								       Height="35" VerticalAlignment="Top">
+									<Grid>
+										<TextBlock>本地播放列表</TextBlock>
+										<Button x:Name="ButtonAddPlaylist" Style="{DynamicResource MaterialDesignToolButton}" Margin="0,-9,0,-5" HorizontalAlignment="Right" Width="39" mD:RippleAssist.IsCentered="True" mD:RippleAssist.RippleSizeMultiplier="1">
+											<mD:PackIcon Kind="PlusCircleOutline"/>
+										</Button>
+									</Grid>
+								</Border>
+								<ListBox x:Name="ListBoxPlaylist"
 								         PreviewMouseRightButtonDown="BlockRightClickSelection" Width="220" Margin="0,107,0,0">
 									<ListBox.ContextMenu>
 										<ContextMenu>
@@ -90,14 +97,14 @@
 											<MenuItem x:Name="MenuImportPlaylist" Header="导入m3u播放列表" Width="180" Height="50" />
 										</ContextMenu>
 									</ListBox.ContextMenu>
-									<ListBoxItem Padding="15,7,0,7" Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
+									<!--<ListBoxItem Padding="15,7,0,7" Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
 										<WrapPanel>
 											<mD:PackIcon Kind="PlaylistPlus" />
 											<TextBlock>
 												<Run Text="新建播放列表" />
 											</TextBlock>
 										</WrapPanel>
-									</ListBoxItem>
+									</ListBoxItem>-->
 								</ListBox>
 							</Grid>
 							<Grid x:Name="GridMusic" Margin="220,0,0,0" Background="#00000000">
@@ -153,7 +160,7 @@
 					</mD:DialogHost>
 				</Grid>
 				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" d:IsHidden="True" Visibility="Hidden">
-					
+
 					<mD:DialogHost x:Name="DlgCloudMusic">
 						<Grid>
 							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70"
@@ -309,5 +316,6 @@
 				</Grid>
 			</Grid>
 		</mD:DialogHost>
+		<mD:Snackbar x:Name="SnackbarInfoMessage"/>
 	</Grid>
 </Window>

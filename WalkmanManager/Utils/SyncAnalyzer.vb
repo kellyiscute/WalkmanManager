@@ -42,7 +42,10 @@ Public Class SyncAnalyzer
 				lstFailed.Add(track)
 			Else
 				Dim songId = GetSongId(path, cmd)
-				AddSongToPlaylist(id, songId, cmd, counter)
+				Try
+					AddSongToPlaylist(id, songId, cmd, counter)
+				Catch
+				End Try
 				counter += 1
 			End If
 			currentProgress += 1
