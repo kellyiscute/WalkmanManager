@@ -251,10 +251,18 @@ Class MainWindow
 	Private Sub Device_Unplugged(sender As Object, d As DriveInfoMem)
 		Dim selDevName, selDevLabel As String
 		selDevName = Dispatcher.Invoke(Of String)(Function()
-													  Return Mid(ComboBoxDevices.SelectedValue, 1, 3)
+													  Try
+														  Return Mid(ComboBoxDevices.SelectedValue, 1, 3)
+													  Catch
+														  Return ""
+													  End Try
 												  End Function)
 		selDevLabel = Dispatcher.Invoke(Of String)(Function()
-													   Return ComboBoxDevices.SelectedValue.Substring(5, ComboBoxDevices.SelectedValue.length - 6)
+													   Try
+														   Return ComboBoxDevices.SelectedValue.Substring(5, ComboBoxDevices.SelectedValue.length - 6)
+													   Catch
+														   Return ""
+													   End Try
 												   End Function)
 
 		For Each itm In ComboBoxDevices.Items
@@ -671,13 +679,12 @@ Class MainWindow
 	Private Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
 		If ButtonRemoteSync.Content.Equals(_syncRemoteDeviceContent) Then
 			_flgSyncStop = False
-			_flgUSBRefreshPause = True
+			_usbWatcher.FlgPause = True
 			StartSync()
 		Else
 			ButtonRemoteSync.Content = "正在取消"
 			ButtonRemoteSync.IsEnabled = False
 			_flgSyncStop = True
-			_flgUSBRefreshPause = False
 		End If
 	End Sub
 
@@ -887,6 +894,8 @@ Complete:
 		End If
 		Await DlgWindowRoot.ShowDialog(msgDlg)
 		ButtonRemoteSync.IsEnabled = True
+		Await Task.Run(Sub() Thread.Sleep(1000))
+		_usbWatcher.FlgPause = False
 	End Sub
 
 	Private Sub CopyingDetailUpdateEventHandler(sender As Synchronizer)
