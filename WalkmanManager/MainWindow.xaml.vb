@@ -6,6 +6,7 @@ Imports ATL
 Imports GongSolutions.Wpf.DragDrop
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
+Imports WalkmanManager.CloudMusic
 
 Class MainWindow
 	ReadOnly NETEASE_RED = Media.Color.FromRgb(198, 47, 47)
@@ -14,7 +15,7 @@ Class MainWindow
 	Dim _lstSongs As ObservableCollection(Of SongInfo)
 	Dim _isRightClickSelect As Boolean = False
 	Dim _isCloudMusicLoggedIn As Boolean = False
-	Dim _cloudMusic As New CloudMusic
+	Dim _cloudMusic As New CloudMusic.CloudMusic
 	Dim _syncRemoteDeviceContent As Object
 	Dim _flgSyncStop As Boolean
 	Dim _flgUSBRefreshPause As Boolean = False
@@ -22,6 +23,8 @@ Class MainWindow
 	Dim _toolWindowConvertNcm As DlgConvertNcm
 	Dim _usbWatcher As UsbWatcher
 	Dim _sbMessageQueue As New SnackbarMessageQueue
+	Dim _remoteActionSyncContent As WrapPanel
+	Dim _remoteActionTakeOverContent As WrapPanel
 
 	Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
 		Handles CzTitle.MouseLeftButtonDown
@@ -205,7 +208,7 @@ Class MainWindow
 			Dim dlgSyncResult = New dlgDirSyncResult(newLost)
 			Await DialogHost.Show(dlgSyncResult, "window-root")
 		End If
-		_syncRemoteDeviceContent = ButtonRemoteSync.Content
+		_syncRemoteDeviceContent = ButtonRemoteAction.Content
 		'Init USB Watcher
 		_usbWatcher = New UsbWatcher
 		AddHandler _usbWatcher.Unplugged, AddressOf Device_Unplugged
@@ -310,6 +313,19 @@ Class MainWindow
 										.UseAeroCaptionButtons = False, .ResizeBorderThickness = New Thickness(5),
 										.CornerRadius = New CornerRadius(10),
 										.CaptionHeight = 34})
+		'Init ActionButton Content
+		_remoteActionSyncContent = New WrapPanel
+		With _remoteActionSyncContent
+			.Children.Add(New PackIcon With {.Kind = PackIconKind.Sync})
+			.Children.Add(New TextBlock With {.Text = "同步", .Height = 29, .Width = 29})
+		End With
+
+		_remoteActionTakeOverContent = New WrapPanel
+		With _remoteActionTakeOverContent
+			.Children.Add(New PackIcon With {.Kind = PackIconKind.Undo})
+			.Children.Add(New TextBlock With {.Text = "接管", .Height = 29, .Width = 29})
+		End With
+
 	End Sub
 
 	Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
@@ -530,7 +546,7 @@ Class MainWindow
 	Private Sub ButtonCloudMusicLogout_Click(sender As Object, e As RoutedEventArgs) Handles ButtonCloudMusicLogout.Click
 		SaveSetting("CloudMusicAutoLogin", "False")
 		_cloudMusic = Nothing
-		_cloudMusic = New CloudMusic
+		_cloudMusic = New CloudMusic.CloudMusic
 		_isCloudMusicLoggedIn = False
 		ImageCloudMusicAvatar.Source = Nothing
 		TabCloudMusic.IsSelected = False
@@ -619,7 +635,7 @@ Class MainWindow
 		Dim rString As String
 		rString = "同步 """ & plName & """ 完成" & vbTab & "失败 " & failed.Count & " 个"
 		rString += vbNewLine & StrDup(rString.Length, "=")
-		For Each itmCloudMusicTracks As CloudMusic.CloudMusicTracks In failed
+		For Each itmCloudMusicTracks As CloudMusic.CloudMusic.CloudMusicTracks In failed
 			rString += vbNewLine & itmCloudMusicTracks.Title & " - " & itmCloudMusicTracks.Artists
 		Next
 		Dim dlgResult As New dlgPlaylistSyncResult(rString)
@@ -676,22 +692,24 @@ Class MainWindow
 		Public Lyric As String
 	End Structure
 
-	Private Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteSync.Click
-		If ButtonRemoteSync.Content.Equals(_syncRemoteDeviceContent) Then
-			_flgSyncStop = False
-			_usbWatcher.FlgPause = True
-			StartSync()
-		Else
-			ButtonRemoteSync.Content = "正在取消"
-			ButtonRemoteSync.IsEnabled = False
-			_flgSyncStop = True
+	Private Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteAction.Click
+		If ComboBoxDevices.SelectedIndex <> -1 Then
+			If ButtonRemoteAction.Content.Equals(_syncRemoteDeviceContent) Then
+				_flgSyncStop = False
+				_usbWatcher.FlgPause = True
+				StartSync()
+			Else
+				ButtonRemoteAction.Content = "正在取消"
+				ButtonRemoteAction.IsEnabled = False
+				_flgSyncStop = True
+			End If
 		End If
 	End Sub
 
 	Private Async Sub StartSync()
 
 		ProgressBarSyncTotal.IsIndeterminate = True
-		ButtonRemoteSync.Content = "取消"
+		ButtonRemoteAction.Content = "取消"
 		Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
 		Dim wmManagedPath = drivePath & "\MUSIC\wmManaged"
 		AddSyncLog(LogType.Information, "连接数据库")
@@ -815,7 +833,7 @@ Class MainWindow
 			ProgressBarSyncSub.IsIndeterminate = False
 			ProgressBarSyncSub.Value = 0
 			ProgressBarSyncTotal.Value = 0
-			ButtonRemoteSync.Content = _syncRemoteDeviceContent
+			ButtonRemoteAction.Content = _syncRemoteDeviceContent
 			Return
 		End If
 
@@ -885,7 +903,7 @@ Complete:
 		ProgressBarSyncSub.Value = 0
 		ProgressBarSyncSub.IsIndeterminate = False
 		ProgressBarSyncTotal.Value = 0
-		ButtonRemoteSync.Content = _syncRemoteDeviceContent
+		ButtonRemoteAction.Content = _syncRemoteDeviceContent
 		Dim msgDlg As New DlgMessageDialog("", "同步完成")
 		If Not IsNothing(progressUpdateThread) Then
 			If progressUpdateThread.IsAlive Then
@@ -893,7 +911,7 @@ Complete:
 			End If
 		End If
 		Await DlgWindowRoot.ShowDialog(msgDlg)
-		ButtonRemoteSync.IsEnabled = True
+		ButtonRemoteAction.IsEnabled = True
 		Await Task.Run(Sub() Thread.Sleep(1000))
 		_usbWatcher.FlgPause = False
 	End Sub
@@ -1143,4 +1161,5 @@ Complete:
 		ButtonMusic.IsSelected = True
 		ListBoxPlaylist.SelectedIndex = -1
 	End Sub
+
 End Class

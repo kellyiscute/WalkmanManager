@@ -2,6 +2,8 @@
 Imports Microsoft.VisualBasic.FileIO
 Imports System.Data.SQLite
 Imports WalkmanManager
+Imports WalkmanManager.MoreSound
+Imports WalkmanManager.CloudMusic
 
 <TestClass()> Public Class UnitTest1
 
@@ -160,6 +162,23 @@ Imports WalkmanManager
 				Console.WriteLine("==========================================")
 			Next
 		End If
+	End Sub
+
+	<TestMethod()> Public Sub MoreSoundTest()
+		Dim ms As New MoreSound
+		Dim result = ms.Search(SearchMethod.qq, "asf")
+		Console.WriteLine(result)
+		For Each r In result
+			Console.WriteLine(r.ToString())
+		Next
+	End Sub
+
+	<TestMethod> Public Sub ThirdPartySearchTest()
+		Dim tpApi As New ThridPartyCloudMusicApi
+		Dim a = tpApi.Search("哈尼 一口甜")
+		For Each b In a
+			Console.WriteLine(b.ToString)
+		Next
 	End Sub
 
 End Class

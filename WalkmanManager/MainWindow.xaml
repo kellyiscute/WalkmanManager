@@ -8,96 +8,96 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="823.639" Width="1111.075" WindowStartupLocation="CenterScreen"
         Background="White">
-	<Grid>
-		<mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="35">
-			<Grid>
-				<Label Margin="10,2,0,0" Foreground="#DDFFFFFF" FontSize="16" HorizontalAlignment="Left" Width="154" Height="30"
+    <Grid>
+        <mD:ColorZone x:Name="CzTitle" Mode="PrimaryMid" Height="35">
+            <Grid>
+                <Label Margin="10,2,0,0" Foreground="#DDFFFFFF" FontSize="16" HorizontalAlignment="Left" Width="154" Height="30"
 				       VerticalAlignment="Top">
-					Walkman Manager
-				</Label>
-				<Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+                    Walkman Manager
+                </Label>
+                <Button x:Name="BtnWindowClose" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
 				        BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0">
-					<mD:PackIcon Kind="Close" />
-				</Button>
-				<Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+                    <mD:PackIcon Kind="Close" />
+                </Button>
+                <Button x:Name="BtnWindowMinimize" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
 				        BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,50,0">
-					<mD:PackIcon Kind="WindowMinimize" />
-				</Button>
-				<Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+                    <mD:PackIcon Kind="WindowMinimize" />
+                </Button>
+                <Button x:Name="BtnSettings" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
 				        BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,100,0">
-					<mD:PackIcon Kind="Settings" />
-				</Button>
-				<Button x:Name="BtnConvertNcm" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
+                    <mD:PackIcon Kind="Settings" />
+                </Button>
+                <Button x:Name="BtnConvertNcm" Height="Auto" HorizontalAlignment="Right" Width="50" Background="Transparent"
 				        BorderThickness="0"
 				        WindowChrome.IsHitTestVisibleInChrome="True"
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,150,0">
-					<mD:PackIcon Kind="Cached" />
-				</Button>
-			</Grid>
-		</mD:ColorZone>
-		<mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,35,0,0">
-			<Grid x:Name="GridRoot">
-				<mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50"
+                    <mD:PackIcon Kind="Cached" />
+                </Button>
+            </Grid>
+        </mD:ColorZone>
+        <mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,35,0,0">
+            <Grid x:Name="GridRoot">
+                <mD:ColorZone Mode="Light" mD:ShadowAssist.ShadowDepth="Depth3" Height="50"
 				              Background="WhiteSmoke">
-					<Grid>
-						<ListBox x:Name="LstTopbar" Style="{DynamicResource MaterialDesignToolToggleFlatListBox}" Height="50"
+                    <Grid>
+                        <ListBox x:Name="LstTopbar" Style="{DynamicResource MaterialDesignToolToggleFlatListBox}" Height="50"
 						         SelectedIndex="0" HorizontalAlignment="Left" Width="337">
-							<ListBoxItem Height="50" x:Name="TabLocal">
-								<WrapPanel>
-									<mD:PackIcon Kind="DesktopTower" />
-									<TextBlock FontSize="17">本地</TextBlock>
-								</WrapPanel>
-							</ListBoxItem>
-							<ListBoxItem x:Name="TabCloudMusic">
-								<WrapPanel>
-									<mD:PackIcon Kind="MusicBox" />
-									<TextBlock FontSize="17">网易云音乐</TextBlock>
-								</WrapPanel>
-							</ListBoxItem>
-							<ListBoxItem x:Name="TabRemote">
-								<WrapPanel>
-									<mD:PackIcon Kind="Cellphone" />
-									<TextBlock FontSize="17">远程设备</TextBlock>
-								</WrapPanel>
-							</ListBoxItem>
-						</ListBox>
-					</Grid>
-				</mD:ColorZone>
-				<Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible">
-					<mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
-						<Grid>
-							<Grid x:Name="LstLocalSidebar" Width="220" HorizontalAlignment="Left">
-								<ListBox Height="62" VerticalAlignment="Top">
-									<ListBoxItem Height="60" VerticalContentAlignment="Center" x:Name="ButtonMusic" IsSelected="True">
-										<Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center" Content="音乐" />
-									</ListBoxItem>
-								</ListBox>
-								<Border Padding="20,10,5,5" Margin="0,67,0,0" BorderThickness="0,1,0,1" BorderBrush="LightGray"
+                            <ListBoxItem Height="50" x:Name="TabLocal">
+                                <WrapPanel>
+                                    <mD:PackIcon Kind="DesktopTower" />
+                                    <TextBlock FontSize="17">本地</TextBlock>
+                                </WrapPanel>
+                            </ListBoxItem>
+                            <ListBoxItem x:Name="TabCloudMusic">
+                                <WrapPanel>
+                                    <mD:PackIcon Kind="MusicBox" />
+                                    <TextBlock FontSize="17">网易云音乐</TextBlock>
+                                </WrapPanel>
+                            </ListBoxItem>
+                            <ListBoxItem x:Name="TabRemote">
+                                <WrapPanel>
+                                    <mD:PackIcon Kind="Cellphone" />
+                                    <TextBlock FontSize="17">远程设备</TextBlock>
+                                </WrapPanel>
+                            </ListBoxItem>
+                        </ListBox>
+                    </Grid>
+                </mD:ColorZone>
+                <Grid Margin="0,50,0,0" x:Name="GridLocal" Visibility="Visible" d:IsHidden="True">
+                    <mD:DialogHost x:Name="DlgLocal" Margin="0,10,0,0">
+                        <Grid>
+                            <Grid x:Name="LstLocalSidebar" Width="220" HorizontalAlignment="Left">
+                                <ListBox Height="62" VerticalAlignment="Top">
+                                    <ListBoxItem Height="60" VerticalContentAlignment="Center" x:Name="ButtonMusic" IsSelected="True">
+                                        <Label Padding="24,0,0,0" FontSize="15" VerticalContentAlignment="Center" Content="音乐" />
+                                    </ListBoxItem>
+                                </ListBox>
+                                <Border Padding="20,10,5,5" Margin="0,67,0,0" BorderThickness="0,1,0,1" BorderBrush="LightGray"
 								       Height="35" VerticalAlignment="Top">
-									<Grid>
-										<TextBlock>本地播放列表</TextBlock>
-										<Button x:Name="ButtonAddPlaylist" Style="{DynamicResource MaterialDesignToolButton}" Margin="0,-9,0,-5" HorizontalAlignment="Right" Width="39" mD:RippleAssist.IsCentered="True" mD:RippleAssist.RippleSizeMultiplier="1">
-											<mD:PackIcon Kind="PlusCircleOutline"/>
-										</Button>
-									</Grid>
-								</Border>
-								<ListBox x:Name="ListBoxPlaylist"
+                                    <Grid>
+                                        <TextBlock>本地播放列表</TextBlock>
+                                        <Button x:Name="ButtonAddPlaylist" Style="{DynamicResource MaterialDesignToolButton}" Margin="0,-9,0,-5" HorizontalAlignment="Right" Width="39" mD:RippleAssist.IsCentered="True" mD:RippleAssist.RippleSizeMultiplier="1">
+                                            <mD:PackIcon Kind="PlusCircleOutline"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                                <ListBox x:Name="ListBoxPlaylist"
 								         PreviewMouseRightButtonDown="BlockRightClickSelection" Width="220" Margin="0,107,0,0">
-									<ListBox.ContextMenu>
-										<ContextMenu>
-											<MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="180" Height="50" />
-											<MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="180" Height="50" />
-											<Separator/>
-											<MenuItem x:Name="MenuImportPlaylist" Header="导入m3u播放列表" Width="180" Height="50" />
-										</ContextMenu>
-									</ListBox.ContextMenu>
-									<!--<ListBoxItem Padding="15,7,0,7" Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
+                                    <ListBox.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem x:Name="MenuDeletePlaylist" Header="删除播放列表" Width="180" Height="50" />
+                                            <MenuItem x:Name="MenuRenamePlaylist" Header="重命名" Width="180" Height="50" />
+                                            <Separator/>
+                                            <MenuItem x:Name="MenuImportPlaylist" Header="导入m3u播放列表" Width="180" Height="50" />
+                                        </ContextMenu>
+                                    </ListBox.ContextMenu>
+                                    <!--<ListBoxItem Padding="15,7,0,7" Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
 										<WrapPanel>
 											<mD:PackIcon Kind="PlaylistPlus" />
 											<TextBlock>
@@ -105,217 +105,239 @@
 											</TextBlock>
 										</WrapPanel>
 									</ListBoxItem>-->
-								</ListBox>
-							</Grid>
-							<Grid x:Name="GridMusic" Margin="220,0,0,0" Background="#00000000">
-								<mD:ColorZone Height="45" Background="#FFF3F3F3" mD:ShadowAssist.ShadowDepth="Depth1">
-									<Grid>
-										<mD:ColorZone x:Name="PanelSearchLocalMusic" Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35"
+                                </ListBox>
+                            </Grid>
+                            <Grid x:Name="GridMusic" Margin="220,0,0,0" Background="#00000000">
+                                <mD:ColorZone Height="45" Background="#FFF3F3F3" mD:ShadowAssist.ShadowDepth="Depth1">
+                                    <Grid>
+                                        <mD:ColorZone x:Name="PanelSearchLocalMusic" Mode="Standard" mD:ShadowAssist.ShadowDepth="Depth1" Height="35"
 										              Margin="8,5,0,0"
 										              HorizontalAlignment="Left" Width="251">
-											<Grid>
-												<TextBox x:Name="TextBoxSearchLocal" VerticalContentAlignment="Center"
+                                            <Grid>
+                                                <TextBox x:Name="TextBoxSearchLocal" VerticalContentAlignment="Center"
 												         mD:TextFieldAssist.DecorationVisibility="Hidden"
 												         BorderThickness="0" VerticalAlignment="Bottom" mD:HintAssist.Hint="搜索" Margin="10,0,35,0"
 												         Height="35" />
-												<Button x:Name="BtnSearchSong" Style="{DynamicResource MaterialDesignToolButton}"
+                                                <Button x:Name="BtnSearchSong" Style="{DynamicResource MaterialDesignToolButton}"
 												        HorizontalAlignment="Right" Width="35" VerticalAlignment="Top" Height="35"
 												        mD:RippleAssist.IsCentered="True">
-													<mD:PackIcon Kind="Magnify" Height="24" Width="22" />
-												</Button>
-											</Grid>
-										</mD:ColorZone>
-										<Button x:Name="ButtonSaveSorting" Margin="10,6,0,7" HorizontalAlignment="Left" Width="141"
+                                                    <mD:PackIcon Kind="Magnify" Height="24" Width="22" />
+                                                </Button>
+                                            </Grid>
+                                        </mD:ColorZone>
+                                        <Button x:Name="ButtonSaveSorting" Margin="10,6,0,7" HorizontalAlignment="Left" Width="141"
 										        Style="{DynamicResource MaterialDesignFlatButton}" Visibility="Collapsed">
-											<WrapPanel>
-												<mD:PackIcon Kind="ContentSave" />
-												<TextBlock>
+                                            <WrapPanel>
+                                                <mD:PackIcon Kind="ContentSave" />
+                                                <TextBlock>
 													<Run Text="保存当前排序" />
-												</TextBlock>
-											</WrapPanel>
-										</Button>
-										<Button x:Name="ButtonDelete" Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto"
+                                                </TextBlock>
+                                            </WrapPanel>
+                                        </Button>
+                                        <Button x:Name="ButtonMatchCoverLyric" Style="{DynamicResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Margin="0,0,81,0" Width="112" Height="Auto" Visibility="Hidden">
+                                            <WrapPanel>
+                                                <mD:PackIcon Kind="Magnify" />
+                                                <TextBlock>匹配词图</TextBlock>
+                                            </WrapPanel>
+                                        </Button>
+                                        <Button x:Name="ButtonDelete" Style="{DynamicResource MaterialDesignFlatButton}" Height="Auto"
 										        HorizontalAlignment="Right">
-											<WrapPanel>
-												<mD:PackIcon Foreground="Red" Kind="Delete" />
-												<TextBlock Foreground="Red">
+                                            <WrapPanel>
+                                                <mD:PackIcon Foreground="Red" Kind="Delete" />
+                                                <TextBlock Foreground="Red">
 													<Run Text="删除" />
-												</TextBlock>
-											</WrapPanel>
-										</Button>
-									</Grid>
-								</mD:ColorZone>
-								<DataGrid x:Name="DatSongList" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
+                                                </TextBlock>
+                                            </WrapPanel>
+                                        </Button>
+                                    </Grid>
+                                </mD:ColorZone>
+                                <DataGrid x:Name="DatSongList" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
 								          AutoGenerateColumns="false" VerticalScrollBarVisibility="Visible" Margin="0,50,0,0"
 								          ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
-									<DataGrid.Columns>
-										<DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID" />
-										<DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220" />
-										<DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220" />
-										<DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200" />
-									</DataGrid.Columns>
-								</DataGrid>
-							</Grid>
-						</Grid>
-					</mD:DialogHost>
-				</Grid>
-				<Grid x:Name="GridCloudMusic" Margin="0,55,0,0" d:IsHidden="True" Visibility="Hidden">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID" />
+                                        <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220" />
+                                        <DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220" />
+                                        <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </Grid>
+                    </mD:DialogHost>
+                </Grid>
+                <Grid x:Name="GridCloudMusic" Margin="0,55,0,0" Visibility="Hidden" d:IsHidden="True">
 
-					<mD:DialogHost x:Name="DlgCloudMusic">
-						<Grid>
-							<Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70"
+                    <mD:DialogHost x:Name="DlgCloudMusic">
+                        <Grid>
+                            <Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70"
 							        VerticalAlignment="Top">
-								<Grid>
-									<Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" FontSize="16" Margin="92,10,10,10"
+                                <Grid>
+                                    <Label x:Name="LabelCloudMusicNickName" VerticalContentAlignment="Center" FontSize="16" Margin="92,10,10,10"
 									       Content="登录" />
-									<mD:ColorZone Background="White" CornerRadius="3" Width="60" Margin="15,4.5,191,0" Height="60"
+                                    <mD:ColorZone Background="White" CornerRadius="3" Width="60" Margin="15,4.5,191,0" Height="60"
 									              VerticalAlignment="Top" mD:ShadowAssist.ShadowDepth="Depth1">
-										<mD:PopupBox mD:ShadowAssist.ShadowDepth="Depth3" Margin="0" HorizontalAlignment="Stretch">
-											<mD:PopupBox.ToggleContent>
-												<Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top"
+                                        <mD:PopupBox mD:ShadowAssist.ShadowDepth="Depth3" Margin="0" HorizontalAlignment="Stretch">
+                                            <mD:PopupBox.ToggleContent>
+                                                <Image x:Name="ImageCloudMusicAvatar" RenderOptions.BitmapScalingMode="Fant" VerticalAlignment="Top"
 												       Height="60" Width="60" Stretch="Uniform" HorizontalAlignment="Left" />
-											</mD:PopupBox.ToggleContent>
-											<StackPanel Width="200">
-												<Button x:Name="ButtonCloudMusicSyncAll" Height="45">
-													<WrapPanel>
-														<mD:PackIcon Kind="Sync" />
-														<TextBlock Margin="10,0,0,0">
+                                            </mD:PopupBox.ToggleContent>
+                                            <StackPanel Width="200">
+                                                <Button x:Name="ButtonCloudMusicSyncAll" Height="45">
+                                                    <WrapPanel>
+                                                        <mD:PackIcon Kind="Sync" />
+                                                        <TextBlock Margin="10,0,0,0">
 															<Run Text="同步所有歌单到本地" />
-														</TextBlock>
-													</WrapPanel>
-												</Button>
-												<Button x:Name="ButtonCloudMusicRefresh" Height="45">
-													<WrapPanel>
-														<mD:PackIcon Kind="Refresh" />
-														<TextBlock Margin="10,0,0,0">
+                                                        </TextBlock>
+                                                    </WrapPanel>
+                                                </Button>
+                                                <Button x:Name="ButtonCloudMusicRefresh" Height="45">
+                                                    <WrapPanel>
+                                                        <mD:PackIcon Kind="Refresh" />
+                                                        <TextBlock Margin="10,0,0,0">
 															<Run Text="刷新" />
-														</TextBlock>
-													</WrapPanel>
-												</Button>
-												<Separator />
-												<Button x:Name="ButtonCloudMusicLogout" Height="45">
-													<WrapPanel>
-														<mD:PackIcon Kind="Logout" />
-														<TextBlock Margin="10,0,0,0">
+                                                        </TextBlock>
+                                                    </WrapPanel>
+                                                </Button>
+                                                <Separator />
+                                                <Button x:Name="ButtonCloudMusicLogout" Height="45">
+                                                    <WrapPanel>
+                                                        <mD:PackIcon Kind="Logout" />
+                                                        <TextBlock Margin="10,0,0,0">
 															<Run Text="退出登录" />
-														</TextBlock>
-													</WrapPanel>
-												</Button>
-											</StackPanel>
-										</mD:PopupBox>
-									</mD:ColorZone>
-								</Grid>
-							</Border>
-							<ListBox x:Name="ListBoxCloudMusicPlaylists" BorderThickness="0,0,1,0" BorderBrush="LightGray"
+                                                        </TextBlock>
+                                                    </WrapPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </mD:PopupBox>
+                                    </mD:ColorZone>
+                                </Grid>
+                            </Border>
+                            <ListBox x:Name="ListBoxCloudMusicPlaylists" BorderThickness="0,0,1,0" BorderBrush="LightGray"
 							         HorizontalAlignment="Left" VerticalAlignment="Stretch" Width="270" Margin="0,70,0,0" />
 
-							<Grid Margin="270,0,0,0">
-								<mD:ColorZone Background="White" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="3" Margin="10,10,0,0"
+                            <Grid Margin="270,0,0,0">
+                                <mD:ColorZone Background="White" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="3" Margin="10,10,0,0"
 								              HorizontalAlignment="Left" Width="130" Height="130">
-									<Image x:Name="ImagePlaylistCover" HorizontalAlignment="Stretch" Width="130" Height="130"
+                                    <Image x:Name="ImagePlaylistCover" HorizontalAlignment="Stretch" Width="130" Height="130"
 									       VerticalAlignment="Stretch"
 									       RenderOptions.BitmapScalingMode="Fant" Stretch="UniformToFill" />
-								</mD:ColorZone>
-								<Grid Margin="155,10,10,0" Height="130" VerticalAlignment="Top">
-									<Label x:Name="LabelCloudMusicPlaylistName" Foreground="#333333" VerticalContentAlignment="Center"
+                                </mD:ColorZone>
+                                <Grid Margin="155,10,10,0" Height="130" VerticalAlignment="Top">
+                                    <Label x:Name="LabelCloudMusicPlaylistName" Foreground="#333333" VerticalContentAlignment="Center"
 									       FontSize="30" Height="56" VerticalAlignment="Top" Content="" />
-									<Button x:Name="ButtonSyncCurrent" Margin="10,80,0,0" HorizontalAlignment="Left" Width="194"
+                                    <Button x:Name="ButtonSyncCurrent" Margin="10,80,0,0" HorizontalAlignment="Left" Width="194"
 									        VerticalAlignment="Top" Background="#c62f2f"
 									        BorderBrush="#a82828">
-										<WrapPanel>
-											<mD:PackIcon Kind="Sync" />
-											<TextBlock Margin="10,0,0,0">同步当前歌单到本地</TextBlock>
-										</WrapPanel>
-									</Button>
-								</Grid>
-								<DataGrid x:Name="DataGridCloudMusic" Margin="0,150,0,0" AutoGenerateColumns="False" IsReadOnly="True"
+                                        <WrapPanel>
+                                            <mD:PackIcon Kind="Sync" />
+                                            <TextBlock Margin="10,0,0,0">同步当前歌单到本地</TextBlock>
+                                        </WrapPanel>
+                                    </Button>
+                                </Grid>
+                                <DataGrid x:Name="DataGridCloudMusic" Margin="0,150,0,0" AutoGenerateColumns="False" IsReadOnly="True"
 								          CanUserSortColumns="False">
-									<DataGrid.Columns>
-										<DataGridTextColumn Binding="{Binding Title}" Width="250" ClipboardContentBinding="{x:Null}" Header="标题" />
-										<DataGridTextColumn Binding="{Binding Artists}" Width="250" ClipboardContentBinding="{x:Null}" Header="艺术家" />
-										<DataGridTextColumn Binding="{Binding Album}" Width="200" ClipboardContentBinding="{x:Null}" Header="专辑" />
-									</DataGrid.Columns>
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding Title}" Width="250" ClipboardContentBinding="{x:Null}" Header="标题" />
+                                        <DataGridTextColumn Binding="{Binding Artists}" Width="250" ClipboardContentBinding="{x:Null}" Header="艺术家" />
+                                        <DataGridTextColumn Binding="{Binding Album}" Width="200" ClipboardContentBinding="{x:Null}" Header="专辑" />
+                                    </DataGrid.Columns>
 
-								</DataGrid>
-							</Grid>
-						</Grid>
-					</mD:DialogHost>
-				</Grid>
+                                </DataGrid>
+                            </Grid>
+                        </Grid>
+                    </mD:DialogHost>
+                </Grid>
 
-				<Grid x:Name="GridRemote" Visibility="Hidden" Margin="0,55,0,0" d:IsHidden="True">
-					<Grid Margin="0,0,0,95">
-					</Grid>
-					<mD:ColorZone VerticalAlignment="Top" Margin="10,10,10,0" Height="70" CornerRadius="10"
+                <Grid x:Name="GridRemote" Visibility="Visible" Margin="0,55,0,0">
+                    <Grid Margin="0,0,0,95">
+                    </Grid>
+                    <mD:ColorZone VerticalAlignment="Top" Margin="10,10,10,0" Height="70" CornerRadius="10"
 					              mD:ShadowAssist.ShadowDepth="Depth2">
-						<Grid>
-							<Border Margin="10,10,0,0" BorderThickness="0,0,1,0" BorderBrush="LightGray" Padding="0,0,10,0" Height="52" VerticalAlignment="Top" HorizontalAlignment="Left" Width="223">
-								<Grid>
-									<Label HorizontalAlignment="Left" VerticalAlignment="Top" Content="设备" />
-									<ComboBox x:Name="ComboBoxDevices" HorizontalAlignment="Left" Margin="0,25,0,0" Width="183" VerticalAlignment="Top" IsReadOnly="True" />
-									<Button x:Name="ButtonRefreshDeviceList" HorizontalAlignment="Right" VerticalAlignment="Bottom" Style="{DynamicResource MaterialDesignToolButton}">
-										<mD:PackIcon Kind="Refresh"/>
-									</Button>
-								</Grid>
-							</Border>
+                        <Grid>
+                            <Border Margin="10,10,0,0" BorderThickness="0,0,1,0" BorderBrush="LightGray" Padding="0,0,10,0" Height="52" VerticalAlignment="Top" HorizontalAlignment="Left" Width="223">
+                                <Grid>
+                                    <Label HorizontalAlignment="Left" VerticalAlignment="Top" Content="设备" />
+                                    <ComboBox x:Name="ComboBoxDevices" HorizontalAlignment="Left" Margin="0,25,0,0" Width="183" VerticalAlignment="Top" IsReadOnly="True" />
+                                    <Button x:Name="ButtonRefreshDeviceList" HorizontalAlignment="Right" VerticalAlignment="Bottom" Style="{DynamicResource MaterialDesignToolButton}">
+                                        <mD:PackIcon Kind="Refresh"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
 
-							<Grid Margin="248,0,275,0">
-								<ScrollViewer Margin="0,10,0,10" VerticalScrollBarVisibility="Auto">
-									<WrapPanel Height="24">
-										<CheckBox x:Name="CheckBoxSyncOptionNoSpaceCheck" FontSize="14" Margin="20,0,0,0">不检查空间</CheckBox>
-										<CheckBox x:Name="CheckBoxSyncOptionDoNotCopyLyric" FontSize="14" Margin="20,0,0,0">不同步歌词</CheckBox>
-										<CheckBox x:Name="CheckBoxSyncOptionHashCheck" FontSize="14" Margin="20,0,0,0">进行散列值检查（消耗大量时间）</CheckBox>
-									</WrapPanel>
-								</ScrollViewer>
-							</Grid>
+                            <Grid Margin="248,0,275,0">
+                                <ScrollViewer Margin="0,10,0,10" VerticalScrollBarVisibility="Auto">
+                                    <WrapPanel Height="24">
+                                        <CheckBox x:Name="CheckBoxSyncOptionNoSpaceCheck" FontSize="14" Margin="20,0,0,0">不检查空间</CheckBox>
+                                        <CheckBox x:Name="CheckBoxSyncOptionDoNotCopyLyric" FontSize="14" Margin="20,0,0,0">不同步歌词</CheckBox>
+                                        <CheckBox x:Name="CheckBoxSyncOptionHashCheck" FontSize="14" Margin="20,0,0,0">进行散列值检查（消耗大量时间）</CheckBox>
+                                    </WrapPanel>
+                                </ScrollViewer>
+                            </Grid>
 
-							<Border HorizontalAlignment="Right" Margin="10" Width="250" BorderThickness="1,0,0,0" BorderBrush="LightGray"
+                            <Border HorizontalAlignment="Right" Margin="10" Width="250" BorderThickness="1,0,0,0" BorderBrush="LightGray"
 							        Padding="10,0,0,0">
-								<StackPanel>
-									<Label x:Name="LabelDeviceTotalVolume">总容量：</Label>
-									<Label x:Name="LabelDeviceFreeVolume">剩余空间：</Label>
-								</StackPanel>
-							</Border>
-						</Grid>
-					</mD:ColorZone>
-					<Button x:Name="ButtonRemoteSync" HorizontalAlignment="Center" FontSize="23" VerticalAlignment="Top" Margin="452,102,451,0" Width="200" Height="70" Style="{DynamicResource MaterialDesignFlatButton}">
-						<WrapPanel>
-							<mD:PackIcon Height="29" Width="29" Kind="Sync"/>
-							<TextBlock Margin="5,0,0,0">同步</TextBlock>
-						</WrapPanel>
-					</Button>
-					<mD:ColorZone Margin="10,190,10,0" VerticalAlignment="Top" Height="272" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
-						<Grid>
-							<ProgressBar x:Name="ProgressBarSyncSub" VerticalAlignment="Top" Height="35" Margin="20,20,20,0"/>
-							<ProgressBar x:Name="ProgressBarSyncTotal" VerticalAlignment="Top" Height="35" Margin="20,70,20,0"/>
-							<Grid Margin="20,120,20,10">
-								<StackPanel HorizontalAlignment="Left">
-									<Label Height="25">当前操作：</Label>
-									<Label Height="25">已完成：</Label>
-									<Label Height="25">总大小：</Label>
-									<Label Height="25">写入块大小：</Label>
-									<Label Visibility="Collapsed" Height="25">读取速度：</Label>
-									<Label Visibility="Collapsed" Height="25">写入速度：</Label>
-									<Label Height="25">剩余时间：</Label>
-								</StackPanel>
-								<StackPanel HorizontalAlignment="Left" Margin="90,0,0,0">
-									<TextBox x:Name="TextBoxOp" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox x:Name="TextBoxComplete" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox x:Name="TextBoxTotal" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox x:Name="TextBoxBlock" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox Visibility="Collapsed" x:Name="TextBoxReadSpd" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox Visibility="Collapsed" x:Name="TextBoxWriteSpd" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-									<TextBox x:Name="TextBoxEst" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
-								</StackPanel>
-							</Grid>
-						</Grid>
-					</mD:ColorZone>
+                                <StackPanel>
+                                    <Label x:Name="LabelDeviceTotalVolume">总容量：</Label>
+                                    <Label x:Name="LabelDeviceFreeVolume">剩余空间：</Label>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </mD:ColorZone>
+                    <Grid Margin="0,102,451,0" Height="70" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200">
+                        <Button x:Name="ButtonRemoteAction" FontSize="23" VerticalAlignment="Top" Height="70" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,34,0">
+                            <WrapPanel>
+                                <mD:PackIcon Height="29" Width="29" Kind="Sync"/>
+                                <TextBlock Margin="5,0,0,0"><Run Text="同步"/></TextBlock>
+                            </WrapPanel>
+                        </Button>
+                        <mD:PopupBox x:Name="ButtonRemoteFuncSel" Foreground="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Right" Width="34" Height="Auto" Padding="0">
+                            <mD:PopupBox.ToggleContent>
+                                <mD:PackIcon Kind="Triangle" RenderTransformOrigin="0.5,0.5">
+                                    <mD:PackIcon.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform/>
+                                            <SkewTransform/>
+                                            <RotateTransform Angle="180"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </mD:PackIcon.RenderTransform>
+                                </mD:PackIcon>
+                            </mD:PopupBox.ToggleContent>
+                        </mD:PopupBox>
+                    </Grid>
+                    <mD:ColorZone Margin="10,190,10,0" VerticalAlignment="Top" Height="272" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
+                        <Grid>
+                            <ProgressBar x:Name="ProgressBarSyncSub" VerticalAlignment="Top" Height="35" Margin="20,20,20,0"/>
+                            <ProgressBar x:Name="ProgressBarSyncTotal" VerticalAlignment="Top" Height="35" Margin="20,70,20,0"/>
+                            <Grid Margin="20,120,20,10">
+                                <StackPanel HorizontalAlignment="Left">
+                                    <Label Height="25">当前操作：</Label>
+                                    <Label Height="25">已完成：</Label>
+                                    <Label Height="25">总大小：</Label>
+                                    <Label Height="25">写入块大小：</Label>
+                                    <Label Visibility="Collapsed" Height="25">读取速度：</Label>
+                                    <Label Visibility="Collapsed" Height="25">写入速度：</Label>
+                                    <Label Height="25">剩余时间：</Label>
+                                </StackPanel>
+                                <StackPanel HorizontalAlignment="Left" Margin="90,0,0,0">
+                                    <TextBox x:Name="TextBoxOp" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+                                    <TextBox x:Name="TextBoxComplete" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+                                    <TextBox x:Name="TextBoxTotal" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+                                    <TextBox x:Name="TextBoxBlock" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+                                    <TextBox Visibility="Collapsed" x:Name="TextBoxReadSpd" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+                                    <TextBox Visibility="Collapsed" x:Name="TextBoxWriteSpd" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+                                    <TextBox x:Name="TextBoxEst" BorderThickness="0" mD:TextFieldAssist.DecorationVisibility="Collapsed" Height="25"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </mD:ColorZone>
 
-					<mD:ColorZone VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Mode="Standard" Margin="10,480,10,20" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
-						<ListBox x:Name="ListBoxSyncEventLog" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
-					</mD:ColorZone>
-				</Grid>
-			</Grid>
-		</mD:DialogHost>
-		<mD:Snackbar x:Name="SnackbarInfoMessage"/>
-	</Grid>
+                    <mD:ColorZone VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Mode="Standard" Margin="10,480,10,20" mD:ShadowAssist.ShadowDepth="Depth2" CornerRadius="5">
+                        <ListBox x:Name="ListBoxSyncEventLog" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
+                    </mD:ColorZone>
+                </Grid>
+            </Grid>
+        </mD:DialogHost>
+        <mD:Snackbar x:Name="SnackbarInfoMessage" d:IsHidden="True"/>
+    </Grid>
 </Window>
