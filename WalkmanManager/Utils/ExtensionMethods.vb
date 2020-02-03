@@ -143,8 +143,7 @@ Public Module ExtensionMethods
 		Try
 			For Each itm In lst
 				If _
-					itm.Name = d.Name And itm.VolumeLabel = d.VolumeLabel And itm.TotalSize = d.TotalSize And
-					itm.TotalFreeSpace = d.TotalFreeSpace Then
+					itm.Name = d.Name And itm.VolumeLabel = d.VolumeLabel And itm.TotalSize = d.TotalSize Then
 					Return True
 				End If
 			Next
