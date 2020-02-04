@@ -43,7 +43,7 @@ Public Module ExtensionMethods
 		For i = 0 To sp.Count - 2
 			result += sp(i) + "."
 		Next
-		result = result.Substring(0, result.Length - 2)
+		result = result.Substring(0, result.Length - 1)
 		Return result
 	End Function
 

@@ -431,5 +431,30 @@ Namespace CloudMusic
 
 			Return result
 		End Function
+
+		''' <summary>
+		''' Get lyric of a song
+		''' </summary>
+		''' <param name="id">id of song</param>
+		''' <returns>lrc or empty if not found</returns>
+		Public Function GetLyric(id) As String
+			Dim queryString As New Dictionary(Of String, String)
+			queryString.Add("id", id)
+			queryString.Add("type", "lyric")
+			Dim url = PrepareDataAsQueryString(queryString)
+			Dim wc As New WebClient()
+			Dim responseReader = New StreamReader(wc.OpenRead(url))
+			Dim response = responseReader.ReadToEnd()
+			responseReader.Close()
+			Dim responseJson = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
+			Dim lyric As String
+			If responseJson.ContainsKey("lrc") Then
+				lyric = responseJson("lrc")("lyric")
+			Else
+				lyric = ""
+			End If
+
+			Return lyric
+		End Function
 	End Class
 End Namespace

@@ -164,6 +164,9 @@ Imports WalkmanManager.CloudMusic
 		End If
 	End Sub
 
+	''' <summary>
+	''' Deprecated
+	''' </summary>
 	<TestMethod()> Public Sub MoreSoundTest()
 		Dim ms As New MoreSound
 		Dim result = ms.Search(SearchMethod.qq, "asf")
@@ -175,10 +178,16 @@ Imports WalkmanManager.CloudMusic
 
 	<TestMethod> Public Sub ThirdPartySearchTest()
 		Dim tpApi As New ThridPartyCloudMusicApi
-		Dim a = tpApi.Search("哈尼 一口甜")
+		Dim a = tpApi.Search("出山 花粥/王胜娚")
 		For Each b In a
 			Console.WriteLine(b.ToString)
 		Next
+	End Sub
+
+	<TestMethod> Public Sub GetLyric()
+		Dim tpApi As New ThridPartyCloudMusicApi
+		Dim a = tpApi.Search("出山 花粥/王胜娚")
+		Console.WriteLine(tpApi.GetLyric(a(0).Id))
 	End Sub
 
 End Class
