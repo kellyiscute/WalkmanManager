@@ -12,16 +12,16 @@
             <Grid>
                 <TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="0,12,47,12" TextAlignment="Center" />
                 <Button HorizontalAlignment="Right" Width="47" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0"
-                        Command="{x:Static mD:DialogHost.CloseDialogCommand}" IsCancel="True">
+                        Command="{x:Static mD:DialogHost.CloseDialogCommand}" IsCancel="True" Click="ButtonClose_Click">
                     <mD:PackIcon Kind="Close" />
                 </Button>
             </Grid>
         </mD:ColorZone>
         <Grid Margin="0,45,0,0">
-            <DataGrid x:Name="DataGridSearchResults" HorizontalAlignment="Left" Width="517" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False">
+            <DataGrid x:Name="DataGridSearchResults" HorizontalAlignment="Left" Width="517" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="曲名" Width="220" />
-                    <DataGridTextColumn Binding="{Binding Artist}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220" />
+                    <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="曲名" Width="150" />
+                    <DataGridTextColumn Binding="{Binding Artist}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="150" />
                     <DataGridTextColumn Binding="{Binding AlbumName}" ClipboardContentBinding="{x:Null}" Header="专辑" Width="200" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -33,7 +33,7 @@
                     </Grid>
                 </mD:ColorZone>
                 <Grid Margin="0,75,0,0">
-                    <TextBox Style="{DynamicResource MaterialDesignOutlinedTextFieldTextBox}" AcceptsReturn="True" Margin="10,10,10,98"></TextBox>
+                    <TextBox x:Name="TextBoxLyrics" IsReadOnly="True" Style="{DynamicResource MaterialDesignOutlinedTextFieldTextBox}" AcceptsReturn="True" Margin="10,10,10,98"></TextBox>
                     <mD:ColorZone mD:ShadowAssist.ShadowDepth="Depth2" Height="73" Margin="10,247,10,0">
                         <Grid>
                             <Label x:Name="TextCurrentPlayTime" Margin="46,10,147,40" VerticalContentAlignment="Center" Content="00:00.000"/>
@@ -41,7 +41,7 @@
                                 <mD:PackIcon Kind="PlayPause"></mD:PackIcon>
                             </Button>
                             <Label x:Name="TextTotalPlayTime" Margin="150,10,40,40" HorizontalContentAlignment="Center">00:00.000</Label>
-                            <Label x:Name="LabelLyric" Margin="0,38,0,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                            <Label x:Name="LabelCurrentLyric" Margin="0,38,0,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
                         </Grid>
                     </mD:ColorZone>
                 </Grid>

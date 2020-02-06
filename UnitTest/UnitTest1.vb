@@ -1,6 +1,7 @@
 ﻿Imports ATL
 Imports System.Data.SQLite
 Imports System.IO
+Imports System.Text.RegularExpressions
 Imports WalkmanManager
 Imports WalkmanManager.MoreSound
 Imports WalkmanManager.CloudMusic
@@ -179,7 +180,7 @@ Imports LibVLCSharp.Shared
 	End Sub
 
 	<TestMethod> Public Sub ThirdPartySearchTest()
-		Dim tpApi As New ThridPartyCloudMusicApi
+		Dim tpApi As New ThirdPartyCloudMusicApi
 		Dim a = tpApi.Search("出山 花粥/王胜娚")
 		For Each b In a
 			Console.WriteLine(b.ToString)
@@ -187,7 +188,7 @@ Imports LibVLCSharp.Shared
 	End Sub
 
 	<TestMethod> Public Sub GetLyric()
-		Dim tpApi As New ThridPartyCloudMusicApi
+		Dim tpApi As New ThirdPartyCloudMusicApi
 		Dim a = tpApi.Search("出山 花粥/王胜娚")
 		Console.WriteLine(tpApi.GetLyric(a(0).Id))
 	End Sub
@@ -207,4 +208,16 @@ Imports LibVLCSharp.Shared
 
 	End Sub
 
+	<TestMethod()> Public Sub TimeToMs()
+		Dim a = "[00:36.580]你悄悄把不安都封印"
+		Dim pattern = "\[([0-9]*):([0-9]{1,2}).([0-9]{1,3})\]"
+		Dim m = Regex.Match(a, pattern)
+		Console.WriteLine(m.Success)
+		Console.WriteLine(m.Value)
+		Console.WriteLine(m.Index)
+		Console.WriteLine(m.Groups(1))
+		Console.WriteLine(m.Groups(2))
+		Console.WriteLine(m.Groups(3))
+		Console.WriteLine(Regex.Replace(a, pattern, ""))
+	End Sub
 End Class

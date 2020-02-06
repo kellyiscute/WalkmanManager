@@ -14,6 +14,10 @@ Class Application
 		a.Close()
 	End Sub
 
+	Private Sub Application_LoadCompleted(sender As Object, e As NavigationEventArgs) Handles Me.LoadCompleted
+		LibVLCSharp.Shared.Core.Initialize()
+	End Sub
+
 	' 应用程序级事件(例如 Startup、Exit 和 DispatcherUnhandledException)
 	' 可以在此文件中进行处理。
 

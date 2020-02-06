@@ -369,7 +369,7 @@ Namespace CloudMusic
 		End Function
 	End Class
 
-	Public Class ThridPartyCloudMusicApi
+	Public Class ThirdPartyCloudMusicApi
 		Public ReadOnly Property BaseUrl As String = "https://api.imjad.cn/cloudmusic/"
 
 		''' <summary>

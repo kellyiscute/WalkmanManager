@@ -28,8 +28,6 @@ Class MainWindow
     Dim _remoteActionSyncContent As WrapPanel
     Dim _remoteActionTakeOverContent As WrapPanel
     Dim LibV As LibVLC
-    Dim MediaPlayer As MediaPlayer
-    '    Dim VideoView As New VideoView
 
     Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
         Handles CzTitle.MouseLeftButtonDown
@@ -338,6 +336,9 @@ Class MainWindow
             .Children.Add(New PackIcon With {.Kind = PackIconKind.Undo})
             .Children.Add(New TextBlock With {.Text = "接管", .Height = 29, .Width = 29})
         End With
+
+        Core.Initialize()
+        LibV = New LibVLC()
     End Sub
 
     Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
@@ -1195,8 +1196,8 @@ Complete:
             filename = dir & filename
             filename = filename
             If Not My.Computer.FileSystem.FileExists(filename) Then
-                Dim tpApi As New ThridPartyCloudMusicApi
-                Dim r As ThridPartyCloudMusicApi.SearchResult
+                Dim tpApi As New ThirdPartyCloudMusicApi
+                Dim r As ThirdPartyCloudMusicApi.SearchResult
                 Await Task.Run(Sub()
                                    r = tpApi.Search(itm.Title & itm.Artists)(0)
                                End Sub)
@@ -1226,9 +1227,9 @@ Complete:
     End Sub
 
     Private Sub Button_Click(sender As Object, e As RoutedEventArgs)
-        Dim tpApi As New ThridPartyCloudMusicApi
-        Dim a = tpApi.Search("出山 花粥/王胜娚")
-        Dim dlg As New DlgChooseLyric(a, DatSongList.SelectedItem)
+        Dim tpApi As New ThirdPartyCloudMusicApi
+        Dim a = tpApi.Search($"{DatSongList.SelectedItem.Title} {DatSongList.SelectedItem.Artists}")
+        Dim dlg As New DlgChooseLyric(LibV, a, DatSongList.SelectedItem)
         DlgWindowRoot.ShowDialog(dlg)
 
     End Sub

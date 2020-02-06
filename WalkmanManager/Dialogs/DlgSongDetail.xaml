@@ -60,7 +60,7 @@
 				</Grid>
 				<Grid Height="30">
 					<WrapPanel VerticalAlignment="Center">
-						<mD:PackIcon Kind="Transfer" VerticalAlignment="Center" />
+						<mD:PackIcon Kind="TransferRight" VerticalAlignment="Center" />
 						<TextBlock Margin="10,0,0,0" x:Name="TextBlockMusicBitRate" VerticalAlignment="Center" Text="码流率:" />
 						<TextBox Margin="10,0,0,0" x:Name="TextBoxMusicBitRate" MaxWidth="260" VerticalAlignment="Center"
 						         IsReadOnly="True" mD:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" />
