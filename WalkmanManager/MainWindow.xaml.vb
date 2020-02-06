@@ -4,13 +4,15 @@ Imports System.Threading
 Imports System.Windows.Shell
 Imports ATL
 Imports GongSolutions.Wpf.DragDrop
+Imports LibVLCSharp.Shared
+Imports LibVLCSharp.WPF
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
 Imports WalkmanManager.CloudMusic
 
 Class MainWindow
-    ReadOnly NETEASE_RED = Media.Color.FromRgb(198, 47, 47)
-    ReadOnly DEFAULT_COLOR = Media.Color.FromRgb(103, 58, 183)
+    ReadOnly NETEASE_RED = Color.FromRgb(198, 47, 47)
+    ReadOnly DEFAULT_COLOR = Color.FromRgb(103, 58, 183)
 
     Dim _lstSongs As ObservableCollection(Of SongInfo)
     Dim _isRightClickSelect As Boolean = False
@@ -25,6 +27,9 @@ Class MainWindow
     Dim _sbMessageQueue As New SnackbarMessageQueue
     Dim _remoteActionSyncContent As WrapPanel
     Dim _remoteActionTakeOverContent As WrapPanel
+    Dim LibV As LibVLC
+    Dim MediaPlayer As MediaPlayer
+    '    Dim VideoView As New VideoView
 
     Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
         Handles CzTitle.MouseLeftButtonDown
@@ -151,20 +156,20 @@ Class MainWindow
     ''' <returns></returns>
     Private Async Function UiCloudMusicLogin(phone As String, pwd As String, dlgProg As dlg_progress) As Task(Of String)
         Dim result = Await Task.Run(Function()
-            Try
-                dlgProg.Text = "登录中"
-                Dim loginResult = _cloudMusic.Login(phone, pwd)
-                If loginResult("success") Then
-                    dlgProg.Text = "获取歌单"
-                    _cloudMusic.GetPlaylists()
-                    Return ""
-                Else
-                    Return loginResult("msg")
-                End If
-            Catch
-                Return "Unknown Error"
-            End Try
-        End Function)
+                                        Try
+                                            dlgProg.Text = "登录中"
+                                            Dim loginResult = _cloudMusic.Login(phone, pwd)
+                                            If loginResult("success") Then
+                                                dlgProg.Text = "获取歌单"
+                                                _cloudMusic.GetPlaylists()
+                                                Return ""
+                                            Else
+                                                Return loginResult("msg")
+                                            End If
+                                        Catch
+                                            Return "Unknown Error"
+                                        End Try
+                                    End Function)
         Return result
     End Function
 
@@ -185,24 +190,24 @@ Class MainWindow
         PageSwitcher(Nothing, Nothing)
 
         Dim newLost = Await Task.Run(Async Function()
-            Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
-            Dim lstLost = Await upd.FindLost()
-            _lstSongs = GetSongs()
-            Dim syncResult As String = ""
-            If lstNew.Count > 0 Then
-                syncResult = "=========================发现以下新项目=========================" & vbNewLine
-                For Each NewItem In lstNew
-                    syncResult += NewItem & vbNewLine
-                Next
-            End If
-            If lstLost.Count > 0 Then
-                syncResult += "=========================发现已删除项目=========================" & vbNewLine
-                For Each LostItem In lstLost
-                    syncResult += LostItem & vbNewLine
-                Next
-            End If
-            Return syncResult
-        End Function)
+                                         Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
+                                         Dim lstLost = Await upd.FindLost()
+                                         _lstSongs = GetSongs()
+                                         Dim syncResult As String = ""
+                                         If lstNew.Count > 0 Then
+                                             syncResult = "=========================发现以下新项目=========================" & vbNewLine
+                                             For Each NewItem In lstNew
+                                                 syncResult += NewItem & vbNewLine
+                                             Next
+                                         End If
+                                         If lstLost.Count > 0 Then
+                                             syncResult += "=========================发现已删除项目=========================" & vbNewLine
+                                             For Each LostItem In lstLost
+                                                 syncResult += LostItem & vbNewLine
+                                             Next
+                                         End If
+                                         Return syncResult
+                                     End Function)
         RefreshPlaylists()
         DatSongList.ItemsSource = _lstSongs
         DlgWindowRoot.IsOpen = False
@@ -260,20 +265,20 @@ Class MainWindow
 
     Private Sub Device_Unplugged(sender As Object, d As DriveInfoMem)
         Dim selDevName, selDevLabel As String
-        selDevName = Dispatcher.Invoke (Of String)(Function()
-            Try
-                Return Mid(ComboBoxDevices.SelectedValue, 1, 3)
-            Catch
-                Return ""
-            End Try
-        End Function)
-        selDevLabel = Dispatcher.Invoke (Of String)(Function()
-            Try
-                Return ComboBoxDevices.SelectedValue.Substring(5, ComboBoxDevices.SelectedValue.length - 6)
-            Catch
-                Return ""
-            End Try
-        End Function)
+        selDevName = Dispatcher.Invoke(Of String)(Function()
+                                                      Try
+                                                          Return Mid(ComboBoxDevices.SelectedValue, 1, 3)
+                                                      Catch
+                                                          Return ""
+                                                      End Try
+                                                  End Function)
+        selDevLabel = Dispatcher.Invoke(Of String)(Function()
+                                                       Try
+                                                           Return ComboBoxDevices.SelectedValue.Substring(5, ComboBoxDevices.SelectedValue.length - 6)
+                                                       Catch
+                                                           Return ""
+                                                       End Try
+                                                   End Function)
 
         For Each itm In ComboBoxDevices.Items
             If itm = $"{d.Name} ({d.VolumeLabel})" Then
@@ -283,12 +288,12 @@ Class MainWindow
         Next
         If selDevLabel = d.VolumeLabel And selDevName = d.Name Then
             Dispatcher.Invoke(Sub()
-                If ComboBoxDevices.Items.Count > 0 Then
-                    ComboBoxDevices.SelectedIndex = 0
-                Else
-                    ComboBoxDevices.SelectedIndex = - 1
-                End If
-            End Sub)
+                                  If ComboBoxDevices.Items.Count > 0 Then
+                                      ComboBoxDevices.SelectedIndex = 0
+                                  Else
+                                      ComboBoxDevices.SelectedIndex = -1
+                                  End If
+                              End Sub)
         End If
 
         _sbMessageQueue.Enqueue($"设备拔出：{d.Name} ({d.VolumeLabel})")
@@ -301,9 +306,9 @@ Class MainWindow
 
     Private Async Sub RefreshPlaylists()
         Dim lstPlaylist = Await Task.Run(Function()
-            Dim r = GetPlaylists()
-            Return r
-        End Function)
+                                             Dim r = GetPlaylists()
+                                             Return r
+                                         End Function)
         ListBoxPlaylist.Items.Clear()
 
         For Each itm In lstPlaylist
@@ -337,7 +342,7 @@ Class MainWindow
 
     Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
         Handles DatSongList.MouseDoubleClick
-        If DatSongList.SelectedIndex <> - 1 Then
+        If DatSongList.SelectedIndex <> -1 Then
             DlgWindowRoot.CloseOnClickAway = True
             Dim detailDialog As New DlgSongDetail(DatSongList.SelectedItem.path)
             Await DlgWindowRoot.ShowDialog(detailDialog)
@@ -402,7 +407,7 @@ Class MainWindow
     'Playlist Selected
     Private Async Sub ListItem_SelectionChange(sender As ListBox, e As EventArgs) _
         Handles ListBoxPlaylist.SelectionChanged
-        If sender.SelectedIndex <> - 1 And Not _isRightClickSelect Then
+        If sender.SelectedIndex <> -1 And Not _isRightClickSelect Then
 
             'if not editing
             If ListBoxPlaylist.SelectedItem.Content.GetType = GetType(String) Then
@@ -415,19 +420,19 @@ Class MainWindow
                 DialogHost.Show(dlg, "window-root")
                 Dim playlistName = sender.SelectedItem.Content
                 Dim lstSongs = Await Task.Run(Function()
-                    Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
-                    Dim conn = Connect()
-                    Dim trans = conn.BeginTransaction()
-                    Dim cmd = conn.CreateCommand()
-                    cmd.Transaction = trans
-                    Dim songs As New ObservableCollection(Of SongInfo)
-                    For Each itm In songIds
-                        songs.Add(GetSongById(itm, cmd))
-                    Next
-                    trans.Commit()
-                    conn.Close()
-                    Return songs
-                End Function)
+                                                  Dim songIds = GetSongsFromPlaylist(GetPlaylistIdByName(playlistName))
+                                                  Dim conn = Connect()
+                                                  Dim trans = conn.BeginTransaction()
+                                                  Dim cmd = conn.CreateCommand()
+                                                  cmd.Transaction = trans
+                                                  Dim songs As New ObservableCollection(Of SongInfo)
+                                                  For Each itm In songIds
+                                                      songs.Add(GetSongById(itm, cmd))
+                                                  Next
+                                                  trans.Commit()
+                                                  conn.Close()
+                                                  Return songs
+                                              End Function)
                 DatSongList.ItemsSource = lstSongs
                 DlgWindowRoot.IsOpen = False
                 ListBoxPlaylist.Focus()
@@ -447,7 +452,7 @@ Class MainWindow
         Handles ButtonMusic.MouseLeftButtonUp
         DatSongList.ItemsSource = Nothing
         DatSongList.ItemsSource = _lstSongs
-        ListBoxPlaylist.SelectedIndex = - 1
+        ListBoxPlaylist.SelectedIndex = -1
         DatSongList.CanUserSortColumns = False
         PanelSearchLocalMusic.Visibility = Visibility.Visible
         ButtonSaveSorting.Visibility = Visibility.Collapsed
@@ -455,12 +460,12 @@ Class MainWindow
 
     Private Sub ButtonMusic_Selected(sender As Object, e As RoutedEventArgs) Handles ButtonMusic.Selected
         On Error Resume Next
-        ListBoxPlaylist.SelectedIndex = - 1
+        ListBoxPlaylist.SelectedIndex = -1
         DatSongList.CanUserSortColumns = True
     End Sub
 
     Private Async Sub DeletePlaylist_Click(sender As Object, e As EventArgs) Handles MenuDeletePlaylist.Click
-        If ListBoxPlaylist.SelectedIndex <> - 1 Then _
+        If ListBoxPlaylist.SelectedIndex <> -1 Then _
             'And ListBoxPlaylist.SelectedIndex <> ListBoxPlaylist.Items.Count - 1
             Dim dlg As New DlgYesNoDialog("删除播放列表", "要删除播放列表 """ & ListBoxPlaylist.SelectedItem.Content & """ 吗")
             Dim r = Await DlgWindowRoot.ShowDialog(dlg)
@@ -497,7 +502,7 @@ Class MainWindow
             End If
         Else
             'Remove from whole library
-            If DatSongList.SelectedIndex <> - 1 Then
+            If DatSongList.SelectedIndex <> -1 Then
                 Dim conn = Connect()
                 Dim cmd = conn.CreateCommand()
                 Dim trans = conn.BeginTransaction()
@@ -528,7 +533,7 @@ Class MainWindow
     End Sub
 
     Private Async Sub SavePlaylistSorting(sender As Object, e As EventArgs) Handles ButtonSaveSorting.Click
-        If ListBoxPlaylist.SelectedIndex <> - 1 Then
+        If ListBoxPlaylist.SelectedIndex <> -1 Then
             Dim conn = Connect()
             Dim cmd = conn.CreateCommand()
             Dim id = GetPlaylistIdByName(ListBoxPlaylist.SelectedItem.Content)
@@ -541,10 +546,10 @@ Class MainWindow
             Dim dlg As New dlg_progress
             DlgWindowRoot.Show(dlg)
             Await Task.Run(Sub()
-                For Each songInfo As SongInfo In lst
-                    AddSongToPlaylist(id, songInfo.Id, cmd)
-                Next
-            End Sub)
+                               For Each songInfo As SongInfo In lst
+                                   AddSongToPlaylist(id, songInfo.Id, cmd)
+                               Next
+                           End Sub)
             trans.Commit()
             conn.Close()
             DatSongList.ItemsSource = lst
@@ -566,16 +571,16 @@ Class MainWindow
     Private Async Sub ListBoxCloudMusicPlaylists_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) _
         Handles ListBoxCloudMusicPlaylists.SelectionChanged
         Try
-            If ListBoxCloudMusicPlaylists.SelectedIndex <> - 1 Then
+            If ListBoxCloudMusicPlaylists.SelectedIndex <> -1 Then
                 Dim id = _cloudMusic.Playlists(ListBoxCloudMusicPlaylists.SelectedIndex)("id")
                 Dim dlg As New dlg_progress
                 dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
                 DlgCloudMusic.ShowDialog(dlg)
 
                 Dim detail = Await Task.Run(Function()
-                    Dim r = _cloudMusic.GetPlaylistDetail(id)
-                    Return r
-                End Function)
+                                                Dim r = _cloudMusic.GetPlaylistDetail(id)
+                                                Return r
+                                            End Function)
                 DataGridCloudMusic.ItemsSource = detail("tracks")
                 Dim img As New BitmapImage
                 img.BeginInit()
@@ -601,8 +606,8 @@ Class MainWindow
         dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
         DlgCloudMusic.ShowDialog(dlg)
         Await Task.Run(Sub()
-            _cloudMusic.GetPlaylists()
-        End Sub)
+                           _cloudMusic.GetPlaylists()
+                       End Sub)
         ListBoxCloudMusicPlaylists.Items.Clear()
         For Each p In _cloudMusic.Playlists
             ListBoxCloudMusicPlaylists.Items.Add(
@@ -640,8 +645,8 @@ Class MainWindow
         Dim plName = ListBoxCloudMusicPlaylists.SelectedItem.Content
         Dim lst = DataGridCloudMusic.ItemsSource
         Dim failed = Await Task.Run(Function()
-            Return SyncAnalyzer.SyncPlaylist(plName, lst, dlg)
-        End Function)
+                                        Return SyncAnalyzer.SyncPlaylist(plName, lst, dlg)
+                                    End Function)
         Dim rString As String
         rString = "同步 """ & plName & """ 完成" & vbTab & "失败 " & failed.Count & " 个"
         rString += vbNewLine & StrDup(rString.Length, "=")
@@ -658,8 +663,8 @@ Class MainWindow
         dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
         DlgWindowRoot.ShowDialog(dlg)
         Dim failed = Await Task.Run(Function()
-            Return SyncAnalyzer.SyncAllPlaylists(_cloudMusic, dlg)
-        End Function)
+                                        Return SyncAnalyzer.SyncAllPlaylists(_cloudMusic, dlg)
+                                    End Function)
         Dim dlgResult As New dlgPlaylistSyncResult(failed)
         DlgWindowRoot.DialogContent = dlgResult
     End Sub
@@ -685,14 +690,14 @@ Class MainWindow
 
     Private Sub ComboBoxDevices_SelectionChanged(sender As Object, e As SelectionChangedEventArgs) _
         Handles ComboBoxDevices.SelectionChanged
-        If sender.SelectedIndex = - 1 Then
+        If sender.SelectedIndex = -1 Then
             Exit Sub
         End If
         Dim dir = ComboBoxDevices.SelectedItem.ToString.Substring(0, 3)
         For Each dev In My.Computer.FileSystem.Drives
             If dev.Name.ToUpper = dir.ToUpper Then
-                LabelDeviceTotalVolume.Content = "总容量：" & dev.TotalSize/1024^2 & " MB"
-                LabelDeviceFreeVolume.Content = "剩余空间：" & dev.AvailableFreeSpace/1024^2 & " MB"
+                LabelDeviceTotalVolume.Content = "总容量：" & dev.TotalSize / 1024 ^ 2 & " MB"
+                LabelDeviceFreeVolume.Content = "剩余空间：" & dev.AvailableFreeSpace / 1024 ^ 2 & " MB"
             End If
         Next
     End Sub
@@ -704,7 +709,7 @@ Class MainWindow
     End Structure
 
     Private Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteAction.Click
-        If ComboBoxDevices.SelectedIndex <> - 1 Then
+        If ComboBoxDevices.SelectedIndex <> -1 Then
             If ButtonRemoteAction.Content.Equals(_syncRemoteDeviceContent) Then
                 _flgSyncStop = False
                 _usbWatcher.FlgPause = True
@@ -751,32 +756,32 @@ Class MainWindow
         End If
 
         progressUpdateThread = New Thread(Sub()
-            Do
-                Dispatcher.Invoke(Sub()
-                    If flgProgressUpdateThreadPause Then
-                        Exit Sub
-                    End If
-                    If progressSubscriber(1) <> 0 Then
-                        ProgressBarSyncSub.IsIndeterminate = False
-                        ProgressBarSyncSub.Maximum = progressSubscriber(1)
-                        ProgressBarSyncSub.Value = progressSubscriber(0)
-                    Else
-                        ProgressBarSyncSub.IsIndeterminate = True
-                    End If
-                End Sub)
-                Thread.Sleep(300)
-                If flgProgressUpdateThreadStop Then
-                    Exit Do
-                End If
-            Loop
-        End Sub)
+                                              Do
+                                                  Dispatcher.Invoke(Sub()
+                                                                        If flgProgressUpdateThreadPause Then
+                                                                            Exit Sub
+                                                                        End If
+                                                                        If progressSubscriber(1) <> 0 Then
+                                                                            ProgressBarSyncSub.IsIndeterminate = False
+                                                                            ProgressBarSyncSub.Maximum = progressSubscriber(1)
+                                                                            ProgressBarSyncSub.Value = progressSubscriber(0)
+                                                                        Else
+                                                                            ProgressBarSyncSub.IsIndeterminate = True
+                                                                        End If
+                                                                    End Sub)
+                                                  Thread.Sleep(300)
+                                                  If flgProgressUpdateThreadStop Then
+                                                      Exit Do
+                                                  End If
+                                              Loop
+                                          End Sub)
         progressUpdateThread.IsBackground = True
         progressUpdateThread.Start()
 
         AddSyncLog(LogType.Information, "查找删除项目", False)
         lstDelete = Await Task.Run(Function()
-            Return SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs, progressSubscriber, _flgSyncStop)
-        End Function)
+                                       Return SyncAnalyzer.FindDeleted(wmManagedPath, lstSongs, progressSubscriber, _flgSyncStop)
+                                   End Function)
         ProgressBarSyncSub.AddOne()
         If _flgSyncStop Then
             GoTo Complete
@@ -785,10 +790,10 @@ Class MainWindow
         AddSyncLog(LogType.Information, "发现需要删除的项目：" & lstDelete.Count, False)
         AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
         Dim lstChanged = Await Task.Run(Function()
-            Return _
+                                            Return _
                                            SyncAnalyzer.FindChangedFiles(wmManagedPath, lstSongs, flgHashCheck,
                                                                          progressSubscriber, _flgSyncStop)
-        End Function)
+                                        End Function)
         If _flgSyncStop Then
             GoTo Complete
         End If
@@ -801,40 +806,40 @@ Class MainWindow
         ProgressBarSyncSub.IsIndeterminate = False
         flgProgressUpdateThreadStop = True
         Await Task.Run(Sub()
-            For Each itm In lstChanged
-                If My.Computer.FileSystem.FileExists(itm) Then
-                    Dim fInfo = My.Computer.FileSystem.GetFileInfo(itm)
-                    totalCopySize += fInfo.Length
-                    Dim sCopy As New CpInfo
-                    sCopy.Source = itm
-                    sCopy.Destination = wmManagedPath & "\" & My.Computer.FileSystem.GetFileInfo(itm).Name
-                    If _
+                           For Each itm In lstChanged
+                               If My.Computer.FileSystem.FileExists(itm) Then
+                                   Dim fInfo = My.Computer.FileSystem.GetFileInfo(itm)
+                                   totalCopySize += fInfo.Length
+                                   Dim sCopy As New CpInfo
+                                   sCopy.Source = itm
+                                   sCopy.Destination = wmManagedPath & "\" & My.Computer.FileSystem.GetFileInfo(itm).Name
+                                   If _
                           flagCopyLrc And
                           My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc") Then
-                        sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
-                        totalCopySize +=
+                                       sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
+                                       totalCopySize +=
                           My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc").Length
-                    End If
+                                   End If
 
-                    lstCopy.Add(sCopy)
-                End If
-                ProgressBarSyncSub.AddOne(Me)
+                                   lstCopy.Add(sCopy)
+                               End If
+                               ProgressBarSyncSub.AddOne(Me)
 
-                If _flgSyncStop Then
-                    Exit Sub
-                End If
-            Next
-            spaceNeeded = totalCopySize
+                               If _flgSyncStop Then
+                                   Exit Sub
+                               End If
+                           Next
+                           spaceNeeded = totalCopySize
 
-            For Each itm In lstDelete
-                spaceNeeded -= My.Computer.FileSystem.GetFileInfo(itm).Length
-                ProgressBarSyncSub.AddOne(Me)
+                           For Each itm In lstDelete
+                               spaceNeeded -= My.Computer.FileSystem.GetFileInfo(itm).Length
+                               ProgressBarSyncSub.AddOne(Me)
 
-                If _flgSyncStop Then
-                    Exit Sub
-                End If
-            Next
-        End Sub)
+                               If _flgSyncStop Then
+                                   Exit Sub
+                               End If
+                           Next
+                       End Sub)
 
         If _
             spaceNeeded > My.Computer.FileSystem.GetDriveInfo(drivePath).TotalFreeSpace And
@@ -860,62 +865,62 @@ Class MainWindow
         AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
 
         Await Task.Run(Sub()
-            For Each itm In lstDelete
-                AddSyncLog(LogType.Information, "删除文件：" & itm)
-                Try
-                    My.Computer.FileSystem.DeleteFile(itm)
-                Catch ex As Exception
-                    AddSyncLog(LogType.Err, "删除文件时出现错误：" & ex.Message)
-                    Exit Sub
-                End Try
-                ProgressBarSyncTotal.AddOne(Me)
+                           For Each itm In lstDelete
+                               AddSyncLog(LogType.Information, "删除文件：" & itm)
+                               Try
+                                   My.Computer.FileSystem.DeleteFile(itm)
+                               Catch ex As Exception
+                                   AddSyncLog(LogType.Err, "删除文件时出现错误：" & ex.Message)
+                                   Exit Sub
+                               End Try
+                               ProgressBarSyncTotal.AddOne(Me)
 
-                If _flgSyncStop Then
-                    Exit Sub
-                End If
-            Next
+                               If _flgSyncStop Then
+                                   Exit Sub
+                               End If
+                           Next
 
-            For Each itm In lstCopy
-                Try
-                    AddSyncLog(LogType.Information, "写入：" & itm.Destination)
-                    cp.CopyFile(itm.Source, itm.Destination)
-                    If itm.Lyric <> "" Then
-                        AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
-                        cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
-                    End If
-                Catch ex As Exception
-                    AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
-                    Exit Sub
-                End Try
-                ProgressBarSyncTotal.AddOne(Me)
+                           For Each itm In lstCopy
+                               Try
+                                   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
+                                   cp.CopyFile(itm.Source, itm.Destination)
+                                   If itm.Lyric <> "" Then
+                                       AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+                                       cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, wmManagedPath))
+                                   End If
+                               Catch ex As Exception
+                                   AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
+                                   Exit Sub
+                               End Try
+                               ProgressBarSyncTotal.AddOne(Me)
 
-                If _flgSyncStop Then
-                    Exit Sub
-                End If
-            Next
-        End Sub)
+                               If _flgSyncStop Then
+                                   Exit Sub
+                               End If
+                           Next
+                       End Sub)
 
         ' Write playlist files
         Await Task.Run(Sub()
-            Dim lstPlaylists = GetPlaylists()
-            For Each p In lstPlaylists
-                Try
-                    AddSyncLog(LogType.Information, "写入：" & wmManagedPath & "\" & p & ".m3u")
-                    Dim playlistFile = My.Computer.FileSystem.OpenTextFileWriter(wmManagedPath & "\" & p & ".m3u", False,
+                           Dim lstPlaylists = GetPlaylists()
+                           For Each p In lstPlaylists
+                               Try
+                                   AddSyncLog(LogType.Information, "写入：" & wmManagedPath & "\" & p & ".m3u")
+                                   Dim playlistFile = My.Computer.FileSystem.OpenTextFileWriter(wmManagedPath & "\" & p & ".m3u", False,
                                                                                  Text.Encoding.UTF8)
-                    For Each s In GetSongsFromPlaylist(p)
-                        Dim sInfo = GetSongById(s)
-                        playlistFile.WriteLine(My.Computer.FileSystem.GetFileInfo(sInfo.Path).Name)
-                        playlistFile.Flush()
-                    Next
-                    playlistFile.Close()
-                Catch ex As Exception
-                    AddSyncLog(LogType.Err, ex.Message)
-                End Try
-            Next
-        End Sub)
+                                   For Each s In GetSongsFromPlaylist(p)
+                                       Dim sInfo = GetSongById(s)
+                                       playlistFile.WriteLine(My.Computer.FileSystem.GetFileInfo(sInfo.Path).Name)
+                                       playlistFile.Flush()
+                                   Next
+                                   playlistFile.Close()
+                               Catch ex As Exception
+                                   AddSyncLog(LogType.Err, ex.Message)
+                               End Try
+                           Next
+                       End Sub)
 
-        Complete:
+Complete:
         ProgressBarSyncSub.Value = 0
         ProgressBarSyncSub.IsIndeterminate = False
         ProgressBarSyncTotal.Value = 0
@@ -934,12 +939,12 @@ Class MainWindow
 
     Private Sub CopyingDetailUpdateEventHandler(sender As Synchronizer)
         Dispatcher.Invoke(Sub()
-            ProgressBarSyncSub.Maximum = sender.TotalLength
-            ProgressBarSyncSub.Value = sender.CopiedLength
-            TextBoxTotal.Text = sender.TotalLength
-            TextBoxComplete.Text = sender.CopiedLength
-            TextBoxBlock.Text = sender.ChunkSize
-        End Sub)
+                              ProgressBarSyncSub.Maximum = sender.TotalLength
+                              ProgressBarSyncSub.Value = sender.CopiedLength
+                              TextBoxTotal.Text = sender.TotalLength
+                              TextBoxComplete.Text = sender.CopiedLength
+                              TextBoxBlock.Text = sender.ChunkSize
+                          End Sub)
     End Sub
 
     Private Enum LogType
@@ -970,18 +975,18 @@ Class MainWindow
             End If
         Else
             Me.Dispatcher.Invoke(Sub()
-                ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
+                                     ListBoxSyncEventLog.Items.Add(New ListBoxItem() With {.Content =
                                                  String.Format("[{0}][{1}]: {2}", Now.ToString, type.ToString, message),
                                                  .Foreground = New SolidColorBrush(dispColor)})
-                If dispOnCpDetail Then
-                    TextBoxOp.Text = message
-                End If
-            End Sub)
+                                     If dispOnCpDetail Then
+                                         TextBoxOp.Text = message
+                                     End If
+                                 End Sub)
         End If
     End Sub
 
     Private Sub MenuRenamePlaylist_Click(sender As Object, e As RoutedEventArgs) Handles MenuRenamePlaylist.Click
-        If ListBoxPlaylist.SelectedIndex <> - 1 Then
+        If ListBoxPlaylist.SelectedIndex <> -1 Then
             If ListBoxPlaylist.SelectedItem.Content.GetType = GetType(String) Then
                 Dim textBoxRenamePlaylist = New TextBox _
                         With {.Tag = New Object() {ListBoxPlaylist.SelectedItem, ListBoxPlaylist.SelectedItem.Content},
@@ -1093,37 +1098,37 @@ Class MainWindow
             DlgWindowRoot.ShowDialog(dlgWait)
             dlgWait.Text = "0/" & files.Count
             Await Task.Run(Sub()
-                'Add playlist, if there is one with the same name, merge
-                If CheckPlaylistNameAvailability(playlistName) Then
-                    'Create
-                    AddPlaylist(playlistName)
-                End If
-                Dim playlistId = GetPlaylistIdByName(playlistName)
+                               'Add playlist, if there is one with the same name, merge
+                               If CheckPlaylistNameAvailability(playlistName) Then
+                                   'Create
+                                   AddPlaylist(playlistName)
+                               End If
+                               Dim playlistId = GetPlaylistIdByName(playlistName)
 
-                For i = 0 To files.Count - 1
-                    Dim audioInfo As New Track(files(i))
-                    Dim songId As Integer
-                    If SongExists(audioInfo.Title, audioInfo.Artist) <> "" Then
-                        'if there is same song, dont copy
-                        songId = FindSong(audioInfo.Title, audioInfo.Artist)(0) 'only take the first one
-                    Else
-                        'copy and add to db
-                        localDir = My.Computer.FileSystem.CombinePath(libDir,
+                               For i = 0 To files.Count - 1
+                                   Dim audioInfo As New Track(files(i))
+                                   Dim songId As Integer
+                                   If SongExists(audioInfo.Title, audioInfo.Artist) <> "" Then
+                                       'if there is same song, dont copy
+                                       songId = FindSong(audioInfo.Title, audioInfo.Artist)(0) 'only take the first one
+                                   Else
+                                       'copy and add to db
+                                       localDir = My.Computer.FileSystem.CombinePath(libDir,
                                                                       My.Computer.FileSystem.GetFileInfo(files(i)).Name)
-                        My.Computer.FileSystem.CopyFile(files(i), localDir, True)
-                        songId = AddSong(audioInfo.Title, audioInfo.Artist, localDir)
-                        dlgWait.Text = (i + 1) & "/" & files.Count
-                    End If
-                    'add to playlist
-                    AddSongToPlaylist(playlistId, songId)
+                                       My.Computer.FileSystem.CopyFile(files(i), localDir, True)
+                                       songId = AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+                                       dlgWait.Text = (i + 1) & "/" & files.Count
+                                   End If
+                                   'add to playlist
+                                   AddSongToPlaylist(playlistId, songId)
 
-                    audioInfo = Nothing
-                Next
-                dlgWait.Text = "更新列表..."
-                _lstSongs = GetSongs()
-                'DatSongList.ItemsSource = _lstSongs
-                Dispatcher.Invoke(Sub() RefreshPlaylists())
-            End Sub)
+                                   audioInfo = Nothing
+                               Next
+                               dlgWait.Text = "更新列表..."
+                               _lstSongs = GetSongs()
+                               'DatSongList.ItemsSource = _lstSongs
+                               Dispatcher.Invoke(Sub() RefreshPlaylists())
+                           End Sub)
             DlgWindowRoot.IsOpen = False
         End If
     End Sub
@@ -1135,28 +1140,28 @@ Class MainWindow
             DlgWindowRoot.ShowDialog(dlg)
             dlg.Max = filename.Count
             Await Task.Run(Sub()
-                Dim libDir = GetSetting("song_dir")
-                Dim localDir As String
+                               Dim libDir = GetSetting("song_dir")
+                               Dim localDir As String
 
-                For i = 0 To filename.Count - 1
-                    'Check extension
-                    If Not DbUpdater.CheckExtention(filename(i)) Then
-                        Continue For
-                    End If
-                    localDir = My.Computer.FileSystem.CombinePath(libDir,
+                               For i = 0 To filename.Count - 1
+                                   'Check extension
+                                   If Not DbUpdater.CheckExtention(filename(i)) Then
+                                       Continue For
+                                   End If
+                                   localDir = My.Computer.FileSystem.CombinePath(libDir,
                                                                   My.Computer.FileSystem.GetFileInfo(filename(i)).Name)
-                    Dim audioInfo As New Track(localDir)
-                    If SongExists(audioInfo.Title, audioInfo.Artist) = "" Then
-                        My.Computer.FileSystem.CopyFile(filename(i), localDir, True)
-                        AddSong(audioInfo.Title, audioInfo.Artist, localDir)
-                        Dispatcher.Invoke(Sub() dlg.Progress += 1)
-                    End If
-                    audioInfo = Nothing
-                Next
+                                   Dim audioInfo As New Track(localDir)
+                                   If SongExists(audioInfo.Title, audioInfo.Artist) = "" Then
+                                       My.Computer.FileSystem.CopyFile(filename(i), localDir, True)
+                                       AddSong(audioInfo.Title, audioInfo.Artist, localDir)
+                                       Dispatcher.Invoke(Sub() dlg.Progress += 1)
+                                   End If
+                                   audioInfo = Nothing
+                               Next
 
-                Dispatcher.Invoke(Sub() dlg.ProgressBar.IsIndeterminate = True)
-                _lstSongs = GetSongs()
-            End Sub)
+                               Dispatcher.Invoke(Sub() dlg.ProgressBar.IsIndeterminate = True)
+                               _lstSongs = GetSongs()
+                           End Sub)
             DlgWindowRoot.IsOpen = False
         End If
     End Sub
@@ -1178,7 +1183,7 @@ Class MainWindow
             RefreshPlaylists()
         End If
         ButtonMusic.IsSelected = True
-        ListBoxPlaylist.SelectedIndex = - 1
+        ListBoxPlaylist.SelectedIndex = -1
     End Sub
 
     Private Async Sub ButtonMatchLyric_Click(sender As Object, e As RoutedEventArgs) Handles ButtonMatchLyric.Click
@@ -1191,9 +1196,15 @@ Class MainWindow
             filename = filename
             If Not My.Computer.FileSystem.FileExists(filename) Then
                 Dim tpApi As New ThridPartyCloudMusicApi
-                Dim r = tpApi.Search(itm.Title & itm.Artists)(0)
+                Dim r As ThridPartyCloudMusicApi.SearchResult
+                Await Task.Run(Sub()
+                                   r = tpApi.Search(itm.Title & itm.Artists)(0)
+                               End Sub)
                 If r.Artist = itm.Artists And r.Name = itm.Title Then
-                    Dim lyric = tpApi.GetLyric(r.Id)
+                    Dim lyric = ""
+                    Await Task.Run(Sub()
+                                       lyric = tpApi.GetLyric(r.Id)
+                                   End Sub)
                     If lyric <> "" Then
                         Dim writer As New StreamWriter(File.OpenWrite(filename))
                         writer.Write(lyric)
@@ -1212,5 +1223,13 @@ Class MainWindow
                 End If
             End If
         End If
+    End Sub
+
+    Private Sub Button_Click(sender As Object, e As RoutedEventArgs)
+        Dim tpApi As New ThridPartyCloudMusicApi
+        Dim a = tpApi.Search("出山 花粥/王胜娚")
+        Dim dlg As New DlgChooseLyric(a, DatSongList.SelectedItem)
+        DlgWindowRoot.ShowDialog(dlg)
+
     End Sub
 End Class

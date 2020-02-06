@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:wpf="clr-namespace:LibVLCSharp.WPF;assembly=LibVLCSharp.WPF"
         xmlns:dd="urn:gong-wpf-dragdrop"
         mc:Ignorable="d"
         Title="MainWindow" Height="823.639" Width="1111.075" WindowStartupLocation="CenterScreen"
@@ -339,5 +340,6 @@
             </Grid>
         </mD:DialogHost>
         <mD:Snackbar x:Name="SnackbarInfoMessage" d:IsHidden="True"/>
+        <Button Margin="538,40,407,721" Click="Button_Click"/>
     </Grid>
 </Window>

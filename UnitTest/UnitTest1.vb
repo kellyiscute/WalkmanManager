@@ -1,9 +1,11 @@
 ﻿Imports ATL
-Imports Microsoft.VisualBasic.FileIO
 Imports System.Data.SQLite
+Imports System.IO
 Imports WalkmanManager
 Imports WalkmanManager.MoreSound
 Imports WalkmanManager.CloudMusic
+Imports LibVLCSharp
+Imports LibVLCSharp.Shared
 
 <TestClass()> Public Class UnitTest1
 
@@ -31,7 +33,7 @@ Imports WalkmanManager.CloudMusic
 
 	<TestMethod()> Public Sub ATL_Test()
 
-		For Each file In My.Computer.FileSystem.GetFiles("C:\Users\guoji\music", SearchOption.SearchAllSubDirectories)
+		For Each file In My.Computer.FileSystem.GetFiles("C:\Users\guoji\music", FileIO.SearchOption.SearchAllSubDirectories)
 			Dim ext = file.Split(".")(file.Split(".").Count - 1)
 			'this list is format that are supported by nw-a45 || http://helpguide.sony.net/dmp/nwa40/v1/zh-cn/contents/TP0001449595.html
 			Dim audioExt As String() = {"mp3", "wma", "flac", "wav", "mp4", "m4a", "3gp", "aif", "aiff", "afc", "aifc", "dsf", "dff", "ape", "mqa", "flac"}
@@ -188,6 +190,21 @@ Imports WalkmanManager.CloudMusic
 		Dim tpApi As New ThridPartyCloudMusicApi
 		Dim a = tpApi.Search("出山 花粥/王胜娚")
 		Console.WriteLine(tpApi.GetLyric(a(0).Id))
+	End Sub
+
+	<TestMethod()> Public Sub VlcPlayer()
+		Core.Initialize()
+		Using libVLC = New LibVLC()
+			Dim video = New Media(libVLC, "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+								  FromType.FromLocation)
+
+			Using mp = New MediaPlayer(video)
+				video.Dispose()
+				mp.Play()
+				Threading.Thread.Sleep(10000)
+			End Using
+		End Using
+
 	End Sub
 
 End Class
