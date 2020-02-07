@@ -155,6 +155,24 @@
                                 <DataGrid x:Name="DatSongList" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
 								          AutoGenerateColumns="false" VerticalScrollBarVisibility="Visible" Margin="0,50,0,0"
 								          ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
+                                    <DataGrid.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="匹配歌词" Click="ButtonMatchLyric_Click">
+                                                <MenuItem.Icon><mD:PackIcon Kind="Magnify"/></MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="选择歌词" Click="ButtonChooseLyric_Click">
+                                                <MenuItem.Icon>
+                                                    <mD:PackIcon Kind="PlaylistCheck"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator/>
+                                            <MenuItem Header="删除" Foreground="Red" Click="ButtonDelete_Click">
+                                                <MenuItem.Icon>
+                                                    <mD:PackIcon Kind="Delete"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </DataGrid.ContextMenu>
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID" />
                                         <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220" />
@@ -340,6 +358,5 @@
             </Grid>
         </mD:DialogHost>
         <mD:Snackbar x:Name="SnackbarInfoMessage" d:IsHidden="True"/>
-        <Button Margin="538,40,407,721" Click="Button_Click"/>
     </Grid>
 </Window>

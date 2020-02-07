@@ -11,9 +11,13 @@
         <mD:ColorZone Height="40" Mode="PrimaryMid">
             <Grid>
                 <TextBlock x:Name="TextBlockTitle" VerticalAlignment="Center" Margin="0,12,47,12" TextAlignment="Center" />
-                <Button HorizontalAlignment="Right" Width="47" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0"
-                        Command="{x:Static mD:DialogHost.CloseDialogCommand}" IsCancel="True" Click="ButtonClose_Click">
-                    <mD:PackIcon Kind="Close" />
+                <Button HorizontalAlignment="Right" Width="74" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0"
+                        Command="{x:Static mD:DialogHost.CloseDialogCommand}" IsCancel="True" Click="ButtonClose_Click" Margin="0,5,716,5" Background="Red" BorderBrush="Red">
+                    取消
+                </Button>
+                <Button x:Name="ButtonDone" HorizontalAlignment="Right" Width="74" Height="Auto" mD:ShadowAssist.ShadowDepth="Depth0"
+                        Command="{x:Static mD:DialogHost.CloseDialogCommand}" Margin="0,5,10,5" Background="#FF00A608" BorderBrush="#FF00A608">
+                    完成
                 </Button>
             </Grid>
         </mD:ColorZone>
@@ -37,7 +41,7 @@
                     <mD:ColorZone mD:ShadowAssist.ShadowDepth="Depth2" Height="73" Margin="10,247,10,0">
                         <Grid>
                             <Label x:Name="TextCurrentPlayTime" Margin="46,10,147,40" VerticalContentAlignment="Center" Content="00:00.000"/>
-                            <Button Style="{DynamicResource MaterialDesignToolButton}" Margin="116,10,113,40" Height="Auto">
+                            <Button x:Name="ButtonPlayPause" Style="{DynamicResource MaterialDesignToolButton}" Margin="116,10,113,40" Height="Auto">
                                 <mD:PackIcon Kind="PlayPause"></mD:PackIcon>
                             </Button>
                             <Label x:Name="TextTotalPlayTime" Margin="150,10,40,40" HorizontalContentAlignment="Center">00:00.000</Label>

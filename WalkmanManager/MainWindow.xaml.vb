@@ -1194,17 +1194,16 @@ Complete:
             Dim dir = My.Computer.FileSystem.GetFileInfo(itm.Path).Directory.FullName & "\"
             Dim filename = My.Computer.FileSystem.GetFileInfo(itm.Path).NameWithoutExtention() & ".lrc"
             filename = dir & filename
-            filename = filename
             If Not My.Computer.FileSystem.FileExists(filename) Then
                 Dim tpApi As New ThirdPartyCloudMusicApi
-                Dim r As ThirdPartyCloudMusicApi.SearchResult
+                Dim r As List(Of ThirdPartyCloudMusicApi.SearchResult)
                 Await Task.Run(Sub()
-                                   r = tpApi.Search(itm.Title & itm.Artists)(0)
+                                   r = tpApi.Search(itm.Title & itm.Artists)
                                End Sub)
-                If r.Artist = itm.Artists And r.Name = itm.Title Then
+                If r(0).Artist = itm.Artists And r(0).Name = itm.Title Then
                     Dim lyric = ""
                     Await Task.Run(Sub()
-                                       lyric = tpApi.GetLyric(r.Id)
+                                       lyric = tpApi.GetLyric(r(0).Id)
                                    End Sub)
                     If lyric <> "" Then
                         Dim writer As New StreamWriter(File.OpenWrite(filename))
@@ -1213,24 +1212,74 @@ Complete:
                         writer.Close()
                     Else
                         DlgWindowRoot.IsOpen = False
-                        Await DlgWindowRoot.ShowDialog(New DlgMessageDialog("匹配歌词", "找不到匹配的歌词"))
+                        Dim dlgR As Boolean = Await DlgWindowRoot.ShowDialog(New DlgYesNoDialog("匹配歌词", "自动匹配失败，手动匹配吗？"))
+                        If dlgR Then
+                            Dim dlg As New DlgChooseLyric(LibV, r, itm)
+                            Dim cancelled = Await DlgWindowRoot.ShowDialog(dlg)
+                            If Not cancelled Then
+                                Dim writer As New StreamWriter(File.OpenWrite(filename))
+                                writer.Write(dlg.lrc)
+                                writer.Flush()
+                                writer.Close()
+                            End If
+                        End If
                         Exit Sub
                     End If
                     DlgWindowRoot.IsOpen = False
                     Await DlgWindowRoot.ShowDialog(New DlgMessageDialog("匹配歌词", "匹配完成"))
                 Else
                     DlgWindowRoot.IsOpen = False
-                    Await DlgWindowRoot.ShowDialog(New DlgMessageDialog("匹配歌词", "找不到匹配的歌词"))
+                    Dim dlgR As Boolean = Await DlgWindowRoot.ShowDialog(New DlgYesNoDialog("匹配歌词", "自动匹配失败，手动匹配吗？"))
+                    If dlgR Then
+                        Dim dlg As New DlgChooseLyric(LibV, r, itm)
+                        Dim cancelled = Await DlgWindowRoot.ShowDialog(dlg)
+                        If cancelled Then
+                            Exit Sub
+                        End If
+                        Dim writer As New StreamWriter(File.OpenWrite(filename))
+                        writer.Write(dlg.lrc)
+                        writer.Flush()
+                        writer.Close()
+                    End If
                 End If
             End If
         End If
     End Sub
 
-    Private Sub Button_Click(sender As Object, e As RoutedEventArgs)
-        Dim tpApi As New ThirdPartyCloudMusicApi
-        Dim a = tpApi.Search($"{DatSongList.SelectedItem.Title} {DatSongList.SelectedItem.Artists}")
-        Dim dlg As New DlgChooseLyric(LibV, a, DatSongList.SelectedItem)
-        DlgWindowRoot.ShowDialog(dlg)
+    Private Async Sub ButtonChooseLyric_Click(sender As Object, e As RoutedEventArgs)
+        If DatSongList.SelectedIndex = -1 Then
+            Exit Sub
+        End If
 
+        Dim itm As SongInfo = DatSongList.SelectedItem
+        Dim dir = My.Computer.FileSystem.GetFileInfo(itm.Path).Directory.FullName & "\"
+        Dim filename = My.Computer.FileSystem.GetFileInfo(itm.Path).NameWithoutExtention() & ".lrc"
+        filename = dir & filename
+
+        Dim tpApi As New ThirdPartyCloudMusicApi
+        DlgWindowRoot.ShowDialog(New dlg_progress)
+        Dim searchResults As List(Of ThirdPartyCloudMusicApi.SearchResult)
+        Dim searchString As String = $"{DatSongList.SelectedItem.Title} {DatSongList.SelectedItem.Artists}"
+        Await Task.Run(Sub()
+                           searchResults = tpApi.Search(searchString)
+                       End Sub)
+        Dim dlg As New DlgChooseLyric(LibV, searchResults, DatSongList.SelectedItem)
+        DlgWindowRoot.IsOpen = False
+        Await DlgWindowRoot.ShowDialog(dlg)
+
+        If dlg.Cancelled Then
+            Exit Sub
+        End If
+
+        If My.Computer.FileSystem.FileExists(filename) Then
+            Dim override As Boolean = Await DlgWindowRoot.ShowDialog(New DlgYesNoDialog("覆盖文件", "文件已存在，覆盖？"))
+            If Not override Then
+                Exit Sub
+            End If
+        End If
+        Dim writer As New StreamWriter(File.OpenWrite(filename))
+        writer.Write(dlg.lrc)
+        writer.Flush()
+        writer.Close()
     End Sub
 End Class

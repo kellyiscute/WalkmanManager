@@ -11,6 +11,22 @@ Public Class DlgChooseLyric
     Dim cachedLyrics As New Dictionary(Of Integer, AnalyzedLyric)
     Dim lyricLastCheck As Integer
     Dim currentLyric As AnalyzedLyric
+    Dim flgClosing As Boolean = False
+    Dim flgPause As Boolean
+    Dim _cancelled As String = True
+    Dim _lrc As String
+
+    Public ReadOnly Property Cancelled As String
+        Get
+            Return _cancelled
+        End Get
+    End Property
+
+    Public ReadOnly Property lrc As String
+        Get
+            Return _lrc
+        End Get
+    End Property
 
     Public Sub New(libv As LibVLC, searchResults As IEnumerable(Of ThirdPartyCloudMusicApi.SearchResult), songInfo As Database.SongInfo)
 
@@ -27,6 +43,8 @@ Public Class DlgChooseLyric
         MediaPlayer.Media = New Media(libVlc, songInfo.Path, FromType.FromPath)
         MediaPlayer.Play()
         AddHandler MediaPlayer.TimeChanged, AddressOf MediaPlayer_TimeChange
+        AddHandler MediaPlayer.Stopped, AddressOf MediaPlayer_Stopped
+        AddHandler MediaPlayer.EndReached, AddressOf MediaPlayer_EndReached
     End Sub
 
     Private Sub DlgChooseLyric_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
@@ -84,6 +102,7 @@ Public Class DlgChooseLyric
                     End If
                 End If
             Next
+            Return ""
         End Function
     End Class
 
@@ -105,6 +124,7 @@ Public Class DlgChooseLyric
     End Function
 
     Private Sub ButtonClose_Click(sender As Object, e As RoutedEventArgs)
+        flgClosing = True
         MediaPlayer.Stop()
     End Sub
 
@@ -123,13 +143,38 @@ Public Class DlgChooseLyric
         End If
     End Sub
 
-    Sub MediaPlayer_TimeChange(sender As Object, e As MediaPlayerTimeChangedEventArgs)
+    Private Sub MediaPlayer_TimeChange(sender As Object, e As MediaPlayerTimeChangedEventArgs)
         lyricLastCheck = My.Computer.Clock.TickCount
         Dispatcher.Invoke(Sub()
                               If Not IsNothing(currentLyric) Then
                                   LabelCurrentLyric.Content = currentLyric.FindLyricLine(e.Time)
-                                  TextCurrentPlayTime.Content = MsToTime(e.Time)
                               End If
+                              TextCurrentPlayTime.Content = MsToTime(e.Time)
                           End Sub)
+    End Sub
+
+    Private Sub MediaPlayer_EndReached(sender As Object, e As EventArgs)
+        flgPause = False
+    End Sub
+
+    Private Sub MediaPlayer_Stopped(sender As Object, e As EventArgs)
+        If Not flgClosing Then
+            MediaPlayer.Play()
+        End If
+        flgPause = False
+    End Sub
+
+    Private Sub ButtonPlayPause_Click(sender As Object, e As RoutedEventArgs) Handles ButtonPlayPause.Click
+        If MediaPlayer.IsPlaying Or flgPause Then
+            MediaPlayer.Pause()
+            flgPause = Not flgPause
+        Else
+            MediaPlayer.Play(New Media(libVlc, _songInfo.Path, FromType.FromPath))
+        End If
+    End Sub
+
+    Private Sub ButtonDone_Click(sender As Object, e As RoutedEventArgs) Handles ButtonDone.Click
+        _cancelled = False
+        _lrc = currentLyric.Original
     End Sub
 End Class
