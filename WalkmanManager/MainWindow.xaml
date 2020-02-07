@@ -40,6 +40,14 @@
 				        mD:ShadowAssist.ShadowDepth="Depth0" Margin="0,0,150,0">
                     <mD:PackIcon Kind="Cached" />
                 </Button>
+                <Grid Margin="279,0,205,0" Background="{DynamicResource PrimaryHueMidBrush}" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Label x:Name="LabelCurruntPlayTime" Foreground="White" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="72">00:00.000</Label>
+                    <Button WindowChrome.IsHitTestVisibleInChrome="True" x:Name="ButtonPlayerPlayPause" Style="{DynamicResource MaterialDesignToolButton}" Margin="77,0,0,0" Height="Auto" Foreground="White" HorizontalAlignment="Left" Width="41">
+                        <mD:PackIcon Kind="PlayPause"></mD:PackIcon>
+                    </Button>
+                    <Label x:Name="LabelTotalPlayTime" Margin="123,0,0,0" Foreground="White" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="72">00:00.000</Label>
+                    <Label x:Name="LabelNowPlaying" VerticalContentAlignment="Center" Margin="195,0,0,0" Foreground="White"/>
+                </Grid>
             </Grid>
         </mD:ColorZone>
         <mD:DialogHost x:Name="DlgWindowRoot" Identifier="window-root" Background="White" Margin="0,35,0,0">
@@ -157,8 +165,16 @@
 								          ClipboardCopyMode="IncludeHeader" IsReadOnly="True">
                                     <DataGrid.ContextMenu>
                                         <ContextMenu>
+                                            <MenuItem Header="播放" Click="MenuPlayMusic">
+                                                <MenuItem.Icon>
+                                                    <mD:PackIcon Kind="Play"></mD:PackIcon>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator/>
                                             <MenuItem Header="匹配歌词" Click="ButtonMatchLyric_Click">
-                                                <MenuItem.Icon><mD:PackIcon Kind="Magnify"/></MenuItem.Icon>
+                                                <MenuItem.Icon>
+                                                    <mD:PackIcon Kind="Magnify"/>
+                                                </MenuItem.Icon>
                                             </MenuItem>
                                             <MenuItem Header="选择歌词" Click="ButtonChooseLyric_Click">
                                                 <MenuItem.Icon>

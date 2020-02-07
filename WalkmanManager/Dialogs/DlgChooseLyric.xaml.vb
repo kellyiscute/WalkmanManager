@@ -28,7 +28,7 @@ Public Class DlgChooseLyric
         End Get
     End Property
 
-    Public Sub New(libv As LibVLC, searchResults As IEnumerable(Of ThirdPartyCloudMusicApi.SearchResult), songInfo As Database.SongInfo)
+    Public Sub New(libv As LibVLC, mp As MediaPlayer, searchResults As IEnumerable(Of ThirdPartyCloudMusicApi.SearchResult), songInfo As Database.SongInfo)
 
         ' 此调用是设计器所必需的。
         InitializeComponent()
@@ -39,7 +39,7 @@ Public Class DlgChooseLyric
         TextBlockTitle.Text = $"正在为 {songInfo.Title} 选择歌词"
         ' Init VLC
         libVlc = libv
-        MediaPlayer = New MediaPlayer(libVlc)
+        MediaPlayer = mp
         MediaPlayer.Media = New Media(libVlc, songInfo.Path, FromType.FromPath)
         MediaPlayer.Play()
         AddHandler MediaPlayer.TimeChanged, AddressOf MediaPlayer_TimeChange
@@ -53,14 +53,14 @@ Public Class DlgChooseLyric
         LabelSongArtist.Content = _songInfo.Artists
     End Sub
 
-    Private Function MsToTime(ms As Long) As String
+    Public Shared Function MsToTime(ms As Long) As String
         Dim min = ms \ 1000 \ 60
         Dim sec = ms \ 1000 - min * 60
         Dim milli = ms - sec * 1000 - min * 60 * 1000
         Return String.Format("{0:D2}:{1:D2}.{2:D3}", min, sec, milli)
     End Function
 
-    Private Function TimeToMs(time As String) As Long
+    Public Shared Function TimeToMs(time As String) As Long
         Dim pattern = "([0-9]*):([0-9]{1,2}).([0-9]{1,3})"
         Dim m = Regex.Match(time, pattern)
         Dim min As Integer = m.Groups(1).ToString()
@@ -157,6 +157,7 @@ Public Class DlgChooseLyric
         flgPause = False
     End Sub
 
+    'MAGIC
     Private Sub MediaPlayer_Stopped(sender As Object, e As EventArgs)
         If Not flgClosing Then
             MediaPlayer.Play()

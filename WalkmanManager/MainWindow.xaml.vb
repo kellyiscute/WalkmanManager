@@ -28,6 +28,7 @@ Class MainWindow
     Dim _remoteActionSyncContent As WrapPanel
     Dim _remoteActionTakeOverContent As WrapPanel
     Dim LibV As LibVLC
+    Dim LibVlcMediaPlayer As MediaPlayer
 
     Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
         Handles CzTitle.MouseLeftButtonDown
@@ -339,6 +340,9 @@ Class MainWindow
 
         Core.Initialize()
         LibV = New LibVLC()
+        LibVlcMediaPlayer = New MediaPlayer(LibV)
+        AddHandler LibVlcMediaPlayer.TimeChanged, AddressOf MediaPlayer_TimeChanged
+        AddHandler LibVlcMediaPlayer.LengthChanged, AddressOf MediaPlayer_LengthChanged
     End Sub
 
     Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
@@ -1214,7 +1218,7 @@ Complete:
                         DlgWindowRoot.IsOpen = False
                         Dim dlgR As Boolean = Await DlgWindowRoot.ShowDialog(New DlgYesNoDialog("匹配歌词", "自动匹配失败，手动匹配吗？"))
                         If dlgR Then
-                            Dim dlg As New DlgChooseLyric(LibV, r, itm)
+                            Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, r, itm)
                             Dim cancelled = Await DlgWindowRoot.ShowDialog(dlg)
                             If Not cancelled Then
                                 Dim writer As New StreamWriter(File.OpenWrite(filename))
@@ -1231,7 +1235,7 @@ Complete:
                     DlgWindowRoot.IsOpen = False
                     Dim dlgR As Boolean = Await DlgWindowRoot.ShowDialog(New DlgYesNoDialog("匹配歌词", "自动匹配失败，手动匹配吗？"))
                     If dlgR Then
-                        Dim dlg As New DlgChooseLyric(LibV, r, itm)
+                        Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, r, itm)
                         Dim cancelled = Await DlgWindowRoot.ShowDialog(dlg)
                         If cancelled Then
                             Exit Sub
@@ -1263,7 +1267,7 @@ Complete:
         Await Task.Run(Sub()
                            searchResults = tpApi.Search(searchString)
                        End Sub)
-        Dim dlg As New DlgChooseLyric(LibV, searchResults, DatSongList.SelectedItem)
+        Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, searchResults, DatSongList.SelectedItem)
         DlgWindowRoot.IsOpen = False
         Await DlgWindowRoot.ShowDialog(dlg)
 
@@ -1282,4 +1286,32 @@ Complete:
         writer.Flush()
         writer.Close()
     End Sub
+
+    Private Sub MenuPlayMusic(sender As Object, e As RoutedEventArgs)
+        If DatSongList.SelectedIndex = -1 Then
+            Exit Sub
+        End If
+
+        Dim m = New Media(LibV, DatSongList.SelectedItem.Path, FromType.FromPath)
+        LibVlcMediaPlayer.Play(m)
+        LabelNowPlaying.Content = "正在播放：" & DatSongList.SelectedItem.title
+        '        LabelTotalPlayTime.Content = DlgChooseLyric.MsToTime(LibVlcMediaPlayer.Length)
+    End Sub
+
+    Private Sub ButtonPlayerPlayPause_Click(sender As Object, e As RoutedEventArgs) Handles ButtonPlayerPlayPause.Click
+        LibVlcMediaPlayer.Pause()
+    End Sub
+
+    Private Sub MediaPlayer_TimeChanged(sender As Object, e As MediaPlayerTimeChangedEventArgs)
+        Dispatcher.Invoke(Sub()
+                              LabelCurruntPlayTime.Content = DlgChooseLyric.MsToTime(e.Time)
+                          End Sub)
+    End Sub
+
+    Private Sub MediaPlayer_LengthChanged(sender As Object, e As MediaPlayerLengthChangedEventArgs)
+        Dispatcher.Invoke(Sub()
+                              LabelTotalPlayTime.Content = DlgChooseLyric.MsToTime(e.Length)
+                          End Sub)
+    End Sub
+
 End Class
