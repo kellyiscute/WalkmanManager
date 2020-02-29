@@ -93,7 +93,7 @@ Public Class DlgChooseLyric
         End Property
 
         Public Function FindLyricLine(pos As Long) As String
-            For i As Integer = 0 To LyricDic.Count
+            For i As Integer = 0 To LyricDic.Count - 1
                 If LyricDic.Keys(i) > pos Then
                     If i <> 0 Then
                         Return LyricDic(LyricDic.Keys(i - 1))
@@ -102,7 +102,7 @@ Public Class DlgChooseLyric
                     End If
                 End If
             Next
-            Return ""
+            Return LyricDic(LyricDic.Keys(LyricDic.Count - 1))
         End Function
     End Class
 

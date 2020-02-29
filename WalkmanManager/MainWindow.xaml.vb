@@ -9,6 +9,8 @@ Imports LibVLCSharp.WPF
 Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
 Imports WalkmanManager.CloudMusic
+Imports System.ComponentModel
+Imports TagLib.IFD.Entries
 
 Class MainWindow
     ReadOnly NETEASE_RED = Color.FromRgb(198, 47, 47)
@@ -29,6 +31,8 @@ Class MainWindow
     Dim _remoteActionTakeOverContent As WrapPanel
     Dim LibV As LibVLC
     Dim LibVlcMediaPlayer As MediaPlayer
+    Dim _nowPlaying As SongInfo
+    Dim fileChangeNotifyIgnoreCount As Integer
 
     Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
         Handles CzTitle.MouseLeftButtonDown
@@ -188,6 +192,10 @@ Class MainWindow
 
         PageSwitcher(Nothing, Nothing)
 
+        If Not My.Computer.FileSystem.DirectoryExists(songDir) Then
+            My.Computer.FileSystem.CreateDirectory(songDir)
+        End If
+
         Dim newLost = Await Task.Run(Async Function()
                                          Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
                                          Dim lstLost = Await upd.FindLost()
@@ -229,21 +237,29 @@ Class MainWindow
         w.EnableRaisingEvents = True
         'Set Message Queue
         SnackbarInfoMessage.MessageQueue = _sbMessageQueue
+        'Set Wrap panel content
+        _remoteActionTakeOverContent = ButtonRemoteChangeAction.Content
+        _remoteActionSyncContent = ButtonRemoteAction.Content
     End Sub
 
     Private Sub File_Created(sender As Object, e As FileSystemEventArgs)
         If DbUpdater.CheckExtention(e.FullPath) Then
             'if is audio, add to db
-            Dim t As New Track(e.FullPath)
-            Dim id = AddSong(t.Title, t.Artist, e.FullPath)
+            Dim FullPath = My.Computer.FileSystem.GetFileInfo(e.FullPath).FullName
+            Dim t As New Track(FullPath)
+            Dim id = AddSong(t.Title, t.Artist, FullPath)
             'add to list
             Dispatcher.Invoke(
                 Sub() _
                                  _lstSongs.Add(New SongInfo _
-                                                  With {.Title = t.Title, .Artists = t.Artist, .Path = e.FullPath,
+                                                  With {.Title = t.Title, .Artists = t.Artist, .Path = FullPath,
                                                   .Id = id}))
             t = Nothing
-            _sbMessageQueue.Enqueue($"新文件：{e.FullPath}")
+            If fileChangeNotifyIgnoreCount = 0 Then
+                _sbMessageQueue.Enqueue($"新文件：{FullPath}")
+            Else
+                fileChangeNotifyIgnoreCount -= 1
+            End If
         End If
     End Sub
 
@@ -251,14 +267,19 @@ Class MainWindow
         If DbUpdater.CheckExtention(e.FullPath) Then
             'if is audio, check if in db
             Dim id = GetSongId(e.FullPath)
+            Dim FullPath = My.Computer.FileSystem.GetFileInfo(e.FullPath).FullName
             If Not IsNothing(id) Then
                 'remove from db
                 RemoveSongFromLib(id)
                 'remove from list
                 Dispatcher.Invoke(
-                    Sub() _lstSongs.Remove((From itm In _lstSongs Where itm.Path = e.FullPath Select itm)(0)))
+                    Sub() _lstSongs.Remove((From itm In _lstSongs Where itm.Path = FullPath Select itm)(0)))
             End If
-            _sbMessageQueue.Enqueue($"文件删除：{e.FullPath}")
+            If fileChangeNotifyIgnoreCount = 0 Then
+                _sbMessageQueue.Enqueue($"文件删除：{FullPath}")
+            Else
+                fileChangeNotifyIgnoreCount -= 1
+            End If
         End If
     End Sub
 
@@ -707,25 +728,35 @@ Class MainWindow
         Next
     End Sub
 
-    Private Structure CpInfo
-        Public Source As String
-        Public Destination As String
-        Public Lyric As String
-    End Structure
-
     Private Sub ButtonRemoteSync_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteAction.Click
+        _syncRemoteDeviceContent = ButtonRemoteAction.Content
         If ComboBoxDevices.SelectedIndex <> -1 Then
-            If ButtonRemoteAction.Content.Equals(_syncRemoteDeviceContent) Then
+            If ButtonRemoteAction.Content Is _remoteActionSyncContent Then
                 _flgSyncStop = False
                 _usbWatcher.FlgPause = True
+                ButtonRemoteChangeAction.IsEnabled = False
                 StartSync()
+            ElseIf ButtonRemoteAction.Content Is _remoteActionTakeOverContent Then
+                _flgSyncStop = False
+                _usbWatcher.FlgPause = True
+                ButtonRemoteChangeAction.IsEnabled = False
+                ButtonRemoteAction.Content = "取消"
+                StartTakeOver()
             Else
                 ButtonRemoteAction.Content = "正在取消"
                 ButtonRemoteAction.IsEnabled = False
                 _flgSyncStop = True
             End If
+        Else
+            SnackbarInfoMessage.MessageQueue.Enqueue("未选择设备")
         End If
     End Sub
+
+    Private Structure CpInfo
+        Public Source As String
+        Public Destination As String
+        Public Lyric As String
+    End Structure
 
     Private Async Sub StartSync()
 
@@ -734,7 +765,7 @@ Class MainWindow
         Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
         Dim wmManagedPath = drivePath & "\MUSIC\wmManaged"
         AddSyncLog(LogType.Information, "连接数据库")
-        Dim conn = Connect()
+        '        Dim conn = Connect()
 
         If Not My.Computer.FileSystem.DirectoryExists(wmManagedPath) Then
             My.Computer.FileSystem.CreateDirectory(wmManagedPath)
@@ -820,10 +851,10 @@ Class MainWindow
                                    sCopy.Destination = wmManagedPath & "\" & My.Computer.FileSystem.GetFileInfo(itm).Name
                                    If _
                           flagCopyLrc And
-                          My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc") Then
+                          My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.NameWithoutExtention & ".lrc") Then
                                        sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
                                        totalCopySize +=
-                          My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.Name & ".lrc").Length
+                          My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.NameWithoutExtention & ".lrc").Length
                                    End If
 
                                    lstCopy.Add(sCopy)
@@ -849,6 +880,7 @@ Class MainWindow
         If _
             spaceNeeded > My.Computer.FileSystem.GetDriveInfo(drivePath).TotalFreeSpace And
             Not CheckBoxSyncOptionNoSpaceCheck.IsChecked Then
+
             Dim errorDlg As New DlgMessageDialog("同步失败", "磁盘空间不足")
             Await DialogHost.Show(errorDlg, "window-root")
             ProgressBarSyncTotal.Value = 0
@@ -938,7 +970,127 @@ Complete:
         End If
         Await DlgWindowRoot.ShowDialog(msgDlg)
         ButtonRemoteAction.IsEnabled = True
-        Await Task.Run(Sub() Thread.Sleep(1000))
+        ButtonRemoteChangeAction.IsEnabled = True
+        '        Await Task.Run(Sub() Thread.Sleep(1000))
+        _usbWatcher.FlgPause = False
+    End Sub
+
+    Private Async Sub StartTakeOver()
+        Dim lstCopyInfo As New List(Of CpInfo)
+        Dim lstCopy As New List(Of String)
+        Dim spaceNeeded As Long
+        Dim songDir = GetSetting("song_dir")
+        Dim progressSubscriber() As Long = {0, 0}
+        Dim flgProgressUpdaterPause As Boolean = False
+        Dim progressUpdateThread As Thread
+
+        ProgressBarSyncSub.IsIndeterminate = True
+
+        progressUpdateThread = New Thread(Sub()
+                                              Do
+                                                  Dispatcher.Invoke(Sub()
+                                                                        If flgProgressUpdaterPause Then
+                                                                            Exit Sub
+                                                                        End If
+                                                                        If progressSubscriber(1) <> 0 Then
+                                                                            ProgressBarSyncSub.IsIndeterminate = False
+                                                                            ProgressBarSyncSub.Maximum = progressSubscriber(1)
+                                                                            ProgressBarSyncSub.Value = progressSubscriber(0)
+                                                                        Else
+                                                                            ProgressBarSyncSub.IsIndeterminate = True
+                                                                        End If
+                                                                    End Sub)
+                                                  Thread.Sleep(300)
+                                                  If flgProgressUpdaterPause Then
+                                                      Exit Do
+                                                  End If
+                                              Loop
+                                          End Sub)
+        progressUpdateThread.IsBackground = True
+        progressUpdateThread.Start()
+
+        Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
+        Dim wmManagedPath = drivePath & "\MUSIC\wmManaged"
+
+        'Find files need to be copied
+        AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
+        lstCopy = Await Task.Run(Function()
+                                     Return SyncAnalyzer.FindDeleted(wmManagedPath, _lstSongs, progressSubscriber, _flgSyncStop)
+                                 End Function)
+        If _flgSyncStop Then
+            GoTo Complete
+        End If
+        AddSyncLog(LogType.Information, "发现需要复制/覆盖的项目：" & lstCopy.Count, False)
+        fileChangeNotifyIgnoreCount = lstCopy.Count
+
+        Dim c As Integer
+        AddSyncLog(LogType.Information, "正在计算所需空间", False)
+        Await Task.Run(Sub()
+                           While Not _flgSyncStop And c < lstCopy.Count
+                               Dim fInfo = My.Computer.FileSystem.GetFileInfo(lstCopy(c))
+                               Dim itmCopyInfo As New CpInfo
+                               spaceNeeded += fInfo.Length
+                               itmCopyInfo.Source = lstCopy(c)
+                               itmCopyInfo.Destination = songDir & "\" & fInfo.Name
+
+                               If My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.NameWithoutExtention & ".lrc") Then
+                                   itmCopyInfo.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
+                                   spaceNeeded +=
+                    My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.NameWithoutExtention & ".lrc").Length
+                               End If
+                               lstCopyInfo.Add(itmCopyInfo)
+
+                               c += 1
+                           End While
+                       End Sub)
+        If _flgSyncStop Then
+            GoTo Complete
+        End If
+
+        Dim cp As New Synchronizer
+        AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
+
+        ProgressBarSyncSub.IsIndeterminate = False
+        ProgressBarSyncSub.Value = 0
+        ProgressBarSyncTotal.Value = 0
+        ProgressBarSyncTotal.Maximum = lstCopy.Count
+
+        Await Task.Run(Sub()
+                           For Each itm In lstCopyInfo
+                               Try
+                                   AddSyncLog(LogType.Information, "写入：" & itm.Destination)
+                                   cp.CopyFile(itm.Source, itm.Destination)
+                                   If itm.Lyric <> "" Then
+                                       AddSyncLog(LogType.Information, "写入：" & SyncAnalyzer.ChangePath(itm.Lyric, songDir))
+                                       cp.CopyFile(itm.Lyric, SyncAnalyzer.ChangePath(itm.Lyric, songDir))
+                                   End If
+                               Catch ex As Exception
+                                   AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
+                                   Exit Sub
+                               End Try
+                               ProgressBarSyncTotal.AddOne(Me)
+
+                               If _flgSyncStop Then
+                                   Exit Sub
+                               End If
+                           Next
+                       End Sub)
+
+Complete:
+        'Stop progressUpdate Thread
+        If Not IsNothing(progressUpdateThread) Then
+            If progressUpdateThread.IsAlive Then
+                progressUpdateThread.Abort()
+            End If
+        End If
+        ProgressBarSyncSub.Value = 0
+        ProgressBarSyncSub.IsIndeterminate = False
+        ProgressBarSyncTotal.Value = 0
+        ButtonRemoteAction.Content = _syncRemoteDeviceContent
+        Dim msgDlg As New DlgMessageDialog("", "同步完成")
+        Await DlgWindowRoot.ShowDialog(msgDlg)
+        ButtonRemoteAction.IsEnabled = True
+        ButtonRemoteChangeAction.IsEnabled = True
         _usbWatcher.FlgPause = False
     End Sub
 
@@ -1262,11 +1414,21 @@ Complete:
 
         Dim tpApi As New ThirdPartyCloudMusicApi
         DlgWindowRoot.ShowDialog(New dlg_progress)
-        Dim searchResults As List(Of ThirdPartyCloudMusicApi.SearchResult)
+        Dim searchResults As List(Of ThirdPartyCloudMusicApi.SearchResult) = Nothing
         Dim searchString As String = $"{DatSongList.SelectedItem.Title} {DatSongList.SelectedItem.Artists}"
+        Dim errMsg As String = ""
         Await Task.Run(Sub()
-                           searchResults = tpApi.Search(searchString)
+                           Try
+                               searchResults = tpApi.Search(searchString)
+                           Catch ex As Exception
+                               errMsg = ex.Message
+                           End Try
                        End Sub)
+        If IsNothing(searchResults) Then
+            DlgWindowRoot.IsOpen = False
+            Await DlgWindowRoot.ShowDialog(New DlgMessageDialog("获取失败", errMsg))
+            Exit Sub
+        End If
         Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, searchResults, DatSongList.SelectedItem)
         DlgWindowRoot.IsOpen = False
         Await DlgWindowRoot.ShowDialog(dlg)
@@ -1293,6 +1455,7 @@ Complete:
         End If
 
         Dim m = New Media(LibV, DatSongList.SelectedItem.Path, FromType.FromPath)
+        _nowPlaying = DatSongList.SelectedItem
         LibVlcMediaPlayer.Play(m)
         LabelNowPlaying.Content = "正在播放：" & DatSongList.SelectedItem.title
         '        LabelTotalPlayTime.Content = DlgChooseLyric.MsToTime(LibVlcMediaPlayer.Length)
@@ -1303,15 +1466,56 @@ Complete:
     End Sub
 
     Private Sub MediaPlayer_TimeChanged(sender As Object, e As MediaPlayerTimeChangedEventArgs)
-        Dispatcher.Invoke(Sub()
-                              LabelCurruntPlayTime.Content = DlgChooseLyric.MsToTime(e.Time)
-                          End Sub)
+
     End Sub
 
     Private Sub MediaPlayer_LengthChanged(sender As Object, e As MediaPlayerLengthChangedEventArgs)
-        Dispatcher.Invoke(Sub()
-                              LabelTotalPlayTime.Content = DlgChooseLyric.MsToTime(e.Length)
-                          End Sub)
+
     End Sub
 
+    Private Sub MediaPlayer_Stopped(sender As Object, e As EventArgs)
+        LabelNowPlaying.Content = ""
+    End Sub
+
+    Private Sub MainWindow_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
+        Environment.Exit(0)
+    End Sub
+
+    Private Sub ButtonPlayerPrev_Click(sender As Object, e As RoutedEventArgs) Handles ButtonPlayerPrev.Click
+        If Not IsNothing(_nowPlaying) Then
+            Dim index = _lstSongs.IndexOf(_nowPlaying)
+            If index <> 0 Then
+                Dim m = New Media(LibV, _lstSongs(index - 1).Path, FromType.FromPath)
+                _nowPlaying = _lstSongs(index - 1)
+                LibVlcMediaPlayer.Play(m)
+                LabelNowPlaying.Content = "正在播放：" & _lstSongs(index - 1).Title
+            Else
+                SnackbarInfoMessage.MessageQueue.Enqueue("已经是第一首啦")
+            End If
+        End If
+    End Sub
+
+    Private Sub ButtonPlayerNext_Click(sender As Object, e As RoutedEventArgs) Handles ButtonPlayerNext.Click
+        If Not IsNothing(_nowPlaying) Then
+            Dim index = _lstSongs.IndexOf(_nowPlaying)
+            If index <> _lstSongs.Count - 1 Then
+                Dim m = New Media(LibV, _lstSongs(index + 1).Path, FromType.FromPath)
+                _nowPlaying = _lstSongs(index + 1)
+                LibVlcMediaPlayer.Play(m)
+                LabelNowPlaying.Content = "正在播放：" & _lstSongs(index + 1).Title
+            Else
+                SnackbarInfoMessage.MessageQueue.Enqueue("已经是最后一首啦")
+            End If
+        End If
+    End Sub
+
+    Private Sub ButtonRemoteChangeAction_Click(sender As Object, e As RoutedEventArgs) Handles ButtonRemoteChangeAction.Click
+        If sender.content Is _remoteActionTakeOverContent Then
+            sender.content = _remoteActionSyncContent
+            ButtonRemoteAction.Content = _remoteActionTakeOverContent
+        Else
+            sender.content = _remoteActionTakeOverContent
+            ButtonRemoteAction.Content = _remoteActionSyncContent
+        End If
+    End Sub
 End Class

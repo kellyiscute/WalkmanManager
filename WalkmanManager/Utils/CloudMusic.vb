@@ -369,8 +369,18 @@ Namespace CloudMusic
 		End Function
 	End Class
 
+	Public Class CheatingException
+		Inherits Exception
+		Sub New(Optional m As String = "")
+			Message = m
+		End Sub
+
+		Public Overrides ReadOnly Property Message As String
+	End Class
+
 	Public Class ThirdPartyCloudMusicApi
-		Public ReadOnly Property BaseUrl As String = "https://api.imjad.cn/cloudmusic/"
+		'		Public ReadOnly Property BaseUrl As String = "https://api.imjad.cn/cloudmusic/"
+		Public ReadOnly Property BaseUrl As String = "http://kellyiscute.com"
 
 		''' <summary>
 		''' Return url that prepared with querystring ready for request
@@ -399,10 +409,10 @@ Namespace CloudMusic
 
 		Public Function Search(keyword As String) As List(Of SearchResult)
 			Dim queryString As New Dictionary(Of String, String)
-			queryString.Add("id", "1")
-			queryString.Add("type", "search")
-			queryString.Add("s", keyword)
-			queryString.Add("search_type", "1")
+			'			queryString.Add("id", "1")
+			queryString.Add("action", "search")
+			queryString.Add("q", keyword)
+			'			queryString.Add("search_type", "1")
 			Dim requestUrl = PrepareDataAsQueryString(queryString)
 			Dim wc As New WebClient
 			Dim responseReader = New StreamReader(wc.OpenRead(requestUrl))
@@ -410,6 +420,9 @@ Namespace CloudMusic
 			responseReader.Close()
 			Dim responseJson = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
 
+			If responseJson.Keys.Contains("msg") AndAlso responseJson("msg") <> "OK" Then
+				Throw New CheatingException(responseJson("msg"))
+			End If
 			Dim result As New List(Of SearchResult)
 			Dim songs = responseJson("result")("songs")
 
@@ -440,7 +453,7 @@ Namespace CloudMusic
 		Public Function GetLyric(id) As String
 			Dim queryString As New Dictionary(Of String, String)
 			queryString.Add("id", id)
-			queryString.Add("type", "lyric")
+			queryString.Add("action", "lyric")
 			Dim url = PrepareDataAsQueryString(queryString)
 			Dim wc As New WebClient()
 			Dim responseReader = New StreamReader(wc.OpenRead(url))

@@ -159,6 +159,7 @@ Public Module ExtensionMethods
 	''' <returns></returns>
 	<System.Runtime.CompilerServices.Extension>
 	Public Function SaveToMem(d As IO.DriveInfo) As DriveInfoMem
+		On Error Resume Next
 		Dim result As New DriveInfoMem With
 				{
 				.AvailableFreeSpace = d.AvailableFreeSpace,
