@@ -5,6 +5,7 @@ Imports System.Net
 Public Module ExtensionMethods
 	Sub New()
 	End Sub
+
 	<System.Runtime.CompilerServices.Extension>
 	Public Function Contains(ByVal str As String, ByVal values As String()) As Boolean
 		Dim result As Integer
@@ -39,10 +40,10 @@ Public Module ExtensionMethods
 		Dim result = file.Name
 		Dim sp = result.Split(".")
 		result = ""
-		For i = 0 To sp.Count-2
+		For i = 0 To sp.Count - 2
 			result += sp(i) + "."
 		Next
-		result = result.Substring(0,result.Length-2)
+		result = result.Substring(0, result.Length - 1)
 		Return result
 	End Function
 
@@ -122,4 +123,55 @@ Public Module ExtensionMethods
 								 End Sub)
 	End Sub
 
+	<System.Runtime.CompilerServices.Extension>
+	Public Function ContainsDriveInfo(lst As IList(Of IO.DriveInfo), d As IO.DriveInfo) As Boolean
+		Try
+			For Each itm In lst
+				If _
+					itm.Name = d.Name And itm.VolumeLabel = d.VolumeLabel And itm.TotalSize = d.TotalSize And
+					itm.TotalFreeSpace = d.TotalFreeSpace Then
+					Return True
+				End If
+			Next
+		Catch
+		End Try
+		Return False
+	End Function
+
+	<System.Runtime.CompilerServices.Extension>
+	Public Function ContainsDriveInfo(lst As IList(Of DriveInfoMem), d As DriveInfoMem) As Boolean
+		Try
+			For Each itm In lst
+				If _
+					itm.Name = d.Name And itm.VolumeLabel = d.VolumeLabel And itm.TotalSize = d.TotalSize Then
+					Return True
+				End If
+			Next
+		Catch
+		End Try
+		Return False
+	End Function
+
+	''' <summary>
+	''' Save DriveInfo to Memory, copy all properties to memory
+	''' </summary>
+	''' <param name="d">IO.DriveInfo</param>
+	''' <returns></returns>
+	<System.Runtime.CompilerServices.Extension>
+	Public Function SaveToMem(d As IO.DriveInfo) As DriveInfoMem
+		On Error Resume Next
+		Dim result As New DriveInfoMem With
+				{
+				.AvailableFreeSpace = d.AvailableFreeSpace,
+				.DriveType = d.DriveType,
+				.DriveFormat = d.DriveFormat,
+				.IsReady = d.IsReady,
+				.Name = d.Name,
+				.RootDirectory = d.RootDirectory.FullName,
+				.TotalFreeSpace = d.TotalFreeSpace,
+				.TotalSize = d.TotalSize,
+				.VolumeLabel = d.VolumeLabel
+				}
+		Return result
+	End Function
 End Module

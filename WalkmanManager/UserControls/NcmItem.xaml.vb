@@ -50,8 +50,10 @@ Public Class NcmItem
 		SetStatus(Status.done)
 	End Function
 
-	Public sub Dispose()
-		_crypto.CloseFile
-		_crypto = nothing
-	End sub
+	Public Sub Dispose()
+		If Not IsNothing(_crypto) Then
+			_crypto.CloseFile()
+			_crypto = Nothing
+		End If
+	End Sub
 End Class

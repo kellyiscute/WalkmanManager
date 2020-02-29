@@ -3,6 +3,7 @@ Imports System.Net
 Imports System.Text
 
 Public Class MoreSound
+	'Deprecated API not usable any more
 
 	Const UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.131 Safari/537.36"
 	Const ApiUrl = "http://moresound.tk/music/api.php"
@@ -21,6 +22,10 @@ Public Class MoreSound
 		Property songmid As String
 		Property songname As String
 		Property singers As List(Of SingerDetail)
+
+		Public Overrides Function ToString() As String
+			Return $"{songname}/{albumname}: {songmid}/{albummid}"
+		End Function
 	End Structure
 
 	Public Structure SingerDetail

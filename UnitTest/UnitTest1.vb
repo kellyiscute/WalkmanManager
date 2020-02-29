@@ -1,7 +1,12 @@
 ﻿Imports ATL
-Imports Microsoft.VisualBasic.FileIO
 Imports System.Data.SQLite
+Imports System.IO
+Imports System.Text.RegularExpressions
 Imports WalkmanManager
+Imports WalkmanManager.MoreSound
+Imports WalkmanManager.CloudMusic
+Imports LibVLCSharp
+Imports LibVLCSharp.Shared
 
 <TestClass()> Public Class UnitTest1
 
@@ -29,7 +34,7 @@ Imports WalkmanManager
 
 	<TestMethod()> Public Sub ATL_Test()
 
-		For Each file In My.Computer.FileSystem.GetFiles("C:\Users\guoji\music", SearchOption.SearchAllSubDirectories)
+		For Each file In My.Computer.FileSystem.GetFiles("C:\Users\guoji\music", FileIO.SearchOption.SearchAllSubDirectories)
 			Dim ext = file.Split(".")(file.Split(".").Count - 1)
 			'this list is format that are supported by nw-a45 || http://helpguide.sony.net/dmp/nwa40/v1/zh-cn/contents/TP0001449595.html
 			Dim audioExt As String() = {"mp3", "wma", "flac", "wav", "mp4", "m4a", "3gp", "aif", "aiff", "afc", "aifc", "dsf", "dff", "ape", "mqa", "flac"}
@@ -162,4 +167,57 @@ Imports WalkmanManager
 		End If
 	End Sub
 
+	''' <summary>
+	''' Deprecated
+	''' </summary>
+	<TestMethod()> Public Sub MoreSoundTest()
+		Dim ms As New MoreSound
+		Dim result = ms.Search(SearchMethod.qq, "asf")
+		Console.WriteLine(result)
+		For Each r In result
+			Console.WriteLine(r.ToString())
+		Next
+	End Sub
+
+	<TestMethod> Public Sub ThirdPartySearchTest()
+		Dim tpApi As New ThirdPartyCloudMusicApi
+		Dim a = tpApi.Search("出山 花粥/王胜娚")
+		For Each b In a
+			Console.WriteLine(b.ToString)
+		Next
+	End Sub
+
+	<TestMethod> Public Sub GetLyric()
+		Dim tpApi As New ThirdPartyCloudMusicApi
+		Dim a = tpApi.Search("出山 花粥/王胜娚")
+		Console.WriteLine(tpApi.GetLyric(a(0).Id))
+	End Sub
+
+	<TestMethod()> Public Sub VlcPlayer()
+		Core.Initialize()
+		Using libVLC = New LibVLC()
+			Dim video = New Media(libVLC, "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+								  FromType.FromLocation)
+
+			Using mp = New MediaPlayer(video)
+				video.Dispose()
+				mp.Play()
+				Threading.Thread.Sleep(10000)
+			End Using
+		End Using
+
+	End Sub
+
+	<TestMethod()> Public Sub TimeToMs()
+		Dim a = "[00:36.580]你悄悄把不安都封印"
+		Dim pattern = "\[([0-9]*):([0-9]{1,2}).([0-9]{1,3})\]"
+		Dim m = Regex.Match(a, pattern)
+		Console.WriteLine(m.Success)
+		Console.WriteLine(m.Value)
+		Console.WriteLine(m.Index)
+		Console.WriteLine(m.Groups(1))
+		Console.WriteLine(m.Groups(2))
+		Console.WriteLine(m.Groups(3))
+		Console.WriteLine(Regex.Replace(a, pattern, ""))
+	End Sub
 End Class

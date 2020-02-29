@@ -39,5 +39,4 @@ Public Class dlg_progress
 	Public Sub ChangeColorTheme(brush As SolidColorBrush)
 		ProgProgress.Foreground = brush
 	End Sub
-
 End Class

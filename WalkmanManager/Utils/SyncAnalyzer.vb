@@ -3,6 +3,7 @@ Imports WalkmanManager.CloudMusic
 Imports System.IO
 Imports System.Security.Cryptography
 Imports System.Threading
+Imports WalkmanManager.CloudMusic.CloudMusic
 
 Public Class SyncAnalyzer
 	Const Md5ConcurrentCheckThreads = 8
@@ -42,7 +43,10 @@ Public Class SyncAnalyzer
 				lstFailed.Add(track)
 			Else
 				Dim songId = GetSongId(path, cmd)
-				AddSongToPlaylist(id, songId, cmd, counter)
+				Try
+					AddSongToPlaylist(id, songId, cmd, counter)
+				Catch
+				End Try
 				counter += 1
 			End If
 			currentProgress += 1
@@ -56,7 +60,7 @@ Public Class SyncAnalyzer
 		Return lstFailed
 	End Function
 
-	Public Shared Function SyncAllPlaylists(cloudMusicObject As CloudMusic, Optional dlg As dlg_progress = Nothing) _
+	Public Shared Function SyncAllPlaylists(cloudMusicObject As CloudMusic.CloudMusic, Optional dlg As dlg_progress = Nothing) _
 		As String
 		Dim playlists = cloudMusicObject.GetPlaylists()
 		If Not IsNothing(dlg) Then

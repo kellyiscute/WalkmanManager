@@ -5,14 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:WalkmanManager"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" x:Class="DlgConvertNcm"
+             xmlns:ei="http://schemas.microsoft.com/xaml/behaviors"
+             x:Class="DlgConvertNcm"
              mc:Ignorable="d" 
              Height="450" Width="800" BorderThickness="1" BorderBrush="#FFC1C1C1"
              WindowChrome.IsHitTestVisibleInChrome="True">
 
-	<i:Interaction.Behaviors>
+	<ei:Interaction.Behaviors>
 		<ei:MouseDragElementBehavior ConstrainToParentBounds="True"/>
-	</i:Interaction.Behaviors>
+	</ei:Interaction.Behaviors>
 	<Border Background="White" mD:ShadowAssist.ShadowDepth="Depth3" CornerRadius="7">
 		<Grid>
 			<mD:ColorZone x:Name="TitleBar" Height="40" Mode="PrimaryMid">

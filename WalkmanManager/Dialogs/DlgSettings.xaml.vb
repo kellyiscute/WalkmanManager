@@ -40,4 +40,8 @@ Public Class DlgSettings
 		Database.ClearDatabase()
 		showOKDialog()
 	End Sub
+
+	Private Sub GotoLink(sender As Object, e As RoutedEventArgs)
+		Process.Start(sender.tag)
+	End Sub
 End Class

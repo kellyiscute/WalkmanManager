@@ -27,8 +27,12 @@
 		Next
 		IconCheck.Visibility = Visibility.Visible
 		ProgressBarWorking.Visibility = Visibility.Hidden
-		ButtonDump.IsEnabled = True
-		LabelStatus.Content = "找到 " & files.Count & " 个加密文件"
+		If files.Count > 0 Then
+			ButtonDump.IsEnabled = True
+			LabelStatus.Content = "找到 " & files.Count & " 个加密文件"
+		Else
+			LabelStatus.Content = "没有找到加密文件"
+		End If
 	End Sub
 
 	Private Function SearchNcm() As List(Of String)
@@ -50,6 +54,9 @@
 	End Sub
 
 	Private Async Sub ButtonDump_Click(sender As Object, e As RoutedEventArgs) Handles ButtonDump.Click
+		If StackPanelFiles.Children.Count = 0 Then
+			Exit Sub
+		End If
 		ButtonDump.IsEnabled = False
 		LabelStatus.Content = "正在转换..."
 		ProgressBarWorking.Visibility = Visibility.Visible
@@ -62,5 +69,8 @@
 			Catch ex As Exception
 			End Try
 		Next
+		LabelStatus.Content = "转换完成"
+		IconCheck.Visibility = Visibility.Hidden
+		ProgressBarWorking.Visibility = Visibility.Visible
 	End Sub
 End Class

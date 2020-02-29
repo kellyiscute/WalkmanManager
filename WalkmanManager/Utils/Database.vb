@@ -555,7 +555,7 @@ Public Class Database
 		Else
 			reader.Close()
 			conn.Close()
-			Return Nothing
+			Return New ObservableCollection(Of SongInfo)
 		End If
 	End Function
 
