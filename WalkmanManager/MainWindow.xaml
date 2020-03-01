@@ -129,10 +129,9 @@
 										              Margin="8,5,0,0"
 										              HorizontalAlignment="Left" Width="251">
                                             <Grid>
-                                                <TextBox x:Name="TextBoxSearchLocal" VerticalContentAlignment="Center"
-												         mD:TextFieldAssist.DecorationVisibility="Hidden"
-												         BorderThickness="0" VerticalAlignment="Bottom" mD:HintAssist.Hint="搜索" Margin="10,0,35,0"
-												         Height="35" />
+                                                <TextBox x:Name="TextBoxSearchLocal" VerticalContentAlignment="Top"
+												         mD:TextFieldAssist.DecorationVisibility="Hidden" 
+												         BorderThickness="0" mD:HintAssist.Hint="搜索" Margin="10,0,35,3" Height="25" VerticalAlignment="Bottom" />
                                                 <Button x:Name="BtnSearchSong" Style="{DynamicResource MaterialDesignToolButton}"
 												        HorizontalAlignment="Right" Width="35" VerticalAlignment="Top" Height="35"
 												        mD:RippleAssist.IsCentered="True">

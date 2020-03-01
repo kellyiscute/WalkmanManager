@@ -74,6 +74,7 @@ Namespace CloudMusic
 		End Function
 
 		Structure CloudMusicTracks
+			Property Id As Integer
 			Property Title As String
 			Property Artists As String
 			Property Album As String
@@ -322,6 +323,8 @@ Namespace CloudMusic
 			Dim tracks As New List(Of CloudMusicTracks)
 			For Each track In cloudMusicDeserialize("result")("tracks")
 				Dim t As New CloudMusicTracks
+				'Read Id
+				t.Id = track("id")
 				'Read Track Name
 				t.Title = track("name")
 				'Read Track Artists
@@ -425,6 +428,10 @@ Namespace CloudMusic
 			End If
 			Dim result As New List(Of SearchResult)
 			Dim songs = responseJson("result")("songs")
+
+			If IsNothing(songs) Then
+				Return Nothing
+			End If
 
 			For Each song In songs
 				Dim itm As New SearchResult

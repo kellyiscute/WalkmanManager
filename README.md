@@ -1,7 +1,8 @@
 # WalkmanManager
 A easy-to-use app to replace Sony MediaCenter with more features and better design  
  **Project Launched: _3rd Jul, 2018_**  
- **Beta Released: _3rd May, 2019_**
+ **Beta Released: _3rd May, 2019_**  
+ **Version 1.0 Released: _Midnight 1st Mar, 2020_**
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
@@ -13,9 +14,10 @@ A easy-to-use app to replace Sony MediaCenter with more features and better desi
 * [x] Drag to import
 * [ ] Personal Cloud Sync
 * [x] Fix issue #7
-* [ ] Match Cover and Lyrics for local songs
-* [ ] Tries to Download CloudMusic Playlist
+* [x] Match ~~Cover and~~ Lyrics for local songs
+* ~~[ ] Tries to Download CloudMusic Playlist~~
 * [x] Demos in README
+* [x] Takeover a Walkman
 
 ## Demos  
 ### To see and change(I forgot to make gif) song details
