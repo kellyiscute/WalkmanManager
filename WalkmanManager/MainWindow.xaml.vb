@@ -187,6 +187,7 @@ Class MainWindow
         If IsNothing(songDir) Then
             My.Computer.FileSystem.CreateDirectory("SongLib")
             SaveSetting("song_dir", "SongLib")
+            songDir = "SongLib"
         End If
         _encryptKey = GetSetting("enc_key")
 
@@ -673,14 +674,23 @@ Class MainWindow
         Dim failed = Await Task.Run(Function()
                                         Return SyncAnalyzer.SyncPlaylist(plName, lst, dlg)
                                     End Function)
-        Dim rString As String
-        rString = "同步 """ & plName & """ 完成" & vbTab & "失败 " & failed.Count & " 个"
-        rString += vbNewLine & StrDup(rString.Length, "=")
-        For Each itmCloudMusicTracks As CloudMusic.CloudMusic.CloudMusicTracks In failed
-            rString += vbNewLine & itmCloudMusicTracks.Title & " - " & itmCloudMusicTracks.Artists
-        Next
-        Dim dlgResult As New dlgPlaylistSyncResult(rString)
-        DlgWindowRoot.DialogContent = dlgResult
+        '        Dim rString As String
+        '        rString = "同步 """ & plName & """ 完成" & vbTab & "失败 " & failed.Count & " 个"
+        '        rString += vbNewLine & StrDup(rString.Length, "=")
+        '        For Each itmCloudMusicTracks As CloudMusic.CloudMusic.CloudMusicTracks In failed
+        '            rString += vbNewLine & itmCloudMusicTracks.Title & " - " & itmCloudMusicTracks.Artists
+        '        Next
+        '        Dim dlgResult As New dlgPlaylistSyncResult(rString)
+        '        DlgWindowRoot.DialogContent = dlgResult
+        If failed.Count = 0 Then
+            Dim dlgMsg As New DlgMessageDialog("同步当前歌单", "同步成功")
+            DlgWindowRoot.IsOpen = False
+            Await DlgWindowRoot.ShowDialog(dlgMsg)
+            Exit Sub
+        End If
+
+        Dim dlgSyncResult As New DlgCloudMusicPlaylistSyncResult(_lstSongs, failed, GetPlaylistIdByName(plName))
+        DlgWindowRoot.DialogContent = dlgSyncResult
     End Sub
 
     Private Async Sub ButtonCloudMusicSyncAll_Click(sender As Object, e As RoutedEventArgs) _
@@ -742,7 +752,7 @@ Class MainWindow
                 ButtonRemoteChangeAction.IsEnabled = False
                 ButtonRemoteAction.Content = "取消"
                 StartTakeOver()
-            Else
+            ElseIf ButtonRemoteAction.Content = "取消" Then
                 ButtonRemoteAction.Content = "正在取消"
                 ButtonRemoteAction.IsEnabled = False
                 _flgSyncStop = True
@@ -763,7 +773,7 @@ Class MainWindow
         ProgressBarSyncTotal.IsIndeterminate = True
         ButtonRemoteAction.Content = "取消"
         Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
-        Dim wmManagedPath = drivePath & "\MUSIC\wmManaged"
+        Dim wmManagedPath = drivePath & "\MUSIC"
         AddSyncLog(LogType.Information, "连接数据库")
         '        Dim conn = Connect()
 
@@ -927,7 +937,6 @@ Class MainWindow
                                    End If
                                Catch ex As Exception
                                    AddSyncLog(LogType.Err, "写入文件时出现错误：" & ex.Message)
-                                   Exit Sub
                                End Try
                                ProgressBarSyncTotal.AddOne(Me)
 
@@ -962,6 +971,7 @@ Complete:
         ProgressBarSyncSub.IsIndeterminate = False
         ProgressBarSyncTotal.Value = 0
         ButtonRemoteAction.Content = _syncRemoteDeviceContent
+        AddSyncLog(LogType.Information, "同步完成")
         Dim msgDlg As New DlgMessageDialog("", "同步完成")
         If Not IsNothing(progressUpdateThread) Then
             If progressUpdateThread.IsAlive Then
@@ -1010,7 +1020,7 @@ Complete:
         progressUpdateThread.Start()
 
         Dim drivePath = ComboBoxDevices.SelectedItem.ToString.Trim.Substring(0, 2)
-        Dim wmManagedPath = drivePath & "\MUSIC\wmManaged"
+        Dim wmManagedPath = drivePath & "\MUSIC"
 
         'Find files need to be copied
         AddSyncLog(LogType.Information, "查找需要复制/覆盖的项目", False)
@@ -1087,6 +1097,7 @@ Complete:
         ProgressBarSyncSub.IsIndeterminate = False
         ProgressBarSyncTotal.Value = 0
         ButtonRemoteAction.Content = _syncRemoteDeviceContent
+        AddSyncLog(LogType.Information, "同步完成")
         Dim msgDlg As New DlgMessageDialog("", "同步完成")
         Await DlgWindowRoot.ShowDialog(msgDlg)
         ButtonRemoteAction.IsEnabled = True
@@ -1356,6 +1367,11 @@ Complete:
                 Await Task.Run(Sub()
                                    r = tpApi.Search(itm.Title & itm.Artists)
                                End Sub)
+                If IsNothing(r) Then
+                    DlgWindowRoot.IsOpen = False
+                    Await DlgWindowRoot.ShowDialog(New DlgMessageDialog("匹配歌词", "匹配失败"))
+                    Exit Sub
+                End If
                 If r(0).Artist = itm.Artists And r(0).Name = itm.Title Then
                     Dim lyric = ""
                     Await Task.Run(Sub()
@@ -1482,9 +1498,9 @@ Complete:
     End Sub
 
     Private Sub ButtonPlayerPrev_Click(sender As Object, e As RoutedEventArgs) Handles ButtonPlayerPrev.Click
-        If Not IsNothing(_nowPlaying) Then
+        If Not IsNothing(_nowPlaying) And _lstSongs.Count > 0 Then
             Dim index = _lstSongs.IndexOf(_nowPlaying)
-            If index <> 0 Then
+            If index > 0 Then
                 Dim m = New Media(LibV, _lstSongs(index - 1).Path, FromType.FromPath)
                 _nowPlaying = _lstSongs(index - 1)
                 LibVlcMediaPlayer.Play(m)
@@ -1496,7 +1512,7 @@ Complete:
     End Sub
 
     Private Sub ButtonPlayerNext_Click(sender As Object, e As RoutedEventArgs) Handles ButtonPlayerNext.Click
-        If Not IsNothing(_nowPlaying) Then
+        If Not IsNothing(_nowPlaying) And _lstSongs.Count > 0 Then
             Dim index = _lstSongs.IndexOf(_nowPlaying)
             If index <> _lstSongs.Count - 1 Then
                 Dim m = New Media(LibV, _lstSongs(index + 1).Path, FromType.FromPath)

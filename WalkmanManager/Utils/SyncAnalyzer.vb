@@ -38,11 +38,26 @@ Public Class SyncAnalyzer
 		Dim counter = 0
 		Dim currentProgress = 0
 		For Each track As CloudMusicTracks In musicTracks
+			Dim songId = Database.FindCloudmusicBinding(track.Id)
+			If songId <> 0 Then
+				Try
+					AddSongToPlaylist(id, songId, cmd, counter, True)
+				Catch
+					Console.WriteLine(String.Format("{0}: {1}", id, songId))
+				End Try
+				counter += 1
+				currentProgress += 1
+				If Not IsNothing(dlg) Then
+					dlg.Text = String.Format("{0}/{1}", currentProgress, musicTracks.Count)
+				End If
+				Continue For
+			End If
+
 			Dim path = SongExists(track.Title, track.Artists, cmd)
 			If path.Length = 0 Then
 				lstFailed.Add(track)
 			Else
-				Dim songId = GetSongId(path, cmd)
+				songId = GetSongId(path, cmd)
 				Try
 					AddSongToPlaylist(id, songId, cmd, counter)
 				Catch
@@ -101,11 +116,24 @@ Public Class SyncAnalyzer
 			End If
 
 			For Each d As CloudMusicTracks In plDetail("tracks")
+				'Check if bonded manually
+				Dim songId = Database.FindCloudmusicBinding(d.Id)
+				If songId <> 0 Then
+					Try
+						AddSongToPlaylist(id, songId, cmd, counter, True)
+					Catch
+						Console.WriteLine(String.Format("{0}: {1}", id, songId))
+					End Try
+					counter += 1
+					Continue For
+				End If
+
+				'Find song in database
 				Dim path = SongExists(d.Title, d.Artists, cmd)
 				If path.Length = 0 Then
 					lstFailed.Add(d)
 				Else
-					Dim songId = GetSongId(path, cmd)
+					songId = GetSongId(path, cmd)
 					Try
 						AddSongToPlaylist(id, songId, cmd, counter, True)
 					Catch

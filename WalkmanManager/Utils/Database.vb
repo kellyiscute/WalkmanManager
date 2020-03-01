@@ -69,6 +69,8 @@ Public Class Database
 		cmd.ExecuteNonQuery()
 		cmd.CommandText = "create table playlist_detail(playlist_id Integer, song_id Integer, song_order Integer)"
 		cmd.ExecuteNonQuery()
+		cmd.CommandText = "create table bindings(local_id Integer, cloudmusic_id Integer)"
+		cmd.ExecuteNonQuery()
 		trans.Commit()
 		conn.Close()
 		Dim encryptKey As String
@@ -999,7 +1001,38 @@ Public Class Database
 		cmd.ExecuteNonQuery()
 		cmd.CommandText = "DROP TABLE settings"
 		cmd.ExecuteNonQuery()
+		cmd.CommandText = "DROP TABLE bindings"
+		cmd.ExecuteNonQuery()
 		conn.Close()
 		CreateDatabase()
+	End Sub
+
+	Public Overloads Shared Function FindCloudmusicBinding(cloudmusicId As Integer) As Integer
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		Dim result = FindCloudmusicBinding(cloudmusicId, cmd)
+		conn.Close()
+		Return result
+	End Function
+
+	Public Overloads Shared Function FindCloudmusicBinding(cloudmusicId As Integer, cmd As SQLiteCommand) As Integer
+		cmd.CommandText = "SELECT local_id FROM bindings WHERE cloudmusic_id = " & cloudmusicId
+		Dim r = cmd.ExecuteReader()
+		If r.HasRows Then
+			r.Read()
+			Dim result = r(0)
+			r.Close()
+			Return result
+		Else
+			Return 0
+		End If
+	End Function
+
+	Public Shared Sub BindSong(cloudmusicId As Integer, localId As Integer)
+		Dim conn = Connect()
+		Dim cmd = conn.CreateCommand
+		cmd.CommandText = $"INSERT INTO bindings VALUES({localId}, {cloudmusicId})"
+		cmd.ExecuteNonQuery()
+		conn.Close()
 	End Sub
 End Class

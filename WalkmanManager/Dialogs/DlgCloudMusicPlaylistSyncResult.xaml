@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="DlgCloudMusicPlaylistSyncResult"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WalkmanManager"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             Height="450" Width="800">
+    <Grid>
+        <materialDesign:ColorZone x:Name="ColorZoneTitle" Mode="PrimaryMid" Height="40">
+            <Grid>
+                <TextBlock x:Name="TextHint" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="16"
+                           Margin="10,0,0,0">手动匹配
+                </TextBlock>
+                <Button x:Name="ButtonClose" VerticalAlignment="Stretch" HorizontalAlignment="Right" materialDesign:ShadowAssist.ShadowDepth="Depth0" Foreground="White" Background="Transparent" BorderThickness="0"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                        Height="Auto"
+                        Width="50">
+                    <materialDesign:PackIcon Kind="Close" />
+                </Button>
+            </Grid>
+        </materialDesign:ColorZone>
+
+        <Grid Margin="0,40,0,0">
+            <materialDesign:ColorZone Margin="10" VerticalAlignment="Stretch" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+                <Grid Margin="5">
+                    <ScrollViewer>
+                        <StackPanel x:Name="StackPanelItems" CanVerticallyScroll="True"/>
+                    </ScrollViewer>
+                </Grid>
+            </materialDesign:ColorZone>
+        </Grid>
+        <Grid x:Name="GridSelectSong" Visibility="Hidden" Margin="0,40,0,0" Background="White">
+            <materialDesign:ColorZone Height="48" Margin="10,5,10,0" materialDesign:ShadowAssist.ShadowDepth="Depth2">
+                <TextBox x:Name="TextBoxSearch" VerticalContentAlignment="Center" materialDesign:TextFieldAssist.DecorationVisibility="Hidden" BorderThickness="0" materialDesign:HintAssist.Hint="搜索" Margin="10,5,10,5"></TextBox>
+            </materialDesign:ColorZone>
+            <DataGrid x:Name="DataGridSearchResult" Margin="10,58,10,41" AutoGenerateColumns="false" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Binding="{Binding Id}" ClipboardContentBinding="{x:Null}" Header="本地储存ID" />
+                    <DataGridTextColumn Binding="{Binding Title}" ClipboardContentBinding="{x:Null}" Header="名称" Width="220" />
+                    <DataGridTextColumn Binding="{Binding Artists}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="220" />
+                    <DataGridTextColumn Binding="{Binding Path}" ClipboardContentBinding="{x:Null}" Header="本地路径" Width="200" />
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button x:Name="ButtonSelectCancel" Foreground="Red " Margin="10,374,702,4" Style="{DynamicResource MaterialDesignOutlinedButton}">取消</Button>
+            <Button x:Name="ButtonSelectDone" IsEnabled="False" Background="#FF00A608" Margin="702,374,10,4">完成</Button>
+
+        </Grid>
+    </Grid>
+</UserControl>
