@@ -412,6 +412,9 @@
   <ItemGroup>
     <Resource Include="Res\GongWPFDragDrop.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Res\LibVLCSharp.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

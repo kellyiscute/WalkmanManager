@@ -862,7 +862,7 @@ Class MainWindow
                                    If _
                           flagCopyLrc And
                           My.Computer.FileSystem.FileExists(fInfo.DirectoryName & "\" & fInfo.NameWithoutExtention & ".lrc") Then
-                                       sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.Name & ".lrc"
+                                       sCopy.Lyric = fInfo.DirectoryName & "\" & fInfo.NameWithoutExtention & ".lrc"
                                        totalCopySize +=
                           My.Computer.FileSystem.GetFileInfo(fInfo.DirectoryName & "\" & fInfo.NameWithoutExtention & ".lrc").Length
                                    End If

@@ -70,7 +70,7 @@
 			End Try
 		Next
 		LabelStatus.Content = "转换完成"
-		IconCheck.Visibility = Visibility.Hidden
-		ProgressBarWorking.Visibility = Visibility.Visible
+		IconCheck.Visibility = Visibility.Visible
+		ProgressBarWorking.Visibility = Visibility.Hidden
 	End Sub
 End Class

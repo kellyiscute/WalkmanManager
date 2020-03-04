@@ -85,8 +85,8 @@
 								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
 									GongSolutions.WPF.DragDrop
 								</Label>
-								<Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet/blob/master/LICENSE" Click="GotoLink">License</Button>
-								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet" Click="GotoLink">Website</Button>
+                                <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/punker76/gong-wpf-dragdrop/blob/dev/LICENSE" Click="GotoLink">License</Button>
+                                <Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/punker76/gong-wpf-dragdrop" Click="GotoLink">Website</Button>
 							</Grid>
 						</mD:ColorZone>
 						<mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
@@ -97,6 +97,16 @@
 								</Label>
 								<Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet/blob/master/LICENSE" Click="GotoLink">License</Button>
 								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet" Click="GotoLink">Website</Button>
+							</Grid>
+						</mD:ColorZone>
+                        <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
+							<Grid>
+								<Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/LibVLCSharp.png"></Image>
+								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
+                                    LibVLCSharp
+                                </Label>
+                                <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/videolan/libvlcsharp/blob/3.x/LICENSE" Click="GotoLink">License</Button>
+								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://videolan.org" Click="GotoLink">Website</Button>
 							</Grid>
 						</mD:ColorZone>
 					</StackPanel>
