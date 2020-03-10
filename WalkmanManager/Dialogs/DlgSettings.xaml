@@ -6,112 +6,110 @@
              xmlns:local="clr-namespace:WalkmanManager"
              xmlns:mD="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" Height="310" Width="485" Background="White">
-	<mD:DialogHost x:Name="Dialog">
-		<Grid>
-			<mD:ColorZone Height="35" Mode="PrimaryMid">
-				<Grid>
-					<Label HorizontalAlignment="Left" Foreground="White" VerticalContentAlignment="Center" Margin="10,0,0,0">设置</Label>
-					<Button HorizontalAlignment="Right" mD:ShadowAssist.ShadowDepth="Depth0" Height="Auto"
+    <mD:DialogHost x:Name="Dialog">
+        <Grid>
+            <mD:ColorZone Height="35" Mode="PrimaryMid">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,276,0">
+                        <RadioButton Style="{DynamicResource MaterialDesignTabRadioButton}" IsChecked="True" Click="RadioButton_Click" Height="Auto" Margin="0,0,0,1">
+                            设置
+                        </RadioButton>
+                        <RadioButton x:Name="RadioButtonLicenses" Style="{DynamicResource MaterialDesignTabRadioButton}" Click="RadioButton_Click" Height="Auto" Margin="0,0,0,1">
+                            开源许可
+                        </RadioButton>
+                    </StackPanel>
+                    <Button HorizontalAlignment="Right" mD:ShadowAssist.ShadowDepth="Depth0" Height="Auto"
 					        Command="{x:Static mD:DialogHost.CloseDialogCommand}">
-						<mD:PackIcon Kind="Close" />
-					</Button>
-				</Grid>
-			</mD:ColorZone>
-			<Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,54,0,0">库位置：</Label>
-			<TextBox x:Name="TextBoxSongDir" VerticalAlignment="Top" Margin="73,54,52,0" IsReadOnly="True"
-			         mD:TextFieldAssist.DecorationVisibility="Collapsed" BorderThickness="0,0,0,1" />
-			<Button x:Name="ButtonOpen" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,47,10,0" Width="37"
-			        Style="{DynamicResource MaterialDesignToolButton}" mD:RippleAssist.RippleSizeMultiplier="1"
-			        mD:RippleAssist.IsCentered="True">
-				<mD:PackIcon Kind="FolderOpen" />
-			</Button>
+                        <mD:PackIcon Kind="Close" />
+                    </Button>
+                </Grid>
+            </mD:ColorZone>
 
-			<GroupBox Margin="10,118,10,0" Height="157" VerticalAlignment="Top" Header="数据库维护" BorderThickness="0"
-			          mD:ShadowAssist.ShadowDepth="Depth2" Visibility="Hidden">
-				<Grid>
-					<Button x:Name="ButtonClearSongs" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,0,0,0" Width="407"
-					        Style="{DynamicResource MaterialDesignFlatButton}">
-						删除曲库记录
-					</Button>
-					<Button x:Name="ButtonClearPlaylist" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,37,0,0"
-					        Width="407" Style="{DynamicResource MaterialDesignFlatButton}">
-						清除播放列表
-					</Button>
-					<Button x:Name="ButtonRebuildDb" VerticalAlignment="Top" Margin="20,74,20,0"
-					        Style="{DynamicResource MaterialDesignFlatButton}">
-						重建数据库
-					</Button>
-				</Grid>
-			</GroupBox>
-			<mD:ColorZone Height="197" Margin="10,96,10,0" CornerRadius="5" Background="White">
-				<ScrollViewer VerticalScrollBarVisibility="Hidden">
-					<StackPanel>
-						<mD:ColorZone Height="35" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth2">
-							<Label VerticalContentAlignment="Center" FontFamily="Microsoft YaHei" FontSize="16">开源许可</Label>
-						</mD:ColorZone>
-						<mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
-							<Grid>
-								<Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/MaterialDesignInXAMLToolkit.png"></Image>
-								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
-									Material Design In XAML Toolkit
-								</Label>
-								<Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/blob/master/LICENSE" Click="GotoLink">License</Button>
-								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="http://materialdesigninxaml.net/" Click="GotoLink">Website</Button>
-							</Grid>
-						</mD:ColorZone>
-						<mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
-							<Grid>
-								<Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/NewtonsoftJson.png"></Image>
-								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
-									Newtonsoft.JSON
-								</Label>
-								<Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md" Click="GotoLink">License</Button>
-								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://www.newtonsoft.com/json" Click="GotoLink">Website</Button>
-							</Grid>
-						</mD:ColorZone>
-						<mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
-							<Grid>
-								<Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/Sqlite.png"></Image>
-								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
-									SQLite
-								</Label>
-								<Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Click="GotoLink" Tag="https://sqlite.org/copyright.html">License</Button>
-								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://sqlite.org/index.html" Click="GotoLink">Website</Button>
-							</Grid>
-						</mD:ColorZone>
-						<mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
-							<Grid>
-								<Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/GongWPFDragDrop.png"></Image>
-								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
-									GongSolutions.WPF.DragDrop
-								</Label>
+            <Grid Margin="19,47,20,10">
+                <Label HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,7,0,0" Content="库位置："/>
+                <TextBox x:Name="TextBoxSongDir" VerticalAlignment="Top" Margin="63,7,42,0" IsReadOnly="True" mD:TextFieldAssist.DecorationVisibility="Collapsed" BorderThickness="0,0,0,1" />
+                <Button x:Name="ButtonOpen" HorizontalAlignment="Right" VerticalAlignment="Top" Width="37" Style="{DynamicResource MaterialDesignToolButton}" mD:RippleAssist.RippleSizeMultiplier="1" mD:RippleAssist.IsCentered="True">
+                    <mD:PackIcon Kind="FolderOpen" />
+                </Button>
+
+                <Label Margin="0,41,0,184" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="74">复制块大小</Label>
+                <Slider x:Name="SliderChunkSize" Style="{DynamicResource MaterialDesignDiscreteSlider}" Margin="79,12,25,174" Maximum="10" Minimum="1"/>
+                <Label Margin="0,74,0,151" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="100">SearchOnType</Label>
+                <Slider x:Name="SliderSearchOnType" Style="{DynamicResource MaterialDesignDiscreteSlider}" Margin="100,43,30,144" Maximum="9999" Minimum="0"/>
+                <Label Margin="0,107,0,118" VerticalContentAlignment="Center" HorizontalAlignment="Left" Width="76">歌词预加载</Label>
+                <TextBox x:Name="TextBoxLyricPreLoad" Margin="81,108,281,122">3</TextBox>
+                <Button x:Name="ButtonSave" HorizontalAlignment="Right" Margin="0,211,10,10" Width="113">保存</Button>
+            </Grid>
+
+            <mD:ColorZone x:Name="ColorZoneLicenses" Height="260" Margin="10,40,10,0" CornerRadius="5" Background="White" Visibility="Hidden">
+                <ScrollViewer VerticalScrollBarVisibility="Hidden">
+                    <StackPanel>
+                        <mD:ColorZone Height="35" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth2">
+                            <Label VerticalContentAlignment="Center" FontFamily="Microsoft YaHei" FontSize="16">开源许可</Label>
+                        </mD:ColorZone>
+                        <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
+                            <Grid>
+                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/MaterialDesignInXAMLToolkit.png"></Image>
+                                <Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
+                                    Material Design In XAML Toolkit
+                                </Label>
+                                <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit/blob/master/LICENSE" Click="GotoLink">License</Button>
+                                <Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="http://materialdesigninxaml.net/" Click="GotoLink">Website</Button>
+                            </Grid>
+                        </mD:ColorZone>
+                        <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
+                            <Grid>
+                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/NewtonsoftJson.png"></Image>
+                                <Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
+                                    Newtonsoft.JSON
+                                </Label>
+                                <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/JamesNK/Newtonsoft.Json/blob/master/LICENSE.md" Click="GotoLink">License</Button>
+                                <Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://www.newtonsoft.com/json" Click="GotoLink">Website</Button>
+                            </Grid>
+                        </mD:ColorZone>
+                        <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
+                            <Grid>
+                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/Sqlite.png"></Image>
+                                <Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
+                                    SQLite
+                                </Label>
+                                <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Click="GotoLink" Tag="https://sqlite.org/copyright.html">License</Button>
+                                <Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://sqlite.org/index.html" Click="GotoLink">Website</Button>
+                            </Grid>
+                        </mD:ColorZone>
+                        <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
+                            <Grid>
+                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/GongWPFDragDrop.png"></Image>
+                                <Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
+                                    GongSolutions.WPF.DragDrop
+                                </Label>
                                 <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/punker76/gong-wpf-dragdrop/blob/dev/LICENSE" Click="GotoLink">License</Button>
                                 <Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/punker76/gong-wpf-dragdrop" Click="GotoLink">Website</Button>
-							</Grid>
-						</mD:ColorZone>
-						<mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
-							<Grid>
-								<Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source=""></Image>
-								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
-									Audio Tools Library (ATL) for .NET
-								</Label>
-								<Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet/blob/master/LICENSE" Click="GotoLink">License</Button>
-								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet" Click="GotoLink">Website</Button>
-							</Grid>
-						</mD:ColorZone>
+                            </Grid>
+                        </mD:ColorZone>
                         <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
-							<Grid>
-								<Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/LibVLCSharp.png"></Image>
-								<Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
+                            <Grid>
+                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source=""></Image>
+                                <Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
+                                    Audio Tools Library (ATL) for .NET
+                                </Label>
+                                <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet/blob/master/LICENSE" Click="GotoLink">License</Button>
+                                <Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/Zeugma440/atldotnet" Click="GotoLink">Website</Button>
+                            </Grid>
+                        </mD:ColorZone>
+                        <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
+                            <Grid>
+                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source="/WalkmanManager;component/Res/LibVLCSharp.png"></Image>
+                                <Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
                                     LibVLCSharp
                                 </Label>
                                 <Button HorizontalAlignment="Left" Margin="48,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://github.com/videolan/libvlcsharp/blob/3.x/LICENSE" Click="GotoLink">License</Button>
-								<Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://videolan.org" Click="GotoLink">Website</Button>
-							</Grid>
-						</mD:ColorZone>
-					</StackPanel>
-				</ScrollViewer>
-			</mD:ColorZone>
-		</Grid>
-	</mD:DialogHost>
+                                <Button HorizontalAlignment="Left" Margin="146,45,0,0" Width="93" VerticalAlignment="Top" Height="25" Style="{DynamicResource MaterialDesignFlatButton}" Tag="https://videolan.org" Click="GotoLink">Website</Button>
+                            </Grid>
+                        </mD:ColorZone>
+                    </StackPanel>
+                </ScrollViewer>
+            </mD:ColorZone>
+        </Grid>
+    </mD:DialogHost>
 </UserControl>

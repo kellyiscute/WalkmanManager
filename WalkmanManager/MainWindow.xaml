@@ -207,7 +207,7 @@
                 </Grid>
                 <Grid x:Name="GridCloudMusic" Margin="0,55,0,0" Visibility="Hidden" d:IsHidden="True">
 
-                    <mD:DialogHost x:Name="DlgCloudMusic">
+                    <mD:DialogHost x:Name="DlgCloudMusic" Style="{DynamicResource MaterialDesignEmbeddedDialogHost}">
                         <Grid>
                             <Border BorderThickness="0,0,1,1" BorderBrush="LightGray" HorizontalAlignment="Left" Width="270" Height="70"
 							        VerticalAlignment="Top">

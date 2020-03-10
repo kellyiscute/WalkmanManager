@@ -31,6 +31,7 @@ Public Class DlgCloudMusicPlaylistSyncResult
         TextBoxSearch.Text = e.track.Title
         GridSelectSong.Visibility = Visibility.Visible
         _nowSelecting = sender
+        TextHint.Text = $"正在匹配 {e.track.Artists} - {e.track.Title}"
     End Sub
 
     Private Sub DataGridSearchResult_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) Handles DataGridSearchResult.MouseDoubleClick
@@ -41,6 +42,7 @@ Public Class DlgCloudMusicPlaylistSyncResult
             _nowSelecting.ButtonMatch.IsEnabled = False
             _nowSelecting.ButtonMatch.Content = "匹配完成"
             TextBoxSearch.Text = ""
+            TextHint.Text = "手动匹配"
         End If
     End Sub
 

@@ -463,18 +463,23 @@ Namespace CloudMusic
 			queryString.Add("action", "lyric")
 			Dim url = PrepareDataAsQueryString(queryString)
 			Dim wc As New WebClient()
-			Dim responseReader = New StreamReader(wc.OpenRead(url))
-			Dim response = responseReader.ReadToEnd()
-			responseReader.Close()
-			Dim responseJson = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
-			Dim lyric As String
-			If responseJson.ContainsKey("lrc") Then
-				lyric = responseJson("lrc")("lyric")
-			Else
-				lyric = ""
-			End If
+			Try
+				Dim responseReader = New StreamReader(wc.OpenRead(url))
+				Dim response = responseReader.ReadToEnd()
+				responseReader.Close()
+				Dim responseJson = JsonConvert.DeserializeObject(Of Dictionary(Of String, Object))(response)
+				Dim lyric As String
+				If responseJson.ContainsKey("lrc") Then
+					lyric = responseJson("lrc")("lyric")
+				Else
+					lyric = ""
+				End If
 
-			Return lyric
+				Return lyric
+			Catch ex As Exception
+				Return Nothing
+			End Try
+
 		End Function
 	End Class
 End Namespace

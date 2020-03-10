@@ -1,7 +1,7 @@
 ﻿Imports System.ComponentModel
 Imports System.Threading
 
-Public Class dlg_progress
+Public Class DlgProgress
 
 	Property Progress() As Integer
 		Get

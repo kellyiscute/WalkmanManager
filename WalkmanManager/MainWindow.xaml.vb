@@ -33,6 +33,8 @@ Class MainWindow
     Dim LibVlcMediaPlayer As MediaPlayer
     Dim _nowPlaying As SongInfo
     Dim fileChangeNotifyIgnoreCount As Integer
+    Dim _searchOnType As Integer = 1300
+    Dim _lyricPreLoad As Integer = 3
 
     Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
         Handles CzTitle.MouseLeftButtonDown
@@ -91,7 +93,7 @@ Class MainWindow
                     End If
 
                     If login Then
-                        Dim dlgProg = New dlg_progress
+                        Dim dlgProg = New DlgProgress
                         dlgProg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
                         DlgWindowRoot.ShowDialog(dlgProg)
                         Dim result = Await UiCloudMusicLogin(dlgLogin.Phone, dlgLogin.Password, dlgProg)
@@ -157,7 +159,7 @@ Class MainWindow
     ''' </summary>
     ''' <param name="dlgProg">progress dialog ref, for changing prompt</param>
     ''' <returns></returns>
-    Private Async Function UiCloudMusicLogin(phone As String, pwd As String, dlgProg As dlg_progress) As Task(Of String)
+    Private Async Function UiCloudMusicLogin(phone As String, pwd As String, dlgProg As DlgProgress) As Task(Of String)
         Dim result = Await Task.Run(Function()
                                         Try
                                             dlgProg.Text = "登录中"
@@ -180,10 +182,12 @@ Class MainWindow
         If Not My.Computer.FileSystem.FileExists("data.db") Then
             CreateDatabase()
         End If
-        Dim dlg As New dlg_progress
+        Dim dlg As New DlgProgress
         DialogHost.Show(dlg, "window-root")
         Dim upd As New DbUpdater
         Dim songDir = GetSetting("song_dir")
+        _searchOnType = GetSetting("searchOnType", 1300)
+        _lyricPreLoad = GetSetting("lyricPreLoad", 3)
         If IsNothing(songDir) Then
             My.Computer.FileSystem.CreateDirectory("SongLib")
             SaveSetting("song_dir", "SongLib")
@@ -196,6 +200,14 @@ Class MainWindow
         If Not My.Computer.FileSystem.DirectoryExists(songDir) Then
             My.Computer.FileSystem.CreateDirectory(songDir)
         End If
+
+        Await Task.Run(Sub()
+                           Core.Initialize()
+                           LibV = New LibVLC()
+                           LibVlcMediaPlayer = New MediaPlayer(LibV)
+                           AddHandler LibVlcMediaPlayer.TimeChanged, AddressOf MediaPlayer_TimeChanged
+                           AddHandler LibVlcMediaPlayer.LengthChanged, AddressOf MediaPlayer_LengthChanged
+                       End Sub)
 
         Dim newLost = Await Task.Run(Async Function()
                                          Dim lstNew = Await upd.FindNew(GetSetting("song_dir"))
@@ -360,11 +372,6 @@ Class MainWindow
             .Children.Add(New TextBlock With {.Text = "接管", .Height = 29, .Width = 29})
         End With
 
-        Core.Initialize()
-        LibV = New LibVLC()
-        LibVlcMediaPlayer = New MediaPlayer(LibV)
-        AddHandler LibVlcMediaPlayer.TimeChanged, AddressOf MediaPlayer_TimeChanged
-        AddHandler LibVlcMediaPlayer.LengthChanged, AddressOf MediaPlayer_LengthChanged
     End Sub
 
     Private Async Sub DatSongList_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) _
@@ -442,7 +449,7 @@ Class MainWindow
                 DatSongList.CanUserSortColumns = False
                 ButtonSaveSorting.Visibility = Visibility.Visible
                 PanelSearchLocalMusic.Visibility = Visibility.Collapsed
-                Dim dlg As New dlg_progress
+                Dim dlg As New DlgProgress
                 DatSongList.ItemsSource = Nothing
                 DialogHost.Show(dlg, "window-root")
                 Dim playlistName = sender.SelectedItem.Content
@@ -570,7 +577,7 @@ Class MainWindow
             cmd.Transaction = trans
             Dim lst As ObservableCollection(Of SongInfo) = DatSongList.ItemsSource
             DatSongList.ItemsSource = Nothing
-            Dim dlg As New dlg_progress
+            Dim dlg As New DlgProgress
             DlgWindowRoot.Show(dlg)
             Await Task.Run(Sub()
                                For Each songInfo As SongInfo In lst
@@ -600,7 +607,7 @@ Class MainWindow
         Try
             If ListBoxCloudMusicPlaylists.SelectedIndex <> -1 Then
                 Dim id = _cloudMusic.Playlists(ListBoxCloudMusicPlaylists.SelectedIndex)("id")
-                Dim dlg As New dlg_progress
+                Dim dlg As New DlgProgress
                 dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
                 DlgCloudMusic.ShowDialog(dlg)
 
@@ -629,7 +636,7 @@ Class MainWindow
     End Sub
 
     Private Async Sub RefreshCloudMusicPlaylists(sender As Object, e As EventArgs) Handles ButtonCloudMusicRefresh.Click
-        Dim dlg As New dlg_progress
+        Dim dlg As New DlgProgress
         dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
         DlgCloudMusic.ShowDialog(dlg)
         Await Task.Run(Sub()
@@ -654,7 +661,7 @@ Class MainWindow
 
     Private Sub TextBoxSearchLocal_TextChanged(sender As Object, e As TextChangedEventArgs) _
         Handles TextBoxSearchLocal.TextChanged
-        If _lstSongs.Count < 1300 Then
+        If _lstSongs.Count < _searchOnType Then
             BtnSearchSong_Click(sender, Nothing)
         End If
     End Sub
@@ -666,7 +673,7 @@ Class MainWindow
     End Sub
 
     Private Async Sub ButtonSyncCurrent_Click(sender As Object, e As RoutedEventArgs) Handles ButtonSyncCurrent.Click
-        Dim dlg As New dlg_progress
+        Dim dlg As New DlgProgress
         dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
         DlgWindowRoot.ShowDialog(dlg)
         Dim plName = ListBoxCloudMusicPlaylists.SelectedItem.Content
@@ -695,7 +702,7 @@ Class MainWindow
 
     Private Async Sub ButtonCloudMusicSyncAll_Click(sender As Object, e As RoutedEventArgs) _
         Handles ButtonCloudMusicSyncAll.Click
-        Dim dlg As New dlg_progress
+        Dim dlg As New DlgProgress
         dlg.ChangeColorTheme(New SolidColorBrush(NETEASE_RED))
         DlgWindowRoot.ShowDialog(dlg)
         Dim failed = Await Task.Run(Function()
@@ -908,7 +915,7 @@ Class MainWindow
         ProgressBarSyncTotal.Maximum = lstCopy.Count + lstDelete.Count
         ProgressBarSyncTotal.IsIndeterminate = False
 
-        Dim cp As New Synchronizer
+        Dim cp As New Synchronizer(GetSetting("chunkSize", 1024))
         AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
 
         Await Task.Run(Sub()
@@ -1057,7 +1064,7 @@ Complete:
             GoTo Complete
         End If
 
-        Dim cp As New Synchronizer
+        Dim cp As New Synchronizer(GetSetting("chunkSize", 1024))
         AddHandler cp.Update, AddressOf CopyingDetailUpdateEventHandler
 
         ProgressBarSyncSub.IsIndeterminate = False
@@ -1200,6 +1207,9 @@ Complete:
                 Process.Start(Application.ResourceAssembly.Location)
                 Environment.Exit(0)
             End If
+            'reload settings
+            _searchOnType = GetSetting("searchOnType", 1300)
+            _lyricPreLoad = GetSetting("lyricPreLoad", 3)
         Catch
         End Try
     End Sub
@@ -1262,7 +1272,7 @@ Complete:
             'Copy to library & add to database
             Dim libDir = GetSetting("song_dir")
             Dim localDir As String
-            Dim dlgWait As New dlg_progress()
+            Dim dlgWait As New DlgProgress()
             DlgWindowRoot.ShowDialog(dlgWait)
             dlgWait.Text = "0/" & files.Count
             Await Task.Run(Sub()
@@ -1356,14 +1366,14 @@ Complete:
 
     Private Async Sub ButtonMatchLyric_Click(sender As Object, e As RoutedEventArgs) Handles ButtonMatchLyric.Click
         If DatSongList.SelectedIndex <> -1 Then
-            DlgWindowRoot.ShowDialog(New dlg_progress)
+            DlgWindowRoot.ShowDialog(New DlgProgress)
             Dim itm As SongInfo = DatSongList.SelectedItem
             Dim dir = My.Computer.FileSystem.GetFileInfo(itm.Path).Directory.FullName & "\"
             Dim filename = My.Computer.FileSystem.GetFileInfo(itm.Path).NameWithoutExtention() & ".lrc"
             filename = dir & filename
             If Not My.Computer.FileSystem.FileExists(filename) Then
                 Dim tpApi As New ThirdPartyCloudMusicApi
-                Dim r As List(Of ThirdPartyCloudMusicApi.SearchResult)
+                Dim r As List(Of ThirdPartyCloudMusicApi.SearchResult) = Nothing
                 Await Task.Run(Sub()
                                    r = tpApi.Search(itm.Title & itm.Artists)
                                End Sub)
@@ -1386,7 +1396,7 @@ Complete:
                         DlgWindowRoot.IsOpen = False
                         Dim dlgR As Boolean = Await DlgWindowRoot.ShowDialog(New DlgYesNoDialog("匹配歌词", "自动匹配失败，手动匹配吗？"))
                         If dlgR Then
-                            Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, r, itm)
+                            Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, r, itm, _lyricPreLoad)
                             Dim cancelled = Await DlgWindowRoot.ShowDialog(dlg)
                             If Not cancelled Then
                                 Dim writer As New StreamWriter(File.OpenWrite(filename))
@@ -1403,7 +1413,7 @@ Complete:
                     DlgWindowRoot.IsOpen = False
                     Dim dlgR As Boolean = Await DlgWindowRoot.ShowDialog(New DlgYesNoDialog("匹配歌词", "自动匹配失败，手动匹配吗？"))
                     If dlgR Then
-                        Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, r, itm)
+                        Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, r, itm, _lyricPreLoad)
                         Dim cancelled = Await DlgWindowRoot.ShowDialog(dlg)
                         If cancelled Then
                             Exit Sub
@@ -1429,7 +1439,7 @@ Complete:
         filename = dir & filename
 
         Dim tpApi As New ThirdPartyCloudMusicApi
-        DlgWindowRoot.ShowDialog(New dlg_progress)
+        DlgWindowRoot.ShowDialog(New DlgProgress)
         Dim searchResults As List(Of ThirdPartyCloudMusicApi.SearchResult) = Nothing
         Dim searchString As String = $"{DatSongList.SelectedItem.Title} {DatSongList.SelectedItem.Artists}"
         Dim errMsg As String = ""
@@ -1445,7 +1455,7 @@ Complete:
             Await DlgWindowRoot.ShowDialog(New DlgMessageDialog("获取失败", errMsg))
             Exit Sub
         End If
-        Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, searchResults, DatSongList.SelectedItem)
+        Dim dlg As New DlgChooseLyric(LibV, LibVlcMediaPlayer, searchResults, DatSongList.SelectedItem, _lyricPreLoad)
         DlgWindowRoot.IsOpen = False
         Await DlgWindowRoot.ShowDialog(dlg)
 

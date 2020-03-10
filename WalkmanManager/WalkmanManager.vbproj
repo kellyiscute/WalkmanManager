@@ -131,6 +131,9 @@
   <PropertyGroup>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ATL, Version=2.16.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\z440.atl.core.2.16.0\lib\net30\ATL.dll</HintPath>
@@ -256,8 +259,8 @@
     <Compile Include="Utils\CloudMusic.vb" />
     <Compile Include="Utils\Database.vb" />
     <Compile Include="Utils\db_updater.vb" />
-    <Compile Include="Dialogs\dlg_progress.xaml.vb">
-      <DependentUpon>dlg_progress.xaml</DependentUpon>
+    <Compile Include="Dialogs\DlgProgress.xaml.vb">
+      <DependentUpon>DlgProgress.xaml</DependentUpon>
     </Compile>
     <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="Utils\DriveInfoMem.vb" />
@@ -311,7 +314,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Dialogs\dlg_progress.xaml">
+    <Page Include="Dialogs\DlgProgress.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -414,6 +417,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Res\LibVLCSharp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

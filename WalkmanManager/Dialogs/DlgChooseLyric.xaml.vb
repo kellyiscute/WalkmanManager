@@ -2,6 +2,7 @@
 Imports System.Text.RegularExpressions
 Imports WalkmanManager.CloudMusic
 Imports LibVLCSharp.Shared
+Imports MaterialDesignThemes.Wpf
 
 Public Class DlgChooseLyric
 
@@ -15,6 +16,8 @@ Public Class DlgChooseLyric
     Dim flgPause As Boolean
     Dim _cancelled As String = True
     Dim _lrc As String
+    Dim _preLoad As Integer
+    Dim preLoadThread As Threading.Thread
 
     Public ReadOnly Property Cancelled As String
         Get
@@ -28,13 +31,15 @@ Public Class DlgChooseLyric
         End Get
     End Property
 
-    Public Sub New(libv As LibVLC, mp As MediaPlayer, searchResults As IEnumerable(Of ThirdPartyCloudMusicApi.SearchResult), songInfo As Database.SongInfo)
+    Public Sub New(libv As LibVLC, mp As MediaPlayer, searchResults As IEnumerable(Of ThirdPartyCloudMusicApi.SearchResult), songInfo As Database.SongInfo, Optional preLoad As Integer = 3)
 
         ' 此调用是设计器所必需的。
         InitializeComponent()
 
         ' 在 InitializeComponent() 调用之后添加任何初始化。
+        _preLoad = preLoad
         _songInfo = songInfo
+        DialogHostDataGridSearchResults.DialogContent = New DlgProgress
         DataGridSearchResults.ItemsSource = New ObservableCollection(Of ThirdPartyCloudMusicApi.SearchResult)(searchResults)
         TextBlockTitle.Text = $"正在为 {songInfo.Title} 选择歌词"
         ' Init VLC
@@ -45,6 +50,33 @@ Public Class DlgChooseLyric
         AddHandler MediaPlayer.TimeChanged, AddressOf MediaPlayer_TimeChange
         AddHandler MediaPlayer.Stopped, AddressOf MediaPlayer_Stopped
         AddHandler MediaPlayer.EndReached, AddressOf MediaPlayer_EndReached
+        ' Init pre-load
+        preLoadThread = New Threading.Thread(Sub()
+                                                 Dim c As Integer = 0
+                                                 Dim tpApi As New ThirdPartyCloudMusicApi
+                                                 While c < searchResults.Count AndAlso c < _preLoad
+                                                     Dim lyric = tpApi.GetLyric(searchResults(c).Id)
+                                                     If IsNothing(lyric) Then
+                                                         Continue While
+                                                     End If
+                                                     If cachedLyrics.Keys.Contains(searchResults(c).Id) Then
+                                                         Continue While
+                                                     End If
+                                                     Dim analyzedLyric = AnalyzeLyric(lyric)
+                                                     ' Double check to avoid error, may be useless, but magic, who knows
+                                                     If cachedLyrics.Keys.Contains(searchResults(c).Id) Then
+                                                         Continue While
+                                                     End If
+                                                     cachedLyrics.Add(c, analyzedLyric)
+                                                     c += 1
+                                                 End While
+                                                 Dispatcher.Invoke(Sub()
+                                                                       TextBlockPreLoadHint.Text = "预加载已完成"
+                                                                       ProgressBarPreLoadHint.IsIndeterminate = False
+                                                                   End Sub)
+                                             End Sub)
+        preLoadThread.IsBackground = True
+        preLoadThread.Start()
     End Sub
 
     Private Sub DlgChooseLyric_Loaded(sender As Object, e As RoutedEventArgs) Handles Me.Loaded
@@ -129,13 +161,27 @@ Public Class DlgChooseLyric
     Private Sub ButtonClose_Click(sender As Object, e As RoutedEventArgs)
         flgClosing = True
         MediaPlayer.Stop()
+        If preLoadThread.IsAlive Then
+            preLoadThread.Abort()
+        End If
     End Sub
 
-    Private Sub DataGridSearchResults_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) Handles DataGridSearchResults.MouseDoubleClick
+    Private Async Sub DataGridSearchResults_MouseDoubleClick(sender As Object, e As MouseButtonEventArgs) Handles DataGridSearchResults.MouseDoubleClick
         If DataGridSearchResults.SelectedIndex <> -1 AndAlso Not cachedLyrics.Keys.Contains(DataGridSearchResults.SelectedIndex) Then
             ' Get lyric
             Dim tyApi As New ThirdPartyCloudMusicApi
-            Dim lyric = tyApi.GetLyric(DataGridSearchResults.SelectedItem.Id)
+            Dim lyric As String = Nothing
+            Dim id = DataGridSearchResults.SelectedItem.Id
+            DialogHostDataGridSearchResults.IsOpen = True
+            Await Task.Run(Sub()
+                               lyric = tyApi.GetLyric(id)
+                           End Sub)
+            DialogHostDataGridSearchResults.IsOpen = False
+            If IsNothing(lyric) Then
+                Await DialogHostDataGridSearchResults.ShowDialog(New DlgMessageDialog("", "加载失败"))
+                DialogHostDataGridSearchResults.DialogContent = New DlgProgress
+                Exit Sub
+            End If
             TextBoxLyrics.Text = lyric
             Dim aLyric = AnalyzeLyric(lyric)
             cachedLyrics.Add(DataGridSearchResults.SelectedIndex, aLyric)
@@ -180,5 +226,9 @@ Public Class DlgChooseLyric
     Private Sub ButtonDone_Click(sender As Object, e As RoutedEventArgs) Handles ButtonDone.Click
         _cancelled = False
         _lrc = currentLyric.Original
+        If preLoadThread.IsAlive Then
+            preLoadThread.Abort()
+        End If
     End Sub
+
 End Class

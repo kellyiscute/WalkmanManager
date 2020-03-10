@@ -14,7 +14,7 @@ Public Class SyncAnalyzer
 	End Structure
 
 	Public Shared Function SyncPlaylist(playlistName As String, musicTracks As List(Of CloudMusicTracks),
-										Optional dlg As dlg_progress = Nothing) As List(Of CloudMusicTracks)
+										Optional dlg As DlgProgress = Nothing) As List(Of CloudMusicTracks)
 
 		Dim lstFailed As New List(Of CloudMusicTracks)
 
@@ -75,7 +75,7 @@ Public Class SyncAnalyzer
 		Return lstFailed
 	End Function
 
-	Public Shared Function SyncAllPlaylists(cloudMusicObject As CloudMusic.CloudMusic, Optional dlg As dlg_progress = Nothing) _
+	Public Shared Function SyncAllPlaylists(cloudMusicObject As CloudMusic.CloudMusic, Optional dlg As DlgProgress = Nothing) _
 		As String
 		Dim playlists = cloudMusicObject.GetPlaylists()
 		If Not IsNothing(dlg) Then

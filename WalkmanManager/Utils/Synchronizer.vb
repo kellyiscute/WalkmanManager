@@ -17,14 +17,14 @@ Public Class Synchronizer
 		End Get
 	End Property
 
-	Dim _chunkSize As Integer
+	Dim _chunkSize As Long
 
 	''' <summary>
 	''' Size of the data chunk write each time
 	''' in KB
 	''' </summary>
 	''' <returns></returns>
-	Public ReadOnly Property ChunkSize As Integer
+	Public ReadOnly Property ChunkSize As Long
 		Get
 			Return _chunkSize / 1024
 		End Get
@@ -57,7 +57,7 @@ Public Class Synchronizer
 	Public Event Update(sender As Synchronizer)
 
 	Sub New(Optional blockSize As Long = 512)
-
+		_chunkSize = blockSize * 1024
 	End Sub
 
 	Public Sub CopyFile(source As String, destination As String)
@@ -65,7 +65,7 @@ Public Class Synchronizer
 
 		Dim sourceFile = New BinaryReader(New FileStream(source, FileMode.Open))
 		_totalLength = sourceFile.BaseStream.Length
-		_chunkSize = 1024 * 1024 'Initial Chunk Size = 1MB
+		'		_chunkSize = 1024 * 1024 'Initial Chunk Size = 1MB
 		Dim destinationFile = New BinaryWriter(New FileStream(destination, FileMode.OpenOrCreate))
 		'Prepare variables
 		Dim rTime As Long

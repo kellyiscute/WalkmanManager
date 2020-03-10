@@ -21,14 +21,23 @@
                 </Button>
             </Grid>
         </mD:ColorZone>
-        <Grid Margin="0,45,0,0">
-            <DataGrid x:Name="DataGridSearchResults" HorizontalAlignment="Left" Width="517" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="曲名" Width="150" />
-                    <DataGridTextColumn Binding="{Binding Artist}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="150" />
-                    <DataGridTextColumn Binding="{Binding AlbumName}" ClipboardContentBinding="{x:Null}" Header="专辑" Width="200" />
-                </DataGrid.Columns>
-            </DataGrid>
+        <Grid Margin="0,40,0,0">
+            <mD:DialogHost x:Name="DialogHostDataGridSearchResults" Style="{DynamicResource MaterialDesignEmbeddedDialogHost}" Margin="0,0,283,0">
+                <Grid Margin="0,10,0,0">
+                    <DataGrid x:Name="DataGridSearchResults" HorizontalAlignment="Left" Width="517" VerticalScrollBarVisibility="Visible" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,29">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" ClipboardContentBinding="{x:Null}" Header="曲名" Width="150" />
+                            <DataGridTextColumn Binding="{Binding Artist}" ClipboardContentBinding="{x:Null}" Header="艺术家" Width="150" />
+                            <DataGridTextColumn Binding="{Binding AlbumName}" ClipboardContentBinding="{x:Null}" Header="专辑" Width="200" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Margin="10,376,0,0">
+                        <ProgressBar x:Name="ProgressBarPreLoadHint" Style="{DynamicResource MaterialDesignCircularProgressBar}" IsIndeterminate="True"/>
+                        <TextBlock x:Name="TextBlockPreLoadHint" Margin="10,3,0,0">正在预加载</TextBlock>
+                    </WrapPanel>
+                </Grid>
+            </mD:DialogHost>
+            
             <Grid HorizontalAlignment="Right" Width="283">
                 <mD:ColorZone Height="60" Margin="10,10,10,0" mD:ShadowAssist.ShadowDepth="Depth2">
                     <Grid Height="32" VerticalAlignment="Top">
