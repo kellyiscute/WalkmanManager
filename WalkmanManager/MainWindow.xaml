@@ -148,6 +148,15 @@
                                                 </TextBlock>
                                             </WrapPanel>
                                         </Button>
+                                        <Button x:Name="ButtonFindRepeat" Style="{DynamicResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Margin="0,0,193,0" Width="85" Height="Auto">
+                                            <StackPanel>
+                                                <WrapPanel>
+                                                    <mD:PackIcon Kind="FileDocumentBoxes"/>
+                                                    <TextBlock Margin="5 0 0 0">查重</TextBlock>
+                                                </WrapPanel>
+                                                <ProgressBar x:Name="ProgressFindRepeat" Visibility="Collapsed"/>
+                                            </StackPanel>
+                                        </Button>
                                         <Button x:Name="ButtonMatchLyric" Style="{DynamicResource MaterialDesignFlatButton}" HorizontalAlignment="Right" Margin="0,0,81,0" Width="112" Height="Auto">
                                             <WrapPanel>
                                                 <mD:PackIcon Kind="Magnify" />

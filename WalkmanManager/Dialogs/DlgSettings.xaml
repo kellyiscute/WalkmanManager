@@ -89,7 +89,7 @@
                         </mD:ColorZone>
                         <mD:ColorZone Height="80" Margin="5" CornerRadius="5" mD:ShadowAssist.ShadowDepth="Depth1">
                             <Grid>
-                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Source=""></Image>
+                                <Image Height="30" Width="30" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0"></Image>
                                 <Label Height="30" VerticalAlignment="Top" Margin="45,10,10,0" VerticalContentAlignment="Center">
                                     Audio Tools Library (ATL) for .NET
                                 </Label>

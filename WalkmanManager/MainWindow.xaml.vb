@@ -10,6 +10,7 @@ Imports MaterialDesignThemes.Wpf
 Imports WalkmanManager.Database
 Imports WalkmanManager.CloudMusic
 Imports System.ComponentModel
+Imports System.Security.Cryptography
 Imports TagLib.IFD.Entries
 
 Class MainWindow
@@ -35,6 +36,7 @@ Class MainWindow
     Dim fileChangeNotifyIgnoreCount As Integer
     Dim _searchOnType As Integer = 1300
     Dim _lyricPreLoad As Integer = 3
+    Dim _flgFindRepeatRunning As Boolean = False
 
     Private Sub czTitle_MouseLeftButtonDown(sender As Object, e As MouseButtonEventArgs) _
         Handles CzTitle.MouseLeftButtonDown
@@ -1543,5 +1545,160 @@ Complete:
             sender.content = _remoteActionTakeOverContent
             ButtonRemoteAction.Content = _remoteActionSyncContent
         End If
+    End Sub
+
+    Private Class FindRepeatFileInfo
+        Property Filename As String
+        Property Size As Long
+        Property Hash As Byte()
+
+        Shared Operator =(v1 As FindRepeatFileInfo, v2 As FindRepeatFileInfo)
+            If v1.Filename = v2.Filename Then
+                Return False
+            End If
+
+            If v1.Hash.Count <> v2.Hash.Count Then
+                Return False
+            End If
+
+            For i = 0 To v1.Hash.Count - 1
+                If v1.Hash(i) <> v2.Hash(i) Then
+                    Return False
+                End If
+            Next
+            Return True
+        End Operator
+
+        Shared Operator <>(v1 As FindRepeatFileInfo, v2 As FindRepeatFileInfo)
+            Return Not v1 = v2
+        End Operator
+
+        Public Overrides Function Equals(obj As Object) As Boolean
+            If IsNothing(obj) Then
+                Return False
+            End If
+            If TypeOf obj Is FindRepeatFileInfo Then
+                If Me.Filename = obj.Filename Then
+                    Return True
+                Else
+                    Return False
+                End If
+            Else
+                Return False
+            End If
+
+        End Function
+    End Class
+
+    Private Async Sub ButtonFindRepeat_Click(sender As Object, e As RoutedEventArgs) Handles ButtonFindRepeat.Click
+        If _flgFindRepeatRunning Then
+            Exit Sub
+        End If
+
+        _flgFindRepeatRunning = True
+        ProgressFindRepeat.Visibility = Visibility.Visible
+        ProgressFindRepeat.Value = 0
+        Dim lstFiles As New List(Of FindRepeatFileInfo)
+
+        Await Task.Run(Sub()
+                           For Each file In My.Computer.FileSystem.GetFiles(GetSetting("song_dir", ""))
+                               If DbUpdater.CheckExtention(file) Then
+                                   Dim itm As New FindRepeatFileInfo
+                                   itm.Filename = file
+                                   itm.Size = My.Computer.FileSystem.GetFileInfo(file).Length
+                                   lstFiles.Add(itm)
+                               End If
+                           Next
+                       End Sub)
+
+        ProgressFindRepeat.Maximum = lstFiles.Count
+        Dim lstSame As New List(Of FindRepeatFileInfo)
+
+        Await Task.Run(Sub()
+                           For i = 0 To lstFiles.Count - 1
+                               For j = i + 1 To lstFiles.Count - 1
+                                   If lstFiles(i).Size = lstFiles(j).Size Then
+                                       If IsNothing(lstFiles(i).Hash) Then
+                                           Try
+                                               Dim r = New BinaryReader(File.Open(lstFiles(i).Filename, FileMode.Open,
+                                                                                  FileAccess.Read))
+                                               Dim data = r.ReadBytes(r.BaseStream.Length)
+                                               r.Close()
+                                               Dim md5 = New MD5CryptoServiceProvider()
+                                               Dim hashData = md5.ComputeHash(data)
+                                               Dim itm As New FindRepeatFileInfo
+                                               itm.Filename = lstFiles(j).Filename
+                                               itm.Size = lstFiles(j).Size
+                                               itm.Hash = hashData
+                                               lstFiles(i) = itm
+                                           Catch
+                                           End Try
+                                       End If
+
+                                       'Check if is able to continue hash check
+                                       If IsNothing(lstFiles(i).Hash) Then
+                                           'Check Song title
+                                           Dim t As New Track(lstFiles(i).Filename)
+                                           Dim t2 As New Track(lstFiles(j).Filename)
+                                           If t.Title <> t2.Title Then
+                                               Continue For
+                                           End If
+                                           'Title Matches
+                                           If Not lstSame.Contains(lstFiles(i)) Then
+                                               lstSame.Add(lstFiles(i))
+                                           End If
+                                           lstSame.Add(lstFiles(j))
+                                           Continue For
+                                       End If
+
+                                       Try
+                                           Dim r = New BinaryReader(File.Open(lstFiles(j).Filename, FileMode.Open, FileAccess.Read))
+                                           Dim data = r.ReadBytes(r.BaseStream.Length)
+                                           r.Close()
+                                           Dim md5 = New MD5CryptoServiceProvider()
+                                           Dim hashData = md5.ComputeHash(data)
+                                           Dim itm As New FindRepeatFileInfo
+                                           itm.Filename = lstFiles(j).Filename
+                                           itm.Size = lstFiles(j).Size
+                                           itm.Hash = hashData
+                                           lstFiles(j) = itm
+                                       Catch
+                                       End Try
+
+                                       'unable to hash check
+                                       If IsNothing(lstFiles(j).Hash) Then
+                                           'Check Song title
+                                           Dim t As New Track(lstFiles(i).Filename)
+                                           Dim t2 As New Track(lstFiles(j).Filename)
+                                           If t.Title <> t2.Title Then
+                                               Continue For
+                                           End If
+                                           'Assume is the same
+                                           If Not lstSame.Contains(lstFiles(i)) Then
+                                               lstSame.Add(lstFiles(i))
+                                           End If
+                                           If Not lstSame.Contains(lstFiles(j)) Then
+                                               lstSame.Add(lstFiles(j))
+                                           End If
+                                           Continue For
+                                       End If
+
+                                       'hash check
+                                       If lstFiles(i) = lstFiles(j) Then
+                                           If Not lstSame.Contains(lstFiles(i)) Then
+                                               lstSame.Add(lstFiles(i))
+                                           End If
+                                           If Not lstSame.Contains(lstFiles(j)) Then
+                                               lstSame.Add(lstFiles(j))
+                                           End If
+                                       End If
+                                   End If
+                               Next
+                               ProgressFindRepeat.AddOne(Me)
+                           Next
+
+                       End Sub)
+        _flgFindRepeatRunning = False
+        ProgressFindRepeat.Visibility = Visibility.Collapsed
     End Sub
 End Class

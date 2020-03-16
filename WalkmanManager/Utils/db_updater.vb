@@ -56,10 +56,8 @@ Public Class DbUpdater
 	''' <returns></returns>
 	Public Shared Function CheckExtention(filename As String) As Boolean
 		filename = filename.Split(".")(filename.Split(".").Count - 1)
-		Console.WriteLine("[ Ext]" & filename)
 		'this list is format that are supported by nw-a45 || http://helpguide.sony.net/dmp/nwa40/v1/zh-cn/contents/TP0001449595.html
 		Dim audioExt As String() = {"mp3", "wma", "flac", "wav", "mp4", "m4a", "3gp", "aif", "aiff", "afc", "aifc", "dsf", "dff", "ape", "mqa", "flac"}
-		Console.WriteLine("[IsAu]" & audioExt.Contains(filename.ToLower))
 		Return audioExt.Contains(filename)
 	End Function
 
