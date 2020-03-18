@@ -112,14 +112,6 @@
                                             <MenuItem x:Name="MenuImportPlaylist" Header="导入m3u播放列表" Width="180" Height="50" />
                                         </ContextMenu>
                                     </ListBox.ContextMenu>
-                                    <!--<ListBoxItem Padding="15,7,0,7" Tag="NewPlaylist" AllowDrop="True" Drop="ListBoxItem_Drop">
-										<WrapPanel>
-											<mD:PackIcon Kind="PlaylistPlus" />
-											<TextBlock>
-												<Run Text="新建播放列表" />
-											</TextBlock>
-										</WrapPanel>
-									</ListBoxItem>-->
                                 </ListBox>
                             </Grid>
                             <Grid x:Name="GridMusic" Margin="220,0,0,0" Background="#00000000">
@@ -332,7 +324,7 @@
                             </Border>
                         </Grid>
                     </mD:ColorZone>
-                    <Grid Margin="0,102,451,0" Height="70" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200">
+                    <Grid Margin="450,101,453,0" Height="70" VerticalAlignment="Top" HorizontalAlignment="Center" Width="200">
                         <Button x:Name="ButtonRemoteAction" FontSize="23" VerticalAlignment="Top" Height="70" Style="{DynamicResource MaterialDesignFlatButton}" Margin="0,0,34,0">
                             <WrapPanel>
                                 <mD:PackIcon Height="29" Width="29" Kind="Sync"/>
@@ -395,6 +387,6 @@
                 </Grid>
             </Grid>
         </mD:DialogHost>
-        <mD:Snackbar x:Name="SnackbarInfoMessage" d:IsHidden="True"/>
+        <mD:Snackbar x:Name="SnackbarInfoMessage" d:IsHidden="True" Margin="408,0,407,0"/>
     </Grid>
 </Window>

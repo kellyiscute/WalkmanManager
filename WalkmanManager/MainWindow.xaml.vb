@@ -1547,10 +1547,11 @@ Complete:
         End If
     End Sub
 
-    Private Class FindRepeatFileInfo
+    Public Class FindRepeatFileInfo
         Property Filename As String
         Property Size As Long
         Property Hash As Byte()
+        Property SongInfo As SongInfo
 
         Shared Operator =(v1 As FindRepeatFileInfo, v2 As FindRepeatFileInfo)
             If v1.Filename = v2.Filename Then
@@ -1601,11 +1602,12 @@ Complete:
         Dim lstFiles As New List(Of FindRepeatFileInfo)
 
         Await Task.Run(Sub()
-                           For Each file In My.Computer.FileSystem.GetFiles(GetSetting("song_dir", ""))
-                               If DbUpdater.CheckExtention(file) Then
+                           For Each song In _lstSongs
+                               If DbUpdater.CheckExtention(song.Path) Then
                                    Dim itm As New FindRepeatFileInfo
-                                   itm.Filename = file
-                                   itm.Size = My.Computer.FileSystem.GetFileInfo(file).Length
+                                   itm.Filename = song.Path
+                                   itm.Size = My.Computer.FileSystem.GetFileInfo(song.Path).Length
+                                   itm.SongInfo = song
                                    lstFiles.Add(itm)
                                End If
                            Next
@@ -1627,8 +1629,9 @@ Complete:
                                                Dim md5 = New MD5CryptoServiceProvider()
                                                Dim hashData = md5.ComputeHash(data)
                                                Dim itm As New FindRepeatFileInfo
-                                               itm.Filename = lstFiles(j).Filename
-                                               itm.Size = lstFiles(j).Size
+                                               itm.Filename = lstFiles(i).Filename
+                                               itm.Size = lstFiles(i).Size
+                                               itm.SongInfo = lstFiles(i).SongInfo
                                                itm.Hash = hashData
                                                lstFiles(i) = itm
                                            Catch
@@ -1660,6 +1663,7 @@ Complete:
                                            Dim itm As New FindRepeatFileInfo
                                            itm.Filename = lstFiles(j).Filename
                                            itm.Size = lstFiles(j).Size
+                                           itm.SongInfo = lstFiles(j).SongInfo
                                            itm.Hash = hashData
                                            lstFiles(j) = itm
                                        Catch
@@ -1698,6 +1702,25 @@ Complete:
                            Next
 
                        End Sub)
+
+        'prepare data
+        Dim sameFileInfoPrepared As New Dictionary(Of String, List(Of FindRepeatFileInfo))
+        Await Task.Run(Sub()
+                           For Each s In lstSame
+                               Dim hexString As String = BitConverter.ToString(s.Hash)
+                               If Not sameFileInfoPrepared.ContainsKey(hexString) Then
+                                   sameFileInfoPrepared.Add(hexString, New List(Of FindRepeatFileInfo))
+                               End If
+                               sameFileInfoPrepared(hexString).Add(s)
+                           Next
+                       End Sub)
+
+        Dim dlg As New DlgFindRepeatResult(sameFileInfoPrepared)
+        If DlgWindowRoot.IsOpen Then
+            DlgWindowRoot.IsOpen = False
+        End If
+        Await DlgWindowRoot.ShowDialog(dlg)
+
         _flgFindRepeatRunning = False
         ProgressFindRepeat.Visibility = Visibility.Collapsed
     End Sub

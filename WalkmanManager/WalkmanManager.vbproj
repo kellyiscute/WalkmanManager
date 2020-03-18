@@ -229,6 +229,9 @@
     <Compile Include="Dialogs\dlgDragImport.xaml.vb">
       <DependentUpon>dlgDragImport.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DlgFindRepeatResult.xaml.vb">
+      <DependentUpon>DlgFindRepeatResult.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\dlgPlaylistSyncResult.xaml.vb">
       <DependentUpon>dlgPlaylistSyncResult.xaml</DependentUpon>
     </Compile>
@@ -287,6 +290,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Dialogs\dlgDragImport.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DlgFindRepeatResult.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
