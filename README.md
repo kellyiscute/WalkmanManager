@@ -1,5 +1,5 @@
 # WalkmanManager
-A easy-to-use app to replace Sony MediaCenter with more features and better design  
+An easy-to-use app to replace Sony MediaCenter with more features and better design  
  **Project Launched: _3rd Jul, 2018_**  
  **Beta Released: _3rd May, 2019_**  
  **Version 1.0 Released: _Midnight 1st Mar, 2020_**
