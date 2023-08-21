@@ -2,7 +2,10 @@
 An easy-to-use app to replace Sony MediaCenter with more features and better design  
  **Project Launched: _3rd Jul, 2018_**  
  **Beta Released: _3rd May, 2019_**  
- **Version 1.0 Released: _Midnight 1st Mar, 2020_**
+ **Version 1.0 Released: _Midnight 1st Mar, 2020_**  
+
+# THIS PROJECT IS DISCONTINUED
+I am no longer working on this project since I am not on Windows anymore. I am considering starting a new project to support all major platforms. However, it won't be started until I am a bit more free from work.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/0a2g6wl6x9mh53bl?svg=true)](https://ci.appveyor.com/project/guo40020/walkmanmanager)
 
